@@ -1,0 +1,16 @@
+{
+  "external_id": "b5accf6f-799e-5c8b-8805-17ef29b6833c",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-02-20T17:12:14Z",
+  "from_email": "alex.jones@crucible.dev",
+  "from_name": "Alex Jones",
+  "to_emails": [],
+  "subject": "Re: upgrade timeline",
+  "thread_id": "thread-seed-stage-saas-crucible",
+  "body": "Hey Alex! Quick ask on upgrade timeline \u2014 Crucible's team has been looking for a way to export data in CSV directly. Any chance that's coming?",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

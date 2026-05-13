@@ -1,0 +1,11 @@
+{
+  "event_name": "dashboard_viewed",
+  "contact_email": "alex.anderson@revenanthq.com",
+  "event_properties": {
+    "plan": "enterprise",
+    "feature": "api_keys",
+    "duration_ms": 23854
+  },
+  "event_id": "9c0f576f-66f0-535d-91b5-fef2f10b8dad",
+  "occurred_at": "2026-05-12T23:53:14Z"
+}

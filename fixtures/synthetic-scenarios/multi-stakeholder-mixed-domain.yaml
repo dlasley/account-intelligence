@@ -1,0 +1,68 @@
+version: 1
+name: multi-stakeholder-mixed-domain
+seed: 7831
+description: >
+  3-5 contacts sending from a mix of corporate and free-mail addresses on the same thread.
+  Auto-discovery stress case: tests that the router handles mixed-domain senders correctly
+  and that corporate-domain signals route to the right account while free-mail senders
+  trigger auto-discovery or land in _unmatched.
+workspace_slug: synth-multistakeholder
+
+accounts:
+  - slug: globex-corp
+    name: Globex Corp
+    primary_domain: globex.com
+    vertical: financial_services
+    status: active
+
+signals:
+  # Mixed corporate + free-mail senders on the same thread — auto-discovery stress
+  - source_type: inbound_email
+    account_slug: globex-corp
+    count: 8
+    axes:
+      contact_diversity: multi
+      contact_email_origin: mixed
+      response_cadence: steady
+      sentiment_trajectory: flat
+      email_tone: formal
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: email_heavy
+      concern_topic: renewal_pending
+
+  # Crowded thread with free-mail senders only — should all trigger auto-discovery
+  - source_type: inbound_email
+    account_slug: globex-corp
+    count: 6
+    axes:
+      contact_diversity: crowded
+      contact_email_origin: personal_email
+      response_cadence: steady
+      sentiment_trajectory: flat
+      email_tone: casual
+      message_length: short
+      threading_topology: branching
+      cross_modal: email_heavy
+      concern_topic: renewal_pending
+
+  # Corporate-only follow-up from same account
+  - source_type: inbound_email
+    account_slug: globex-corp
+    count: 4
+    axes:
+      contact_diversity: multi
+      contact_email_origin: corporate
+      response_cadence: drift
+      sentiment_trajectory: flat
+      email_tone: technical
+      message_length: multi
+      threading_topology: linear
+      cross_modal: balanced
+      concern_topic: renewal_pending
+
+target:
+  outcome: null
+  health_score: null
+  dimension_scores: []
+  verification_method: null

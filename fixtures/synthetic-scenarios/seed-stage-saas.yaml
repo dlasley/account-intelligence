@@ -1,0 +1,754 @@
+version: 1
+name: seed-stage-saas
+seed: 7214
+description: >
+  12-account portfolio for Lattice Build, a seed-stage CI/CD observability startup.
+  Covers the full concern_topic corpus (all 8 values) and multiple cross-modal shapes.
+  Hero account: Crucible (divergent — warm emails masking a 62% product-usage
+  decline). Designed for the Phase A.2 TAM-interview demo.
+workspace_slug: lattice-build
+
+accounts:
+  - slug: phalanx-systems
+    name: Phalanx Systems
+    primary_domain: phalanxsystems.io
+    vertical: public_sector
+    status: active
+
+  - slug: driftwood-labs
+    name: Driftwood Labs
+    primary_domain: driftwoodlabs.com
+    vertical: life_sciences
+    status: active
+
+  - slug: ironclad-pipeline
+    name: Ironclad Pipeline Co
+    primary_domain: ironcladpipeline.com
+    vertical: financial_services
+    status: active
+
+  - slug: crucible
+    name: Crucible
+    primary_domain: crucible.dev
+    vertical: software
+    status: active
+
+  - slug: cascade-infra
+    name: Cascade Infra
+    primary_domain: cascadeinfra.io
+    vertical: software
+    status: active
+
+  - slug: petal-analytics
+    name: Petal Analytics
+    primary_domain: petalanalytics.com
+    vertical: media_entertainment
+    status: active
+
+  - slug: stonebridge-devops
+    name: Stonebridge DevOps
+    primary_domain: stonebridgedevops.com
+    vertical: financial_services
+    status: active
+
+  - slug: orca-cloud
+    name: Orca Cloud
+    primary_domain: orcacloud.io
+    vertical: software
+    status: active
+
+  - slug: thornfield-ai
+    name: Thornfield AI
+    primary_domain: thornfield.ai
+    vertical: professional_services
+    status: active
+
+  - slug: meridian-cloud
+    name: Meridian Cloud
+    primary_domain: meridiancloud.com
+    vertical: software
+    status: active
+
+  - slug: revenant-systems
+    name: Revenant Systems
+    primary_domain: revenanthq.com
+    vertical: software
+    status: active
+
+  - slug: helix-platforms
+    name: Helix Platforms
+    primary_domain: helixplatforms.io
+    vertical: healthcare
+    status: active
+
+signals:
+  # -----------------------------------------------------------------------
+  # Account 1: Phalanx Systems — healthy/expanding
+  # Email: 5 signals (3 casual + 2 formal), concern_topic: success_expansion
+  # Product: 8 events, steady, cross_modal: product_heavy
+  # -----------------------------------------------------------------------
+
+  - source_type: inbound_email
+    account_slug: phalanx-systems
+    count: 3
+    axes:
+      contact_diversity: multi
+      contact_email_origin: corporate
+      response_cadence: steady
+      sentiment_trajectory: flat
+      email_tone: casual
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: product_heavy
+      concern_topic: success_expansion
+
+  - source_type: inbound_email
+    account_slug: phalanx-systems
+    count: 2
+    axes:
+      contact_diversity: multi
+      contact_email_origin: corporate
+      response_cadence: steady
+      sentiment_trajectory: flat
+      email_tone: formal
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: product_heavy
+      concern_topic: success_expansion
+
+  - source_type: product_event
+    account_slug: phalanx-systems
+    count: 8
+    axes:
+      contact_email_origin: corporate
+      response_cadence: steady
+      cross_modal: product_heavy
+      concern_topic: success_expansion
+
+  # -----------------------------------------------------------------------
+  # Account 2: Driftwood Labs — healthy/steady, SAML SSO feature gap
+  # Email: 3 signals (2 technical + 1 casual), concern_topic: feature_gap
+  # Product: 5 events, steady, cross_modal: balanced
+  # -----------------------------------------------------------------------
+
+  - source_type: inbound_email
+    account_slug: driftwood-labs
+    count: 2
+    axes:
+      contact_diversity: single
+      contact_email_origin: corporate
+      response_cadence: steady
+      sentiment_trajectory: flat
+      email_tone: technical
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: balanced
+      concern_topic: feature_gap
+
+  - source_type: inbound_email
+    account_slug: driftwood-labs
+    count: 1
+    axes:
+      contact_diversity: single
+      contact_email_origin: corporate
+      response_cadence: steady
+      sentiment_trajectory: flat
+      email_tone: casual
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: balanced
+      concern_topic: feature_gap
+
+  - source_type: product_event
+    account_slug: driftwood-labs
+    count: 5
+    axes:
+      contact_email_origin: corporate
+      response_cadence: steady
+      cross_modal: balanced
+      concern_topic: feature_gap
+
+  # -----------------------------------------------------------------------
+  # Account 3: Ironclad Pipeline Co — post-onboarding stalled
+  # Email: 4 signals (2 formal + 1 technical + 1 apologetic), concern_topic: utilization_decline
+  # Product: 10 events split 8 burst (early) + 2 drift (recent), cross_modal: divergent
+  # -----------------------------------------------------------------------
+
+  - source_type: inbound_email
+    account_slug: ironclad-pipeline
+    count: 2
+    axes:
+      contact_diversity: multi
+      contact_email_origin: corporate
+      response_cadence: burst
+      sentiment_trajectory: flat
+      email_tone: formal
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: divergent
+      concern_topic: utilization_decline
+
+  - source_type: inbound_email
+    account_slug: ironclad-pipeline
+    count: 1
+    axes:
+      contact_diversity: multi
+      contact_email_origin: corporate
+      response_cadence: steady
+      sentiment_trajectory: flat
+      email_tone: technical
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: divergent
+      concern_topic: utilization_decline
+
+  - source_type: inbound_email
+    account_slug: ironclad-pipeline
+    count: 1
+    axes:
+      contact_diversity: multi
+      contact_email_origin: corporate
+      response_cadence: drift
+      sentiment_trajectory: flat
+      email_tone: apologetic
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: divergent
+      concern_topic: utilization_decline
+
+  # Early burst of product usage — onboarding period
+  - source_type: product_event
+    account_slug: ironclad-pipeline
+    count: 8
+    axes:
+      contact_email_origin: corporate
+      contact_diversity: crowded
+      response_cadence: burst
+      cross_modal: divergent
+      concern_topic: utilization_decline
+
+  # Near-silence after week 2 — team stopped logging in
+  - source_type: product_event
+    account_slug: ironclad-pipeline
+    count: 2
+    axes:
+      contact_email_origin: corporate
+      contact_diversity: single
+      response_cadence: drift
+      cross_modal: divergent
+      concern_topic: utilization_decline
+
+  # -----------------------------------------------------------------------
+  # Account 4: Crucible — HERO ACCOUNT (divergent / covert churn risk)
+  # Email group A: 3 casual, success_expansion — CTO sending warm notes
+  # Email group B: 3 casual, feature_gap — CTO asking product questions
+  # Product group C: 6 events, burst — early high usage (4-5 engineers)
+  # Product group D: 4 events, drift — last 14 days, usage collapsing
+  # contact_diversity: single throughout (CTO is sole sender — by design)
+  # -----------------------------------------------------------------------
+
+  # Group A: warm expansion signals from the CTO
+  - source_type: inbound_email
+    account_slug: crucible
+    count: 3
+    axes:
+      contact_diversity: single
+      contact_email_origin: corporate
+      response_cadence: steady
+      sentiment_trajectory: flat
+      email_tone: casual
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: divergent
+      concern_topic: success_expansion
+
+  # Group B: product questions, still positive in tone
+  - source_type: inbound_email
+    account_slug: crucible
+    count: 3
+    axes:
+      contact_diversity: single
+      contact_email_origin: corporate
+      response_cadence: steady
+      sentiment_trajectory: flat
+      email_tone: casual
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: divergent
+      concern_topic: feature_gap
+
+  # Group C: early-period high usage — 4-5 engineers active, daily builds
+  - source_type: product_event
+    account_slug: crucible
+    count: 6
+    axes:
+      contact_email_origin: corporate
+      contact_diversity: crowded
+      response_cadence: burst
+      cross_modal: divergent
+      concern_topic: success_expansion
+
+  # Group D: last 14 days — usage sharply declining, down to 1-2 engineers
+  - source_type: product_event
+    account_slug: crucible
+    count: 4
+    axes:
+      contact_email_origin: corporate
+      contact_diversity: single
+      response_cadence: drift
+      cross_modal: divergent
+      concern_topic: utilization_decline
+
+  # Group E: support tickets from the CTO (feature gap frustration) — Pylon-sourced
+  # Crucible uses Pylon ($59/mo) as their support desk — the demo integration target.
+  - source_type: pylon_ticket
+    account_slug: crucible
+    count: 2
+    axes:
+      contact_diversity: single
+      contact_email_origin: corporate
+      response_cadence: steady
+      sentiment_trajectory: declining
+      email_tone: technical
+      message_length: paragraph
+      concern_topic: feature_gap
+
+  # Group F: meeting notes (weekly sync + QBR)
+  - source_type: granola_note
+    account_slug: crucible
+    count: 2
+    axes:
+      contact_diversity: single
+      contact_email_origin: corporate
+      response_cadence: steady
+      sentiment_trajectory: flat
+      email_tone: casual
+      message_length: paragraph
+      concern_topic: success_expansion
+
+  # -----------------------------------------------------------------------
+  # Account 5: Cascade Infra — active incident escalation
+  # Email: 6 signals (3 escalation + 2 formal + 1 technical), concern_topic: outage
+  # Product: 3 events, burst then pause (blocked by incident), cross_modal: email_heavy
+  # -----------------------------------------------------------------------
+
+  - source_type: inbound_email
+    account_slug: cascade-infra
+    count: 3
+    axes:
+      contact_diversity: multi
+      contact_email_origin: corporate
+      response_cadence: burst
+      sentiment_trajectory: declining
+      email_tone: escalation
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: email_heavy
+      concern_topic: outage
+
+  - source_type: inbound_email
+    account_slug: cascade-infra
+    count: 2
+    axes:
+      contact_diversity: multi
+      contact_email_origin: corporate
+      response_cadence: burst
+      sentiment_trajectory: flat
+      email_tone: formal
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: email_heavy
+      concern_topic: outage
+
+  - source_type: inbound_email
+    account_slug: cascade-infra
+    count: 1
+    axes:
+      contact_diversity: multi
+      contact_email_origin: corporate
+      response_cadence: steady
+      sentiment_trajectory: flat
+      email_tone: technical
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: email_heavy
+      concern_topic: outage
+
+  - source_type: product_event
+    account_slug: cascade-infra
+    count: 3
+    axes:
+      contact_email_origin: corporate
+      response_cadence: burst
+      cross_modal: email_heavy
+      concern_topic: outage
+
+  # Support tickets during the incident (escalation cluster)
+  - source_type: plain_ticket
+    account_slug: cascade-infra
+    count: 3
+    axes:
+      contact_diversity: multi
+      contact_email_origin: corporate
+      response_cadence: burst
+      sentiment_trajectory: declining
+      email_tone: escalation
+      message_length: paragraph
+      concern_topic: outage
+
+  # Post-incident debrief meeting note
+  - source_type: granola_note
+    account_slug: cascade-infra
+    count: 1
+    axes:
+      contact_diversity: single
+      contact_email_origin: corporate
+      response_cadence: steady
+      sentiment_trajectory: flat
+      email_tone: formal
+      message_length: multi
+      concern_topic: outage
+
+  # -----------------------------------------------------------------------
+  # Account 6: Petal Analytics — new logo, early healthy
+  # Email: 4 signals (2 technical + 2 casual), concern_topic: feature_gap
+  # Product: 5 events, burst (heavy initial activity), cross_modal: balanced
+  # -----------------------------------------------------------------------
+
+  - source_type: inbound_email
+    account_slug: petal-analytics
+    count: 2
+    axes:
+      contact_diversity: single
+      contact_email_origin: corporate
+      response_cadence: steady
+      sentiment_trajectory: flat
+      email_tone: technical
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: balanced
+      concern_topic: feature_gap
+
+  - source_type: inbound_email
+    account_slug: petal-analytics
+    count: 2
+    axes:
+      contact_diversity: single
+      contact_email_origin: corporate
+      response_cadence: steady
+      sentiment_trajectory: flat
+      email_tone: casual
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: balanced
+      concern_topic: feature_gap
+
+  - source_type: product_event
+    account_slug: petal-analytics
+    count: 5
+    axes:
+      contact_email_origin: corporate
+      response_cadence: burst
+      cross_modal: balanced
+      concern_topic: feature_gap
+
+  # -----------------------------------------------------------------------
+  # Account 7: Stonebridge DevOps — healthy renewal, procurement involved
+  # Email: 5 signals (3 formal + 2 casual), concern_topic: renewal_pending
+  # Product: 5 events, steady, cross_modal: balanced
+  # -----------------------------------------------------------------------
+
+  - source_type: inbound_email
+    account_slug: stonebridge-devops
+    count: 3
+    axes:
+      contact_diversity: multi
+      contact_email_origin: corporate
+      response_cadence: steady
+      sentiment_trajectory: flat
+      email_tone: formal
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: balanced
+      concern_topic: renewal_pending
+
+  - source_type: inbound_email
+    account_slug: stonebridge-devops
+    count: 2
+    axes:
+      contact_diversity: multi
+      contact_email_origin: corporate
+      response_cadence: steady
+      sentiment_trajectory: flat
+      email_tone: casual
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: balanced
+      concern_topic: renewal_pending
+
+  - source_type: product_event
+    account_slug: stonebridge-devops
+    count: 5
+    axes:
+      contact_email_origin: corporate
+      response_cadence: steady
+      cross_modal: balanced
+      concern_topic: renewal_pending
+
+  # -----------------------------------------------------------------------
+  # Account 8: Orca Cloud — passive churn / competitive
+  # Email: 5 signals (2 formal + 1 technical + 1 escalation + 1 apologetic), concern_topic: competitive
+  # Product: 4 events, drift, cross_modal: divergent
+  # -----------------------------------------------------------------------
+
+  - source_type: inbound_email
+    account_slug: orca-cloud
+    count: 2
+    axes:
+      contact_diversity: single
+      contact_email_origin: corporate
+      response_cadence: steady
+      sentiment_trajectory: flat
+      email_tone: formal
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: divergent
+      concern_topic: competitive
+
+  - source_type: inbound_email
+    account_slug: orca-cloud
+    count: 1
+    axes:
+      contact_diversity: single
+      contact_email_origin: corporate
+      response_cadence: steady
+      sentiment_trajectory: flat
+      email_tone: technical
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: divergent
+      concern_topic: competitive
+
+  - source_type: inbound_email
+    account_slug: orca-cloud
+    count: 1
+    axes:
+      contact_diversity: single
+      contact_email_origin: corporate
+      response_cadence: drift
+      sentiment_trajectory: declining
+      email_tone: escalation
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: divergent
+      concern_topic: competitive
+
+  - source_type: inbound_email
+    account_slug: orca-cloud
+    count: 1
+    axes:
+      contact_diversity: single
+      contact_email_origin: corporate
+      response_cadence: drift
+      sentiment_trajectory: declining
+      email_tone: apologetic
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: divergent
+      concern_topic: competitive
+
+  - source_type: product_event
+    account_slug: orca-cloud
+    count: 4
+    axes:
+      contact_email_origin: corporate
+      response_cadence: drift
+      cross_modal: divergent
+      concern_topic: competitive
+
+  # -----------------------------------------------------------------------
+  # Account 9: Thornfield AI — product-healthy, email-dark
+  # Email: 2 signals (1 casual + 1 apologetic), concern_topic: none
+  # Product: 6 events, steady (product is the dominant signal)
+  # cross_modal: product_heavy
+  # -----------------------------------------------------------------------
+
+  - source_type: inbound_email
+    account_slug: thornfield-ai
+    count: 1
+    axes:
+      contact_diversity: single
+      contact_email_origin: corporate
+      response_cadence: steady
+      sentiment_trajectory: flat
+      email_tone: casual
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: product_heavy
+      concern_topic: none
+
+  - source_type: inbound_email
+    account_slug: thornfield-ai
+    count: 1
+    axes:
+      contact_diversity: single
+      contact_email_origin: corporate
+      response_cadence: drift
+      sentiment_trajectory: flat
+      email_tone: apologetic
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: product_heavy
+      concern_topic: none
+
+  - source_type: product_event
+    account_slug: thornfield-ai
+    count: 6
+    axes:
+      contact_email_origin: corporate
+      response_cadence: steady
+      cross_modal: product_heavy
+      concern_topic: none
+
+  # -----------------------------------------------------------------------
+  # Account 10: Meridian Cloud — pricing friction, procurement active
+  # Email: 6 signals (4 formal + 1 escalation + 1 apologetic), concern_topic: pricing
+  # Product: 3 events, drift (holding usage pending contract), cross_modal: email_heavy
+  # -----------------------------------------------------------------------
+
+  - source_type: inbound_email
+    account_slug: meridian-cloud
+    count: 4
+    axes:
+      contact_diversity: multi
+      contact_email_origin: corporate
+      response_cadence: burst
+      sentiment_trajectory: flat
+      email_tone: formal
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: email_heavy
+      concern_topic: pricing
+
+  - source_type: inbound_email
+    account_slug: meridian-cloud
+    count: 1
+    axes:
+      contact_diversity: multi
+      contact_email_origin: corporate
+      response_cadence: burst
+      sentiment_trajectory: declining
+      email_tone: escalation
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: email_heavy
+      concern_topic: pricing
+
+  - source_type: inbound_email
+    account_slug: meridian-cloud
+    count: 1
+    axes:
+      contact_diversity: multi
+      contact_email_origin: corporate
+      response_cadence: steady
+      sentiment_trajectory: flat
+      email_tone: apologetic
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: email_heavy
+      concern_topic: pricing
+
+  - source_type: product_event
+    account_slug: meridian-cloud
+    count: 3
+    axes:
+      contact_email_origin: corporate
+      response_cadence: drift
+      cross_modal: email_heavy
+      concern_topic: pricing
+
+  # -----------------------------------------------------------------------
+  # Account 11: Revenant Systems — healthy/expanding power-user
+  # Email: 4 signals (3 technical + 1 casual), concern_topic: feature_gap
+  # Product: 8 events, steady high frequency, cross_modal: product_heavy
+  # -----------------------------------------------------------------------
+
+  - source_type: inbound_email
+    account_slug: revenant-systems
+    count: 3
+    axes:
+      contact_diversity: multi
+      contact_email_origin: corporate
+      response_cadence: steady
+      sentiment_trajectory: flat
+      email_tone: technical
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: product_heavy
+      concern_topic: feature_gap
+
+  - source_type: inbound_email
+    account_slug: revenant-systems
+    count: 1
+    axes:
+      contact_diversity: multi
+      contact_email_origin: corporate
+      response_cadence: steady
+      sentiment_trajectory: flat
+      email_tone: casual
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: product_heavy
+      concern_topic: feature_gap
+
+  - source_type: product_event
+    account_slug: revenant-systems
+    count: 8
+    axes:
+      contact_email_origin: corporate
+      response_cadence: steady
+      cross_modal: product_heavy
+      concern_topic: feature_gap
+
+  # -----------------------------------------------------------------------
+  # Account 12: Helix Platforms — stalled expansion, downgrade risk
+  # Email: 3 signals (2 apologetic + 1 casual), concern_topic: utilization_decline
+  # Product: 4 events, drift, cross_modal: balanced
+  # -----------------------------------------------------------------------
+
+  - source_type: inbound_email
+    account_slug: helix-platforms
+    count: 2
+    axes:
+      contact_diversity: single
+      contact_email_origin: corporate
+      response_cadence: drift
+      sentiment_trajectory: declining
+      email_tone: apologetic
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: balanced
+      concern_topic: utilization_decline
+
+  - source_type: inbound_email
+    account_slug: helix-platforms
+    count: 1
+    axes:
+      contact_diversity: single
+      contact_email_origin: corporate
+      response_cadence: drift
+      sentiment_trajectory: declining
+      email_tone: casual
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: balanced
+      concern_topic: utilization_decline
+
+  - source_type: product_event
+    account_slug: helix-platforms
+    count: 4
+    axes:
+      contact_email_origin: corporate
+      response_cadence: drift
+      cross_modal: balanced
+      concern_topic: utilization_decline

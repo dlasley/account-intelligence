@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-05-09T06:52:27.999189+00:00",
+  "account": {
+    "slug": "crucible",
+    "vertical": "software",
+    "status": "active",
+    "overall_health_score": 64
+  },
+  "deterministic": {
+    "engagement": 90,
+    "engagement_rationale": "15 signals in the last 14 days from 8 contacts.",
+    "overall_health_score": 64
+  },
+  "llm_produced": {
+    "sentiment": 58,
+    "narrative": "Engagement is high with 15 signals over the past 14 days from at least 6 distinct product contacts, though activity has notably concentrated: the 2026-05-04 window showed broad usage across Quinn Williams (integration connected, settings updated), Drew White (feature used), Kendall Jones (share link generated), Alex Miller (file uploaded), and Alex Smith (search performed), but from 2026-05-06 through 2026-05-08, only Cameron Jackson remained active (share_link_generated, comment_added, report_generated), representing a sharp drop in contact diversity. Sentiment is mixed \u2014 the 2026-04-25 'Re: renewal terms' thread conveyed clear expansion enthusiasm with a request to roll out to two more teams and set up a planning call, and the 2026-04-26 'Re: data retention policy' message confirmed internal approval to expand significantly, both strong positive indicators. However, the 2026-04-26 'Renewal terms', 2026-04-28 'Re: data migration', and 2026-04-29 'Re: renewal terms' messages each ask whether capabilities are on the product roadmap, with the customer explicitly weighing whether to build internally \u2014 a direct competing-priority and churn risk for those workflows. The mix of plan values across product events (free, pro, enterprise) also suggests possible license inconsistency worth clarifying."
+  },
+  "dim_scores": [
+    {
+      "dimension_type": "email",
+      "weight": 0.35,
+      "score": 90
+    },
+    {
+      "dimension_type": "product_usage",
+      "weight": 0.35,
+      "score": 41
+    },
+    {
+      "dimension_type": "sentiment",
+      "weight": 0.2,
+      "score": 58
+    }
+  ],
+  "window": {
+    "signal_window_start": "2026-04-25T06:43:55.461938+00:00",
+    "signal_window_end": "2026-05-09T06:43:55.461938+00:00",
+    "signal_count": 15
+  },
+  "provenance": {
+    "prompt_version": "38d62038",
+    "generated_at": "2026-05-09T06:43:55.461938+00:00",
+    "audit_run_id": "manual_cli_1778309289",
+    "audit_overall_passed": true,
+    "audited_at": "2026-05-09T06:49:50.037569+00:00"
+  }
+}

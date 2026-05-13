@@ -1,0 +1,11 @@
+{
+  "event_name": "report_generated",
+  "contact_email": "skylar.thomas@champion-co.com",
+  "event_properties": {
+    "plan": "enterprise",
+    "feature": "report_generated",
+    "duration_ms": 12834
+  },
+  "event_id": "1912a896-3805-5f3a-91d4-f3d7c8645f09",
+  "occurred_at": "2026-01-18T15:27:11Z"
+}

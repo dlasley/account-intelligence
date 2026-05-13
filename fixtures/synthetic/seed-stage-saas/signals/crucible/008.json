@@ -1,0 +1,11 @@
+{
+  "event_name": "share_link_generated",
+  "contact_email": "kendall.jones@crucible.dev",
+  "event_properties": {
+    "plan": "pro",
+    "feature": "notifications",
+    "duration_ms": 9623
+  },
+  "event_id": "415b3692-8d21-59be-9933-cc3d31e210bb",
+  "occurred_at": "2026-02-20T20:51:14Z"
+}

@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-05-09T06:52:28.000308+00:00",
+  "account": {
+    "slug": "ironclad-pipeline",
+    "vertical": "financial_services",
+    "status": "active",
+    "overall_health_score": 78
+  },
+  "deterministic": {
+    "engagement": 90,
+    "engagement_rationale": "14 signals in the last 14 days from 8 contacts.",
+    "overall_health_score": 78
+  },
+  "llm_produced": {
+    "sentiment": 38,
+    "narrative": "Engagement is high, with 14 signals from 8 distinct contacts over the past 14 days, and product usage has surged entirely in the last 3 days \u2014 10 events across 5 contacts with zero activity in the prior window, indicating a sharp burst of adoption. Sentiment is mixed to negative: on the positive side, Cameron Johnson drove heavy activity on 2026-05-06 (workspace creation, feature usage, settings updates, comments), Reese Garcia connected an integration the same day, and Dana Harris uploaded a file to the audit_log feature on 2026-05-08 \u2014 notable for a financial services account potentially tied to compliance workflows. However, on 2026-04-30, Jordan Thomas reported a sharp drop in reporting accuracy API calls (from ~1,200/day to ~300/day), Cameron Davis formally requested a structured SSO configuration enablement program and flagged declining data retention policy utilization, and on 2026-05-02 Kendall Wilson acknowledged that internal change management around reporting accuracy has been harder than anticipated. The account appears to be actively attempting to course-correct with renewed product exploration, but multiple unresolved adoption and utilization gaps \u2014 especially around reporting accuracy, SSO, and data retention \u2014 pose real risk."
+  },
+  "dim_scores": [
+    {
+      "dimension_type": "email",
+      "weight": 0.35,
+      "score": 90
+    },
+    {
+      "dimension_type": "product_usage",
+      "weight": 0.35,
+      "score": 90
+    },
+    {
+      "dimension_type": "sentiment",
+      "weight": 0.2,
+      "score": 38
+    }
+  ],
+  "window": {
+    "signal_window_start": "2026-04-25T06:42:47.427387+00:00",
+    "signal_window_end": "2026-05-09T06:42:47.427387+00:00",
+    "signal_count": 14
+  },
+  "provenance": {
+    "prompt_version": "38d62038",
+    "generated_at": "2026-05-09T06:42:47.427387+00:00",
+    "audit_run_id": "manual_cli_1778309289",
+    "audit_overall_passed": true,
+    "audited_at": "2026-05-09T06:50:45.742197+00:00"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "external_id": "2deb1f1a-c38c-5809-b71e-e96c2e484d88",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-06-02T05:53:14Z",
+  "from_email": "blake.davis@helixplatforms.io",
+  "from_name": "Blake Davis",
+  "to_emails": [],
+  "subject": "Contract renewal",
+  "thread_id": "thread-seed-stage-saas-helix-platforms",
+  "body": "Quick question on contract renewal telemetry: Helix Platforms suspects a specific team stopped using the feature after an update. Can you share session data?",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

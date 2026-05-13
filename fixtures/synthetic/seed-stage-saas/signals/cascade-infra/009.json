@@ -1,0 +1,19 @@
+{
+  "id": "b9865723-c5cb-5c3a-a55d-1783c3746cdb",
+  "type": "thread.created",
+  "timestamp": "2026-03-09T22:47:14Z",
+  "workspaceId": "worksp_dc2e049960d753ae",
+  "payload": {
+    "thread": {
+      "id": "thr_2a49a0d9-883a-52d2-843d-1360a749bb34",
+      "title": "[URGENT] slow response times \u2014 production down"
+    },
+    "customer": {
+      "email": {
+        "email": "skylar.wilson@cascadeinfra.io"
+      },
+      "fullName": "Skylar Wilson"
+    }
+  },
+  "webhookMetadata": {}
+}

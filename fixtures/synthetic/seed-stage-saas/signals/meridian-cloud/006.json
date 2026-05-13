@@ -1,0 +1,11 @@
+{
+  "event_name": "member_invited",
+  "contact_email": "skylar.williams@meridiancloud.com",
+  "event_properties": {
+    "plan": "pro",
+    "feature": "workflows",
+    "duration_ms": 15704
+  },
+  "event_id": "2c12e0b5-898d-5822-818a-0d5d2b564761",
+  "occurred_at": "2026-05-01T13:53:14Z"
+}

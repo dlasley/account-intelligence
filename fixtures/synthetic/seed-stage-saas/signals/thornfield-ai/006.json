@@ -1,0 +1,11 @@
+{
+  "event_name": "report_generated",
+  "contact_email": "drew.brown@thornfield.ai",
+  "event_properties": {
+    "plan": "enterprise",
+    "feature": "comments",
+    "duration_ms": 11108
+  },
+  "event_id": "10164b2c-34a7-5774-b306-149c104d0e5b",
+  "occurred_at": "2026-04-25T09:54:14Z"
+}

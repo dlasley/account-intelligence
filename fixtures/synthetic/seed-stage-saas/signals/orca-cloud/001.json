@@ -1,0 +1,16 @@
+{
+  "external_id": "14a5c605-e718-51d9-9448-844010dddce1",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-04-07T02:54:14Z",
+  "from_email": "avery.wilson@orcacloud.io",
+  "from_name": "Avery Wilson",
+  "to_emails": [],
+  "subject": "Re: webhook configuration",
+  "thread_id": "thread-seed-stage-saas-orca-cloud",
+  "body": "I am writing on behalf of Orca Cloud to request a competitive review meeting for webhook configuration. We have received pricing from three alternative providers.",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

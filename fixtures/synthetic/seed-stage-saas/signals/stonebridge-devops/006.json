@@ -1,0 +1,11 @@
+{
+  "event_name": "file_uploaded",
+  "contact_email": "blake.brown@stonebridgedevops.com",
+  "event_properties": {
+    "plan": "enterprise",
+    "feature": "shareable_links",
+    "duration_ms": 8552
+  },
+  "event_id": "c330251d-1166-5df8-a9f0-613ff7ec867a",
+  "occurred_at": "2026-03-29T02:54:14Z"
+}

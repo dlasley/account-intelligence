@@ -1,0 +1,40 @@
+version: 1
+name: single-champion-then-silence
+seed: 4217
+description: >
+  One contact drives all early engagement, then goes silent at week 6.
+  Exercises engagement-health scoring when frequency drops after a high-activity period.
+workspace_slug: synth-silence
+
+accounts:
+  - slug: acme-corp
+    name: Acme Corp
+    primary_domain: acme.com
+    vertical: software
+    status: active
+
+signals:
+  # Burst of inbound emails in weeks 1-5 — single champion, technical register
+  - source_type: inbound_email
+    account_slug: acme-corp
+    count: 12
+    axes:
+      contact_diversity: single
+      contact_email_origin: corporate
+      response_cadence: burst
+      sentiment_trajectory: flat
+      email_tone: technical
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: email_heavy
+      concern_topic: utilization_decline
+
+  # Silence: week 6-10 — achieved by omitting further email entries.
+  # The structural gap (no signals) is the test vector, not a generator parameter.
+
+target:
+  # reserved for v1.5 — ignored in v1
+  outcome: null
+  health_score: null
+  dimension_scores: []
+  verification_method: null

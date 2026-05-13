@@ -1,0 +1,19 @@
+{
+  "external_id": "1fbe5151-f871-56a3-b61e-c87b5ba91da3",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-01-04T14:00:14Z",
+  "from_email": "quinn.williams@phalanxsystems.io",
+  "from_name": "Quinn Williams",
+  "to_emails": [
+    "cameron.miller@phalanxsystems.io",
+    "avery.davis@phalanxsystems.io"
+  ],
+  "subject": "Re: feature roadmap",
+  "thread_id": "thread-seed-stage-saas-phalanx-systems",
+  "body": "Hey, following up on feature roadmap \u2014 Phalanx Systems hit a major milestone last week and your product was a big part of it. Time to grow!",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

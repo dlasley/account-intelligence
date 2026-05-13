@@ -1,0 +1,16 @@
+{
+  "external_id": "a043a8d3-820d-5b16-a75a-70cb45a7a597",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-03-11T00:29:14Z",
+  "from_email": "blake.brown@petalanalytics.com",
+  "from_name": "Blake Brown",
+  "to_emails": [],
+  "subject": "Webhook configuration",
+  "thread_id": "thread-seed-stage-saas-petal-analytics",
+  "body": "Quick question: does webhook configuration support bulk operations at Petal Analytics's scale? We're talking 50k records per batch and the current API doesn't seem to handle it.",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

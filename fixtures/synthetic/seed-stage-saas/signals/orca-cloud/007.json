@@ -1,0 +1,11 @@
+{
+  "event_name": "settings_updated",
+  "contact_email": "morgan.jones@orcacloud.io",
+  "event_properties": {
+    "plan": "pro",
+    "feature": "analytics",
+    "duration_ms": 10459
+  },
+  "event_id": "86384190-dae9-5417-9f7f-862b46851c87",
+  "occurred_at": "2026-04-12T23:54:14Z"
+}

@@ -1,0 +1,16 @@
+{
+  "external_id": "a37ddb87-5d98-59ca-8435-8c72c509501a",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-01-08T06:32:43Z",
+  "from_email": "morgan.wilson@initech.com",
+  "from_name": "Morgan Wilson",
+  "to_emails": [],
+  "subject": "Re: SSO configuration",
+  "thread_id": "thread-frustrated-escalation-initech",
+  "body": "Can you share the SSO configuration incident timeline? Initech Solutions needs it for our own internal post-mortem and SLA reporting.\n\nFollowing up on the SSO configuration incident from yesterday \u2014 Initech Solutions is still seeing elevated error rates (p99 latency 8x normal). Not fully recovered.",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

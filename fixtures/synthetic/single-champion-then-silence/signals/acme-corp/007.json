@@ -1,0 +1,16 @@
+{
+  "external_id": "c0d35c85-557d-5da1-9a76-6fcfb24ccfbd",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2025-12-31T22:15:17Z",
+  "from_email": "blake.johnson@acme.com",
+  "from_name": "Blake Johnson",
+  "to_emails": [],
+  "subject": "Re: API rate limits",
+  "thread_id": "thread-single-champion-then-silence-acme-corp",
+  "body": "The API rate limits dashboard at Acme Corp is barely being used. Can we get a report on which modules have zero activity in the last 60 days?",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

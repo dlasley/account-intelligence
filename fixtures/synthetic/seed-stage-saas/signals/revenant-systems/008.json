@@ -1,0 +1,11 @@
+{
+  "event_name": "file_uploaded",
+  "contact_email": "alex.anderson@revenanthq.com",
+  "event_properties": {
+    "plan": "enterprise",
+    "feature": "pdf_export",
+    "duration_ms": 11813
+  },
+  "event_id": "be1f8934-ea25-5b17-8b65-e56a5281286f",
+  "occurred_at": "2026-05-22T23:53:14Z"
+}

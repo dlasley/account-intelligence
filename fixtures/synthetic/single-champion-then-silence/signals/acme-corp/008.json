@@ -1,0 +1,16 @@
+{
+  "external_id": "cc9c10ae-137a-5df1-a9ba-c6873e797ac8",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2025-12-31T23:25:17Z",
+  "from_email": "blake.johnson@acme.com",
+  "from_name": "Blake Johnson",
+  "to_emails": [],
+  "subject": "Re: compliance requirements",
+  "thread_id": "thread-single-champion-then-silence-acme-corp",
+  "body": "Quick question on compliance requirements telemetry: Acme Corp suspects a specific team stopped using the feature after an update. Can you share session data?",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

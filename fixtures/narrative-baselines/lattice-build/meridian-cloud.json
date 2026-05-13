@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-05-09T06:52:27.999432+00:00",
+  "account": {
+    "slug": "meridian-cloud",
+    "vertical": "software",
+    "status": "active",
+    "overall_health_score": 61
+  },
+  "deterministic": {
+    "engagement": 90,
+    "engagement_rationale": "9 signals in the last 14 days from 7 contacts.",
+    "overall_health_score": 61
+  },
+  "llm_produced": {
+    "sentiment": 28,
+    "narrative": "Engagement is high, with nine signals from seven contacts over the past two weeks spanning renewal pricing, billing, webhook configuration, performance-related financials, and product usage. Sentiment is negative: Jordan Jackson (2026-05-01, 'Re: contract renewal') and Quinn Anderson (2026-05-01, 'Re: webhook configuration') both stated Meridian Cloud is evaluating all vendor contracts and requires formal pricing proposals by end of quarter, signaling an active competitive review. Riley Williams (2026-04-30, 'Performance issues') requested a meeting with the commercial team to discuss financial terms tied to performance issues. Alex Davis (2026-05-03, 'Billing questions') acknowledged that pricing concerns went unaddressed too long and wants to reset the conversation, while Quinn Smith (2026-05-03, 'Webhook configuration') cited a procurement process change that delayed a quote. Drew Thomas (2026-05-02, 'Contract renewal') asked whether API call volume is included in the current tier or billed as overage. Product usage remains narrow \u2014 only Skylar Williams is active in Lattice Build (member invite, report generation, and search between May 5\u20138), offering no breadth of adoption to counterbalance the commercial pressure."
+  },
+  "dim_scores": [
+    {
+      "dimension_type": "email",
+      "weight": 0.35,
+      "score": 90
+    },
+    {
+      "dimension_type": "product_usage",
+      "weight": 0.35,
+      "score": 50
+    },
+    {
+      "dimension_type": "sentiment",
+      "weight": 0.2,
+      "score": 28
+    }
+  ],
+  "window": {
+    "signal_window_start": "2026-04-25T06:43:05.675601+00:00",
+    "signal_window_end": "2026-05-09T06:43:05.675601+00:00",
+    "signal_count": 9
+  },
+  "provenance": {
+    "prompt_version": "38d62038",
+    "generated_at": "2026-05-09T06:43:05.675601+00:00",
+    "audit_run_id": "manual_cli_1778309289",
+    "audit_overall_passed": true,
+    "audited_at": "2026-05-09T06:49:58.085259+00:00"
+  }
+}

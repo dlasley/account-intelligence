@@ -1,0 +1,11 @@
+{
+  "event_name": "integration_connected",
+  "contact_email": "casey.johnson@petalanalytics.com",
+  "event_properties": {
+    "plan": "pro",
+    "feature": "reports",
+    "duration_ms": 24903
+  },
+  "event_id": "08b37fb8-c7a1-56cf-844f-46585557e2e2",
+  "occurred_at": "2026-03-17T16:29:14Z"
+}

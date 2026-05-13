@@ -1,0 +1,11 @@
+{
+  "event_name": "search_performed",
+  "contact_email": "alex.smith@crucible.dev",
+  "event_properties": {
+    "plan": "enterprise",
+    "feature": "dashboards",
+    "duration_ms": 8935
+  },
+  "event_id": "1d505536-7f6c-5dd5-b076-5ef1ad14a069",
+  "occurred_at": "2026-02-20T19:12:14Z"
+}

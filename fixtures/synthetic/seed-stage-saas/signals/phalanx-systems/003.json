@@ -1,0 +1,19 @@
+{
+  "external_id": "93ba477e-8eeb-5fba-bf6e-ac79812c0e33",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-01-06T13:00:14Z",
+  "from_email": "morgan.miller@phalanxsystems.io",
+  "from_name": "Morgan Miller",
+  "to_emails": [
+    "blake.thomas@phalanxsystems.io",
+    "quinn.jones@phalanxsystems.io"
+  ],
+  "subject": "Compliance requirements",
+  "thread_id": "thread-seed-stage-saas-phalanx-systems",
+  "body": "On behalf of Phalanx Systems, I am writing to initiate a formal expansion discussion for compliance requirements. Our pilot results have exceeded expectations.",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

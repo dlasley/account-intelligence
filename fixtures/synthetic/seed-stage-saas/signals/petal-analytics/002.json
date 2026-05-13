@@ -1,0 +1,16 @@
+{
+  "external_id": "b2a28e88-5460-56ef-89b6-7d2308d0b3b0",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-03-14T09:29:14Z",
+  "from_email": "taylor.thomas@petalanalytics.com",
+  "from_name": "Taylor Thomas",
+  "to_emails": [],
+  "subject": "Dashboard access",
+  "thread_id": "thread-seed-stage-saas-petal-analytics",
+  "body": "Hey, is dashboard access on the roadmap for this year? Petal Analytics keeps working around the gap and it'd be great to know if we should build internally or wait.",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

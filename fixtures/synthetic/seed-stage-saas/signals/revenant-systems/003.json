@@ -1,0 +1,18 @@
+{
+  "external_id": "ea5394af-e569-5b29-8551-aa1c8e1f128e",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-05-11T02:53:14Z",
+  "from_email": "blake.thomas@revenanthq.com",
+  "from_name": "Blake Thomas",
+  "to_emails": [
+    "reese.anderson@revenanthq.com"
+  ],
+  "subject": "Export functionality",
+  "thread_id": "thread-seed-stage-saas-revenant-systems",
+  "body": "Hey Blake! Quick ask on export functionality \u2014 Revenant Systems's team has been looking for a way to export data in CSV directly. Any chance that's coming?",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

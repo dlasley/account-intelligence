@@ -1,0 +1,70 @@
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Claude Code
+.claude/settings.local.json
+.claude/internal.md
+CLAUDE.local.md
+.claude/data/
+.claude/logs/
+.claude/.cache/
+
+# Hypothesis (property-based test) example database
+.hypothesis/
+
+# Private agent output
+.private/
+
+# Vercel
+.vercel/
+
+# Supabase CLI working dir
+supabase/.temp/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+# Node / Next.js
+node_modules/
+frontend/node_modules/
+frontend/.next/
+frontend/coverage/
+*.tsbuildinfo
+# Root-level package-lock for the tracker-build dev dep (esbuild). The built
+# tracker bundle in src/server/static/dist/ is committed; reproducing the
+# build is "npm install" away.
+package-lock.json
+
+# Python build artifacts
+dist/
+*.egg-info/
+*.egg
+# Allow checked-in tracker bundle (built artifact, served by FastAPI worker)
+!src/server/static/dist/
+
+# Config — workspace overrides may contain secrets; all workspace configs are gitignored.
+# A fresh clone won't have demo workspace configs. Recreate from the maintainer or .private/.
+config/workspaces/*.json
+.vercel
+.env*.local
+
+# Claude Code runtime lock files
+.claude/scheduled_tasks.lock
+
+# Forward-coverage: prevent accidental commits of common build/test artifacts
+*.log
+htmlcov/
+.mypy_cache/

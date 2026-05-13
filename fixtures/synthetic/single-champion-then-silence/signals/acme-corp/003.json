@@ -1,0 +1,16 @@
+{
+  "external_id": "c6b18354-24b1-5f21-aa63-2eb8d690b12e",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2025-12-31T16:26:17Z",
+  "from_email": "blake.johnson@acme.com",
+  "from_name": "Blake Johnson",
+  "to_emails": [],
+  "subject": "Re: onboarding progress",
+  "thread_id": "thread-single-champion-then-silence-acme-corp",
+  "body": "Investigating the onboarding progress utilization drop at Acme Corp. The pattern suggests the change happened right after the v2.3 update \u2014 is that a known regression?",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

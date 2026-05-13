@@ -1,0 +1,11 @@
+{
+  "event_name": "share_link_generated",
+  "contact_email": "cameron.smith@ironcladpipeline.com",
+  "event_properties": {
+    "plan": "free",
+    "feature": "comments",
+    "duration_ms": 29047
+  },
+  "event_id": "d380890a-b164-5c60-8aa8-880a7240afd7",
+  "occurred_at": "2026-02-08T18:14:14Z"
+}

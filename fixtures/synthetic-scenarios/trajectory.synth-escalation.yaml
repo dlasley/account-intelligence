@@ -1,0 +1,13 @@
+workspace_slug: synth-escalation
+trajectories:
+  initech:
+  - id: 40890b9c
+    start_date: '2026-03-14'
+    end_date: '2026-05-08'
+    primitive: declining
+    params:
+      start_health: 75
+      end_health: 60
+      slope_shape: linear
+    seed: 5713500
+    generated_at: null

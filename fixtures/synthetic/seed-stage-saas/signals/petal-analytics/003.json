@@ -1,0 +1,16 @@
+{
+  "external_id": "13c3f5ff-d528-54e3-9345-78d2fef16fb2",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-03-16T09:29:14Z",
+  "from_email": "taylor.thomas@petalanalytics.com",
+  "from_name": "Taylor Thomas",
+  "to_emails": [],
+  "subject": "Re: dashboard access",
+  "thread_id": "thread-seed-stage-saas-petal-analytics",
+  "body": "Hey Taylor! Quick ask on dashboard access \u2014 Petal Analytics's team has been looking for a way to export data in CSV directly. Any chance that's coming?",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

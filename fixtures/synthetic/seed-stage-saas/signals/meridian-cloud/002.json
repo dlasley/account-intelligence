@@ -1,0 +1,18 @@
+{
+  "external_id": "7638adff-1573-52a4-aecc-660993071903",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-04-28T15:20:14Z",
+  "from_email": "drew.williams@meridiancloud.com",
+  "from_name": "Drew Williams",
+  "to_emails": [
+    "taylor.garcia@meridiancloud.com"
+  ],
+  "subject": "Re: contract renewal",
+  "thread_id": "thread-seed-stage-saas-meridian-cloud",
+  "body": "Please consider this a formal notification that Meridian Cloud intends to renegotiate the pricing terms for contract renewal prior to the next renewal cycle.",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

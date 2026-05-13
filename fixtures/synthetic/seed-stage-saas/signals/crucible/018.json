@@ -1,0 +1,26 @@
+{
+  "id": "not_4af9177fa0d5516e8f79592530605cd5",
+  "title": "Crucible \u2014 growth sync",
+  "createdAt": "2026-03-02T02:26:14Z",
+  "owner": {
+    "name": "Blake Harris",
+    "email": "blake.harris@crucible.dev"
+  },
+  "summary": "Solid sync with Crucible. Blake Harris confirmed the team is seeing strong adoption across both use cases we discussed. Key highlights: engineering handoff rollout is on track, two new team members are onboarding next month, and they're already thinking about expanding to the European team. No blockers. Next steps: share updated pricing proposal by Friday.",
+  "transcript": [
+    {
+      "speaker": {
+        "name": "Marcus Webb",
+        "source": "microphone"
+      },
+      "text": "Before we get into the agenda \u2014 any quick wins to share since our last call?"
+    },
+    {
+      "speaker": {
+        "name": "Blake Harris",
+        "source": "speaker"
+      },
+      "text": "Yeah, we shipped two new integrations using engineering handoff last week. The team is really happy with how it works."
+    }
+  ]
+}

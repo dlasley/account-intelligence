@@ -1,0 +1,11 @@
+{
+  "event_name": "integration_connected",
+  "contact_email": "avery.brown@helixplatforms.io",
+  "event_properties": {
+    "plan": "enterprise",
+    "feature": "pdf_export",
+    "duration_ms": 23228
+  },
+  "event_id": "af2d820b-5c96-57d6-a03b-9cff66c7ce24",
+  "occurred_at": "2026-06-02T15:53:14Z"
+}

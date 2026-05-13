@@ -1,0 +1,11 @@
+{
+  "event_name": "plan_changed",
+  "contact_email": "alex.anderson@revenanthq.com",
+  "event_properties": {
+    "plan": "enterprise",
+    "feature": "integrations",
+    "duration_ms": 22313
+  },
+  "event_id": "1a8d8a45-e0b3-5ebb-8d3e-993c9215bea4",
+  "occurred_at": "2026-05-15T23:53:14Z"
+}

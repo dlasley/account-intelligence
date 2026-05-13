@@ -1,0 +1,16 @@
+{
+  "external_id": "9140d741-e399-5f22-b078-1364971e4ea8",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-01-03T14:27:11Z",
+  "from_email": "cameron.thomas@champion-co.com",
+  "from_name": "Cameron Thomas",
+  "to_emails": [],
+  "subject": "Re: support ticket response",
+  "thread_id": "thread-expanding-champion-champion-co",
+  "body": "Quick win to share: Champion Co's support ticket response usage is up 200% this quarter and leadership wants to expand. Exciting times!",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

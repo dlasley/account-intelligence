@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "scenario_name": "single-champion-then-silence",
+  "scenario_seed": 4217,
+  "scenario_input_hash": "909bd88263359da60a5715bbb063ea8b9403d4349b1c5ac99a945484fab9d8a8",
+  "generator_version": "0.1.0",
+  "signal_count": 12,
+  "account_slugs": [
+    "acme-corp"
+  ]
+}

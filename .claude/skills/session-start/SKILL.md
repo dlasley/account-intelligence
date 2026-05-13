@@ -1,0 +1,1 @@
+/Users/davidlasley/Projects/claude-harness/skills/session-start/SKILL.md

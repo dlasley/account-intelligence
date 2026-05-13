@@ -1,0 +1,16 @@
+{
+  "external_id": "d3e2e02b-0c25-58ba-89ff-182ddab90129",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-02-16T17:12:14Z",
+  "from_email": "alex.jones@crucible.dev",
+  "from_name": "Alex Jones",
+  "to_emails": [],
+  "subject": "Compliance requirements",
+  "thread_id": "thread-seed-stage-saas-crucible",
+  "body": "Hey, is compliance requirements on the roadmap for this year? Crucible keeps working around the gap and it'd be great to know if we should build internally or wait.",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

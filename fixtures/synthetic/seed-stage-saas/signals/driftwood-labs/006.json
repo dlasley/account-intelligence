@@ -1,0 +1,11 @@
+{
+  "event_name": "file_uploaded",
+  "contact_email": "alex.davis@driftwoodlabs.com",
+  "event_properties": {
+    "plan": "free",
+    "feature": "reports",
+    "duration_ms": 8889
+  },
+  "event_id": "d8858dfd-c849-517e-a3f0-a5e369c82bdf",
+  "occurred_at": "2026-01-31T23:00:14Z"
+}

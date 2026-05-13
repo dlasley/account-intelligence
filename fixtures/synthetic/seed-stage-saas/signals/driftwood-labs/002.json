@@ -1,0 +1,16 @@
+{
+  "external_id": "665d69bb-6cc0-57e8-8355-9bcc2c0d649e",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-01-27T09:00:14Z",
+  "from_email": "morgan.anderson@driftwoodlabs.com",
+  "from_name": "Morgan Anderson",
+  "to_emails": [],
+  "subject": "User provisioning",
+  "thread_id": "thread-seed-stage-saas-driftwood-labs",
+  "body": "Hey \u2014 any update on user provisioning? Driftwood Labs asked about this a few months ago and just wondering if it's moved up in priority.",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

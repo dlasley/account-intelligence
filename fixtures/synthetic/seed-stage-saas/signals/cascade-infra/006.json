@@ -1,0 +1,11 @@
+{
+  "event_name": "integration_connected",
+  "contact_email": "skylar.brown@cascadeinfra.io",
+  "event_properties": {
+    "plan": "free",
+    "feature": "alerts",
+    "duration_ms": 8421
+  },
+  "event_id": "3c09745b-8ab6-5430-bc2e-58afc61b2364",
+  "occurred_at": "2026-03-09T17:07:14Z"
+}

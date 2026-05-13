@@ -1,0 +1,11 @@
+{
+  "event_name": "integration_connected",
+  "contact_email": "skylar.thomas@champion-co.com",
+  "event_properties": {
+    "plan": "enterprise",
+    "feature": "integration_connected",
+    "duration_ms": 19661
+  },
+  "event_id": "9779dc53-b31c-5a4c-bb57-d3ee1ff28be8",
+  "occurred_at": "2026-01-23T15:27:11Z"
+}

@@ -1,0 +1,19 @@
+{
+  "external_id": "232178ee-2bb2-5298-b19b-a43019be5837",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-05-09T08:53:14Z",
+  "from_email": "alex.jackson@revenanthq.com",
+  "from_name": "Alex Jackson",
+  "to_emails": [
+    "alex.jones@revenanthq.com",
+    "taylor.white@revenanthq.com"
+  ],
+  "subject": "Re: API rate limits",
+  "thread_id": "thread-seed-stage-saas-revenant-systems",
+  "body": "The API rate limits API at Revenant Systems's integration point doesn't expose the `account_status` field we need. Is there a workaround or timeline for the fix?",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

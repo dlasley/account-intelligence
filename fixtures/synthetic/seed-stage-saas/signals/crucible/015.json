@@ -1,0 +1,11 @@
+{
+  "event_name": "report_generated",
+  "contact_email": "cameron.jackson@crucible.dev",
+  "event_properties": {
+    "plan": "free",
+    "feature": "pdf_export",
+    "duration_ms": 6549
+  },
+  "event_id": "d1dc6ed4-dbae-5621-9fe2-f65ba7caf9b6",
+  "occurred_at": "2026-02-24T17:26:14Z"
+}

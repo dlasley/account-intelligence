@@ -1,0 +1,16 @@
+{
+  "external_id": "22ebe749-fb2b-5263-903b-a98abe92c1a7",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-01-09T12:27:11Z",
+  "from_email": "jordan.wilson@champion-co.com",
+  "from_name": "Jordan Wilson",
+  "to_emails": [],
+  "subject": "Support ticket response",
+  "thread_id": "thread-expanding-champion-champion-co",
+  "body": "I am writing on behalf of Champion Co to document our satisfaction with support ticket response and to initiate the expansion process.",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

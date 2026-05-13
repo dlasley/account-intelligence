@@ -1,0 +1,11 @@
+{
+  "event_name": "settings_updated",
+  "contact_email": "quinn.williams@crucible.dev",
+  "event_properties": {
+    "plan": "free",
+    "feature": "alerts",
+    "duration_ms": 8620
+  },
+  "event_id": "2901a143-5e4b-5168-9e34-bd5aa6f2e34a",
+  "occurred_at": "2026-02-20T23:26:14Z"
+}

@@ -1,0 +1,16 @@
+{
+  "external_id": "37b6bae8-deac-57ed-b90b-414c19cb077b",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-04-07T19:54:14Z",
+  "from_email": "quinn.wilson@orcacloud.io",
+  "from_name": "Quinn Wilson",
+  "to_emails": [],
+  "subject": "Dashboard access",
+  "thread_id": "thread-seed-stage-saas-orca-cloud",
+  "body": "For dashboard access: a competitor is offering Orca Cloud a 90-day POC. To be fair in our evaluation, can we get access to your equivalent trial environment?",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

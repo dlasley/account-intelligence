@@ -1,0 +1,16 @@
+{
+  "external_id": "b768dc80-8b78-54ca-bc3d-cabe099d1a8b",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-04-15T22:54:14Z",
+  "from_email": "casey.thomas@thornfield.ai",
+  "from_name": "Casey Thomas",
+  "to_emails": [],
+  "subject": "Webhook configuration",
+  "thread_id": "thread-seed-stage-saas-thornfield-ai",
+  "body": "I should have flagged webhook configuration earlier. Thornfield AI has been slow to act and I want to acknowledge that directly.",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

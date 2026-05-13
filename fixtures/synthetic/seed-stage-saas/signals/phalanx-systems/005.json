@@ -1,0 +1,11 @@
+{
+  "event_name": "dashboard_viewed",
+  "contact_email": "alex.anderson@phalanxsystems.io",
+  "event_properties": {
+    "plan": "pro",
+    "feature": "favorites",
+    "duration_ms": 13702
+  },
+  "event_id": "5cff5e48-2885-5869-adfe-e356ad5d49af",
+  "occurred_at": "2026-01-09T08:00:14Z"
+}

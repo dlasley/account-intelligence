@@ -1,0 +1,8 @@
+{
+  "slug": "acme-corp",
+  "name": "Acme Corp",
+  "primary_domain": "acme.com",
+  "additional_domains": [],
+  "vertical": "tech",
+  "status": "active"
+}

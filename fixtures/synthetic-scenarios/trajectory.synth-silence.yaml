@@ -1,0 +1,13 @@
+workspace_slug: synth-silence
+trajectories:
+  acme-corp:
+  - id: 3ab2a4fc
+    start_date: '2026-03-14'
+    end_date: '2026-05-08'
+    primitive: declining
+    params:
+      start_health: 63
+      end_health: 38
+      slope_shape: linear
+    seed: 8501560
+    generated_at: null

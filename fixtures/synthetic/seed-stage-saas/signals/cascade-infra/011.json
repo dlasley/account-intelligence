@@ -1,0 +1,22 @@
+{
+  "id": "e5a6b54f-edad-546c-9891-f662b9631e73",
+  "type": "email.sent",
+  "timestamp": "2026-03-10T00:29:14Z",
+  "workspaceId": "worksp_dc2e049960d753ae",
+  "payload": {
+    "thread": {
+      "id": "thr_2a49a0d9-883a-52d2-843d-1360a749bb34"
+    },
+    "email": {
+      "subject": "[URGENT] data sync delay \u2014 production down",
+      "textContent": "I should have been clearer in my earlier report about data sync delay. Cascade Infra's symptoms were related to a misconfiguration we introduced.",
+      "to": [
+        {
+          "email": "skylar.wilson@cascadeinfra.io",
+          "name": "Skylar Wilson"
+        }
+      ]
+    }
+  },
+  "webhookMetadata": {}
+}

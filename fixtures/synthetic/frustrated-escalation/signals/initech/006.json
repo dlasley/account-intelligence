@@ -1,0 +1,16 @@
+{
+  "external_id": "d975c2a5-9906-5c43-84d6-e8d34198e7de",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-01-10T06:32:43Z",
+  "from_email": "morgan.wilson@initech.com",
+  "from_name": "Morgan Wilson",
+  "to_emails": [],
+  "subject": "Re: API rate limits",
+  "thread_id": "thread-frustrated-escalation-initech",
+  "body": "Can you share the API rate limits incident timeline? Initech Solutions needs it for our own internal post-mortem and SLA reporting.\n\nInitech Solutions has been experiencing intermittent failures on API rate limits for the past 6 hours. Error logs show connection resets on the load balancer.",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

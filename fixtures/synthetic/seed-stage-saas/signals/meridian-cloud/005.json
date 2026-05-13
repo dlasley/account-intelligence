@@ -1,0 +1,18 @@
+{
+  "external_id": "e10d4506-0304-5805-9b77-2d10f5691927",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-04-30T12:53:14Z",
+  "from_email": "taylor.jones@meridiancloud.com",
+  "from_name": "Taylor Jones",
+  "to_emails": [
+    "dana.johnson@meridiancloud.com"
+  ],
+  "subject": "Webhook configuration",
+  "thread_id": "thread-seed-stage-saas-meridian-cloud",
+  "body": "Sorry for the gap in communication on webhook configuration. Meridian Cloud went through a procurement process change and your quote got delayed.",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

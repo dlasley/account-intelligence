@@ -1,0 +1,16 @@
+{
+  "external_id": "f6be6a09-9bf3-5b94-825a-de3911caf32e",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-05-31T23:53:14Z",
+  "from_email": "avery.smith@helixplatforms.io",
+  "from_name": "Avery Smith",
+  "to_emails": [],
+  "subject": "User provisioning",
+  "thread_id": "thread-seed-stage-saas-helix-platforms",
+  "body": "Investigating the user provisioning utilization drop at Helix Platforms. The pattern suggests the change happened right after the v2.3 update \u2014 is that a known regression?",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

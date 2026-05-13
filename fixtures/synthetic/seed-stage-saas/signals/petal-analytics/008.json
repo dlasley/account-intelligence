@@ -1,0 +1,11 @@
+{
+  "event_name": "report_generated",
+  "contact_email": "casey.johnson@petalanalytics.com",
+  "event_properties": {
+    "plan": "enterprise",
+    "feature": "saved_views",
+    "duration_ms": 24981
+  },
+  "event_id": "5ec735e0-d433-57a7-9e58-ee032626a009",
+  "occurred_at": "2026-03-17T20:54:14Z"
+}

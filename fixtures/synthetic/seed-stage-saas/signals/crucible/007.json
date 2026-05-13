@@ -1,0 +1,11 @@
+{
+  "event_name": "file_uploaded",
+  "contact_email": "alex.miller@crucible.dev",
+  "event_properties": {
+    "plan": "enterprise",
+    "feature": "alerts",
+    "duration_ms": 18807
+  },
+  "event_id": "23748a9a-9197-5738-8521-6b31ed8205ec",
+  "occurred_at": "2026-02-20T20:15:14Z"
+}

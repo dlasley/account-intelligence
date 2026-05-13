@@ -1,0 +1,11 @@
+{
+  "event_name": "search_performed",
+  "contact_email": "skylar.williams@meridiancloud.com",
+  "event_properties": {
+    "plan": "pro",
+    "feature": "csv_export",
+    "duration_ms": 20243
+  },
+  "event_id": "a2bad0e8-81a7-58a0-a8ea-825bedd4639b",
+  "occurred_at": "2026-05-04T13:53:14Z"
+}

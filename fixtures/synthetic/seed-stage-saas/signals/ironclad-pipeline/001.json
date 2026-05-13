@@ -1,0 +1,18 @@
+{
+  "external_id": "63a6089f-43eb-5568-bbe9-2dd2a9643346",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-02-05T00:36:14Z",
+  "from_email": "morgan.miller@ironcladpipeline.com",
+  "from_name": "Morgan Miller",
+  "to_emails": [
+    "reese.smith@ironcladpipeline.com"
+  ],
+  "subject": "Re: user provisioning",
+  "thread_id": "thread-seed-stage-saas-ironclad-pipeline",
+  "body": "Please consider this a formal request from Ironclad Pipeline Co for access to our user provisioning usage analytics to support an internal adoption initiative.",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

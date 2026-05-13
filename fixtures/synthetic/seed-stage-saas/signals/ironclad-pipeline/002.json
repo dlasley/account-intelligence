@@ -1,0 +1,18 @@
+{
+  "external_id": "7e0c251f-2b6d-51e1-9c29-4128619ff577",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-02-06T21:36:14Z",
+  "from_email": "taylor.brown@ironcladpipeline.com",
+  "from_name": "Taylor Brown",
+  "to_emails": [
+    "morgan.brown@ironcladpipeline.com"
+  ],
+  "subject": "Renewal terms",
+  "thread_id": "thread-seed-stage-saas-ironclad-pipeline",
+  "body": "We're seeing a sharp drop in renewal terms API calls at Ironclad Pipeline Co. The event counts dropped from ~1200/day to ~300/day two weeks ago. Any ideas?",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

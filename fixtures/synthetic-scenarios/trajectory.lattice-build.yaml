@@ -1,0 +1,138 @@
+workspace_slug: lattice-build
+trajectories:
+  crucible:
+  - id: 15d05b8e
+    start_date: '2026-03-03'
+    end_date: '2026-05-01'
+    primitive: declining
+    params:
+      start_health: 84
+      end_health: 57
+      slope_shape: cliff_at_week_5
+    seed: 8517608
+    generated_at: '2026-05-12T06:19:12.408564Z'
+  phalanx-systems:
+  - id: 62313cb4
+    start_date: '2026-03-03'
+    end_date: '2026-05-01'
+    primitive: stable
+    params:
+      target_band:
+      - 72
+      - 85
+    seed: 3843230
+    generated_at: '2026-05-12T06:22:18.046307Z'
+  cascade-infra:
+  - id: 967f5a4c
+    start_date: '2026-03-03'
+    end_date: '2026-05-01'
+    primitive: declining
+    params:
+      start_health: 78
+      end_health: 31
+      slope_shape: linear
+    seed: 8530473
+    generated_at: '2026-05-12T06:24:25.706621Z'
+  stonebridge-devops:
+  - id: 226381b1
+    start_date: '2026-03-03'
+    end_date: '2026-05-01'
+    primitive: recovering
+    params:
+      start_health: 45
+      end_health: 74
+      slope_shape: jump_at_week_4
+    seed: 6350913
+    generated_at: '2026-05-12T06:26:30.318252Z'
+  orca-cloud:
+  - id: 3e1bda6d
+    start_date: '2026-03-03'
+    end_date: '2026-05-01'
+    primitive: declining
+    params:
+      start_health: 65
+      end_health: 28
+      slope_shape: exponential
+    seed: 4865002
+    generated_at: '2026-05-12T07:01:18.228974Z'
+  helix-platforms:
+  - id: d9229621
+    start_date: '2026-03-03'
+    end_date: '2026-05-01'
+    primitive: oscillating
+    params:
+      low: 35
+      high: 62
+      period_weeks: 4
+    seed: 1391854
+    generated_at: '2026-05-12T07:04:50.051711Z'
+  driftwood-labs:
+  - id: d09087f4
+    start_date: '2026-03-03'
+    end_date: '2026-05-01'
+    primitive: stable
+    params:
+      target_band:
+      - 68
+      - 78
+    seed: 2811938
+    generated_at: '2026-05-12T07:07:09.004915Z'
+  ironclad-pipeline:
+  - id: 79b329d2
+    start_date: '2026-03-03'
+    end_date: '2026-05-01'
+    primitive: cliff
+    params:
+      cliff_date: '2026-03-24'
+      pre_band:
+      - 70
+      - 82
+      post_band:
+      - 18
+      - 30
+    seed: 7525485
+    generated_at: '2026-05-12T07:09:00.844559Z'
+  petal-analytics:
+  - id: 9b5a2c09
+    start_date: '2026-03-03'
+    end_date: '2026-05-01'
+    primitive: recovering
+    params:
+      start_health: 55
+      end_health: 75
+      slope_shape: linear
+    seed: 6499930
+    generated_at: '2026-05-12T07:11:23.183368Z'
+  thornfield-ai:
+  - id: b0c91585
+    start_date: '2026-03-03'
+    end_date: '2026-05-01'
+    primitive: stable
+    params:
+      target_band:
+      - 60
+      - 72
+    seed: 1437112
+    generated_at: '2026-05-12T07:13:46.431471Z'
+  meridian-cloud:
+  - id: 8d61fbc9
+    start_date: '2026-03-03'
+    end_date: '2026-05-01'
+    primitive: oscillating
+    params:
+      low: 42
+      high: 71
+      period_weeks: 3
+    seed: 2537383
+    generated_at: '2026-05-12T07:16:10.775382Z'
+  revenant-systems:
+  - id: 8e8d76b0
+    start_date: '2026-03-03'
+    end_date: '2026-05-01'
+    primitive: stable
+    params:
+      target_band:
+      - 80
+      - 92
+    seed: 4475328
+    generated_at: '2026-05-12T07:19:21.855898Z'

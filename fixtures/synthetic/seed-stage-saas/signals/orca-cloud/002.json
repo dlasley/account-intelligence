@@ -1,0 +1,16 @@
+{
+  "external_id": "26ba3c83-7834-5867-b236-a5a8cead3f23",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-04-07T13:54:14Z",
+  "from_email": "kendall.brown@orcacloud.io",
+  "from_name": "Kendall Brown",
+  "to_emails": [],
+  "subject": "Integration setup",
+  "thread_id": "thread-seed-stage-saas-orca-cloud",
+  "body": "Orca Cloud has been comparing integration setup benchmark numbers. The competing platform shows lower p99 latency \u2014 can you walk us through your architecture differences?",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

@@ -1,0 +1,11 @@
+{
+  "event_name": "share_link_generated",
+  "contact_email": "alex.anderson@phalanxsystems.io",
+  "event_properties": {
+    "plan": "free",
+    "feature": "shareable_links",
+    "duration_ms": 2902
+  },
+  "event_id": "0f21e83b-da90-5019-b24c-c41bcffbd8f5",
+  "occurred_at": "2026-01-16T08:00:14Z"
+}

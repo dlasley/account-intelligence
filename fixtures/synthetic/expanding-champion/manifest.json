@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "scenario_name": "expanding-champion",
+  "scenario_seed": 8831,
+  "scenario_input_hash": "d57e21d03d2e35df2de830cc7f13e9f1c276524270731cc3a754cebd867ea3be",
+  "generator_version": "0.1.0",
+  "signal_count": 14,
+  "account_slugs": [
+    "champion-co"
+  ]
+}

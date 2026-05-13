@@ -1,0 +1,19 @@
+{
+  "external_id": "379a229d-9bb7-5497-aa8a-3a08e5e75dff",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-03-25T12:54:14Z",
+  "from_email": "taylor.anderson@stonebridgedevops.com",
+  "from_name": "Taylor Anderson",
+  "to_emails": [
+    "kendall.thomas@stonebridgedevops.com",
+    "riley.brown@stonebridgedevops.com"
+  ],
+  "subject": "Re: onboarding progress",
+  "thread_id": "thread-seed-stage-saas-stonebridge-devops",
+  "body": "Hi! Quick heads up \u2014 Stonebridge DevOps is starting to look at the onboarding progress renewal. We're happy with the product but finance wants to do a value check.",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

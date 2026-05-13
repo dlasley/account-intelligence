@@ -1,0 +1,18 @@
+{
+  "external_id": "a743156e-8c0d-56ce-84ad-21c72397e255",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-04-28T18:53:14Z",
+  "from_email": "avery.davis@meridiancloud.com",
+  "from_name": "Avery Davis",
+  "to_emails": [
+    "skylar.harris@meridiancloud.com"
+  ],
+  "subject": "Integration setup",
+  "thread_id": "thread-seed-stage-saas-meridian-cloud",
+  "body": "Quick question on integration setup pricing: does Meridian Cloud's current tier include API call volume, or is that billed separately at overage rates?",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

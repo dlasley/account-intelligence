@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-05-09T06:52:27.999640+00:00",
+  "account": {
+    "slug": "revenant-systems",
+    "vertical": "software",
+    "status": "active",
+    "overall_health_score": 47
+  },
+  "deterministic": {
+    "engagement": 50,
+    "engagement_rationale": "12 signals in the last 30 days from 3 contacts.",
+    "overall_health_score": 47
+  },
+  "llm_produced": {
+    "sentiment": 35,
+    "narrative": "Engagement at Revenant Systems is medium, with 12 signals across the window from three contacts, though product usage is concentrated almost entirely on Alex Anderson \u2014 the only user generating product events. Sentiment is mixed to negative: while Alex Anderson remains actively using the product (file uploads, exports, report generation, a share link on 2026-05-08, and a plan_changed event on 2026-04-23), multiple email signals surface unresolved friction. Casey Thomas raised a multi-region data residency gap on 2026-04-20 ('Re: dashboard access') and flagged a contract renewal need tied to custom metadata filtering in the API on 2026-04-19 ('Contract renewal'). Alex Garcia requested scoped read-only API access on 2026-04-22 ('Re: feature roadmap'), calling the current all-or-nothing key model a security issue. Alex Anderson separately reported recurring integration setup difficulties on 2026-04-22 ('Integration setup'). Several product gaps \u2014 integration setup, API permissioning, data residency, and metadata filtering \u2014 are converging around what appears to be an upcoming renewal discussion, and none have visible resolutions yet."
+  },
+  "dim_scores": [
+    {
+      "dimension_type": "email",
+      "weight": 0.35,
+      "score": 50
+    },
+    {
+      "dimension_type": "product_usage",
+      "weight": 0.35,
+      "score": 50
+    },
+    {
+      "dimension_type": "sentiment",
+      "weight": 0.2,
+      "score": 35
+    }
+  ],
+  "window": {
+    "signal_window_start": "2026-04-09T06:41:44.348288+00:00",
+    "signal_window_end": "2026-05-09T06:41:44.348288+00:00",
+    "signal_count": 12
+  },
+  "provenance": {
+    "prompt_version": "38d62038",
+    "generated_at": "2026-05-09T06:41:44.348288+00:00",
+    "audit_run_id": "manual_cli_1778309289",
+    "audit_overall_passed": true,
+    "audited_at": "2026-05-09T06:50:08.881145+00:00"
+  }
+}

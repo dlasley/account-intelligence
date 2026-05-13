@@ -1,0 +1,11 @@
+{
+  "event_name": "comment_added",
+  "contact_email": "cameron.jackson@crucible.dev",
+  "event_properties": {
+    "plan": "pro",
+    "feature": "csv_export",
+    "duration_ms": 11402
+  },
+  "event_id": "3c59c827-05e9-5b72-8873-e1e73aafb4bb",
+  "occurred_at": "2026-02-23T17:26:14Z"
+}

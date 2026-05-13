@@ -1,0 +1,11 @@
+{
+  "event_name": "integration_connected",
+  "contact_email": "reese.garcia@ironcladpipeline.com",
+  "event_properties": {
+    "plan": "enterprise",
+    "feature": "notifications",
+    "duration_ms": 20457
+  },
+  "event_id": "d0118560-aec4-5722-abc2-5be3f9247212",
+  "occurred_at": "2026-02-08T15:36:14Z"
+}

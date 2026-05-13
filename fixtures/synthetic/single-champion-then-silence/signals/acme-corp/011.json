@@ -1,0 +1,16 @@
+{
+  "external_id": "036ba69a-0156-5256-8427-eb317a5905aa",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-01-01T01:55:17Z",
+  "from_email": "blake.johnson@acme.com",
+  "from_name": "Blake Johnson",
+  "to_emails": [],
+  "subject": "Re: upgrade timeline",
+  "thread_id": "thread-single-champion-then-silence-acme-corp",
+  "body": "Hi Blake, Acme Corp's upgrade timeline usage has dropped 40% over the last 30 days. Can you pull the detailed activity logs so we can investigate?",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

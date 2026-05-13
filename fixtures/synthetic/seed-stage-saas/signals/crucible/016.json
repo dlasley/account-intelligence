@@ -1,0 +1,26 @@
+{
+  "data": {
+    "id": "d17877d5-38fe-5e9b-9a88-442531f0c77f",
+    "type": "issue.created",
+    "timestamp": "2026-02-25T11:26:14Z",
+    "issue": {
+      "id": "44f6c667-cac2-5955-89e9-da6bb80fe42f",
+      "title": "Feature request: login / SSO failure",
+      "requester": {
+        "email": "drew.harris@crucible.dev",
+        "name": "Drew Harris"
+      },
+      "messages": [
+        {
+          "id": "39e76cb2-fe92-55eb-9260-78b4672476ad",
+          "body": "For login / SSO failure: Crucible needs read-only API access with scoped permissions. The current all-or-nothing key model is a security issue for us.",
+          "author": {
+            "type": "customer",
+            "email": "drew.harris@crucible.dev",
+            "name": "Drew Harris"
+          }
+        }
+      ]
+    }
+  }
+}

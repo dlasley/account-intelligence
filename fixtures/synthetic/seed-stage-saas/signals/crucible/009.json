@@ -1,0 +1,11 @@
+{
+  "event_name": "feature_used",
+  "contact_email": "drew.white@crucible.dev",
+  "event_properties": {
+    "plan": "pro",
+    "feature": "bulk_actions",
+    "duration_ms": 470
+  },
+  "event_id": "a27b59f4-2eb9-520c-b979-bc1acb1d8a94",
+  "occurred_at": "2026-02-20T21:21:14Z"
+}

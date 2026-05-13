@@ -1,0 +1,38 @@
+version: 1
+name: product-heavy-email-light
+seed: 7741
+description: >
+  Account with heavy product usage and minimal email contact.
+  Exercises product_usage dimension scoring and cross-modal balanced narrative generation.
+workspace_slug: synth-product-heavy
+
+accounts:
+  - slug: brightpath-co
+    name: Brightpath Co
+    primary_domain: brightpath.io
+    vertical: software
+    status: active
+
+signals:
+  # 3 emails — light touch, steady cadence
+  - source_type: inbound_email
+    account_slug: brightpath-co
+    count: 3
+    axes:
+      contact_diversity: single
+      contact_email_origin: corporate
+      response_cadence: steady
+      cross_modal: product_heavy
+      concern_topic: feature_gap
+      # exercises: baseline email presence so narrative has something to say
+
+  # 20 product events — the dominant signal type
+  - source_type: product_event
+    account_slug: brightpath-co
+    count: 20
+    axes:
+      contact_email_origin: corporate
+      response_cadence: steady
+      cross_modal: product_heavy
+      concern_topic: feature_gap
+      # exercises: product_usage dimension + api_key_identity routing (known email)

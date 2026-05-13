@@ -1,0 +1,16 @@
+{
+  "external_id": "5de986c5-3458-5f80-96ba-8985f98c54e3",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-01-12T18:32:43Z",
+  "from_email": "casey.brown@initech.com",
+  "from_name": "Casey Brown",
+  "to_emails": [],
+  "subject": "Compliance requirements",
+  "thread_id": "thread-frustrated-escalation-initech-8",
+  "body": "Initech Solutions formally requests an incident debrief meeting to review the co",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

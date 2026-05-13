@@ -1,0 +1,13 @@
+workspace_slug: synth-champion
+trajectories:
+  champion-co:
+  - id: 57500e66
+    start_date: '2026-03-14'
+    end_date: '2026-05-08'
+    primitive: declining
+    params:
+      start_health: 89
+      end_health: 74
+      slope_shape: linear
+    seed: 3459820
+    generated_at: null

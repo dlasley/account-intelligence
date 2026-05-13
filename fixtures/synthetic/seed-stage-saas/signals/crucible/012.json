@@ -1,0 +1,11 @@
+{
+  "event_name": "dashboard_viewed",
+  "contact_email": "cameron.jackson@crucible.dev",
+  "event_properties": {
+    "plan": "free",
+    "feature": "webhooks",
+    "duration_ms": 580
+  },
+  "event_id": "44eb983d-20e3-5244-89e8-65f0ce4915c5",
+  "occurred_at": "2026-02-21T17:26:14Z"
+}

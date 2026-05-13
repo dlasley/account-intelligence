@@ -1,0 +1,16 @@
+{
+  "external_id": "af681a89-6ea3-59dd-842f-320dc925be4f",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-06-01T23:53:14Z",
+  "from_email": "avery.smith@helixplatforms.io",
+  "from_name": "Avery Smith",
+  "to_emails": [],
+  "subject": "Re: compliance requirements",
+  "thread_id": "thread-seed-stage-saas-helix-platforms",
+  "body": "The compliance requirements dashboard at Helix Platforms is barely being used. Can we get a report on which modules have zero activity in the last 60 days?",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

@@ -1,0 +1,11 @@
+{
+  "event_name": "report_generated",
+  "contact_email": "skylar.williams@meridiancloud.com",
+  "event_properties": {
+    "plan": "enterprise",
+    "feature": "alerts",
+    "duration_ms": 8520
+  },
+  "event_id": "3ffda908-7877-510e-b805-6fe0de25b267",
+  "occurred_at": "2026-05-03T13:53:14Z"
+}

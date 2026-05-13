@@ -1,0 +1,11 @@
+{
+  "event_name": "export_started",
+  "contact_email": "blake.brown@stonebridgedevops.com",
+  "event_properties": {
+    "plan": "free",
+    "feature": "dashboards",
+    "duration_ms": 9885
+  },
+  "event_id": "daeeb196-6c17-585a-8cf7-e32ebd514d39",
+  "occurred_at": "2026-03-26T02:54:14Z"
+}

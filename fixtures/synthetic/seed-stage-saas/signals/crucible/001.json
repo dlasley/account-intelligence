@@ -1,0 +1,16 @@
+{
+  "external_id": "3e304074-cba4-5c12-b9a8-473786c79c28",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-02-13T01:12:14Z",
+  "from_email": "dana.wilson@crucible.dev",
+  "from_name": "Dana Wilson",
+  "to_emails": [],
+  "subject": "Re: onboarding progress",
+  "thread_id": "thread-seed-stage-saas-crucible",
+  "body": "Hey \u2014 Crucible just got internal approval to expand onboarding progress significantly. Really excited about what we can do together from here.",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

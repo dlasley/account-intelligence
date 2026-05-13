@@ -1,0 +1,16 @@
+{
+  "external_id": "1c6ebfc5-2e78-547a-898d-2c697c9d1400",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2025-12-31T18:16:17Z",
+  "from_email": "blake.johnson@acme.com",
+  "from_name": "Blake Johnson",
+  "to_emails": [],
+  "subject": "Re: executive business review",
+  "thread_id": "thread-single-champion-then-silence-acme-corp",
+  "body": "For executive business review: Acme Corp's active user count is down from 85 to 23 since last quarter. Is there a way to see which features they were using before?",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

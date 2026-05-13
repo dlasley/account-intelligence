@@ -1,0 +1,11 @@
+{
+  "event_name": "settings_updated",
+  "contact_email": "dana.jackson@ironcladpipeline.com",
+  "event_properties": {
+    "plan": "free",
+    "feature": "templates",
+    "duration_ms": 245
+  },
+  "event_id": "25a1c057-1b8e-5b82-8eda-4843210c5f39",
+  "occurred_at": "2026-02-08T18:59:14Z"
+}

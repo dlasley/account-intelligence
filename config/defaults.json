@@ -1,0 +1,81 @@
+{
+  "inbound_domain": "signal.example.com",
+  "account_health": {
+    "engagement_tiers": [
+      { "name": "high",   "score": 90, "min_signals": 5, "window_days": 14, "min_contacts": 2 },
+      { "name": "good",   "score": 70, "min_signals": 3, "window_days": 14, "min_contacts": 2 },
+      { "name": "medium", "score": 50, "min_signals": 2, "window_days": 30, "min_contacts": 1 },
+      { "name": "fair",   "score": 30, "min_signals": 1, "window_days": 30, "min_contacts": 1 },
+      { "name": "low",    "score": 10, "min_signals": 0, "window_days": 30, "min_contacts": 0 }
+    ],
+    "sentiment_bands": [
+      { "min_score": 80, "label": "high" },
+      { "min_score": 60, "label": "good" },
+      { "min_score": 40, "label": "medium" },
+      { "min_score": 20, "label": "fair" },
+      { "min_score": 0,  "label": "low" }
+    ]
+  },
+  "health_scoring": {
+    "formula": "weighted_average",
+    "dimensions": [
+      {
+        "dimension_type": "email",
+        "name": "Email Health",
+        "weight": 0.35,
+        "enabled": true,
+        "config": { "email_score_source": "engagement" }
+      },
+      {
+        "dimension_type": "product_usage",
+        "name": "Product Usage",
+        "weight": 0.35,
+        "enabled": true,
+        "config": {
+          "window_days": 7,
+          "window_days_cascade": [7, 14, 30, 60],
+          "min_events_for_active": 1,
+          "trajectory_decay_ratio": 0.5
+        }
+      },
+      {
+        "dimension_type": "sentiment",
+        "name": "Sentiment",
+        "weight": 0.2,
+        "enabled": true,
+        "config": {}
+      },
+      {
+        "dimension_type": "csm_score",
+        "name": "CSM Score",
+        "weight": 0.1,
+        "enabled": true,
+        "config": {}
+      }
+    ]
+  },
+  "narrative_generation": {
+    "model": "claude-opus-4-6",
+    "max_signals_in_context": 40,
+    "prompt_template_path": "config/prompts/narrative.v1.md",
+    "include_vertical_hint": true
+  },
+  "routing": {
+    "personal_provider_domains": [
+      "gmail.com", "googlemail.com", "outlook.com", "hotmail.com", "live.com",
+      "yahoo.com", "icloud.com", "me.com", "mac.com",
+      "proton.me", "protonmail.com", "aol.com"
+    ]
+  },
+  "outreach_generation": {
+    "max_signals_in_context": 5,
+    "templates_path": "config/templates/outreach"
+  },
+  "api": {
+    "ingest_rate_limit_per_minute": 600,
+    "rate_limit_per_minute": 100
+  },
+  "integrations": {
+    "max_consecutive_errors": 5
+  }
+}

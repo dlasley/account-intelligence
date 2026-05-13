@@ -1,0 +1,18 @@
+{
+  "external_id": "682e9625-8d9d-52d2-8d9f-93cae0b051d0",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-04-28T13:54:14Z",
+  "from_email": "drew.williams@meridiancloud.com",
+  "from_name": "Drew Williams",
+  "to_emails": [
+    "taylor.garcia@meridiancloud.com"
+  ],
+  "subject": "Sso configuration",
+  "thread_id": "thread-seed-stage-saas-meridian-cloud",
+  "body": "Following our recent review, Meridian Cloud has concerns regarding the pricing model for SSO configuration and seeks clarification before the upcoming renewal.",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

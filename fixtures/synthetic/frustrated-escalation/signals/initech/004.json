@@ -1,0 +1,16 @@
+{
+  "external_id": "dc8cb7fd-3a48-543e-bcc8-24df7e30901a",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-01-07T06:32:43Z",
+  "from_email": "morgan.wilson@initech.com",
+  "from_name": "Morgan Wilson",
+  "to_emails": [],
+  "subject": "Webhook configuration",
+  "thread_id": "thread-frustrated-escalation-initech",
+  "body": "Hi Morgan, Initech Solutions is seeing complete failure on webhook configuration \u2014 all requests timing out since ~14:00 UTC. Is there a known incident?\n\nInitech Solutions has been experiencing intermittent failures on webhook configuration for the past 6 hours. Error logs show connection resets on the load balancer.",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

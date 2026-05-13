@@ -1,0 +1,11 @@
+{
+  "event_name": "member_invited",
+  "contact_email": "alex.davis@driftwoodlabs.com",
+  "event_properties": {
+    "plan": "enterprise",
+    "feature": "dashboards",
+    "duration_ms": 17802
+  },
+  "event_id": "f0479595-1381-57af-becb-ed1f209b7539",
+  "occurred_at": "2026-02-03T23:00:14Z"
+}

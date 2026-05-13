@@ -1,0 +1,26 @@
+{
+  "data": {
+    "id": "341a517c-7664-55ce-97cd-2f363418b98e",
+    "type": "issue.message_added",
+    "timestamp": "2026-02-28T11:26:14Z",
+    "issue": {
+      "id": "44f6c667-cac2-5955-89e9-da6bb80fe42f",
+      "title": "Feature request: dashboard loading error",
+      "requester": {
+        "email": "drew.harris@crucible.dev",
+        "name": "Drew Harris"
+      },
+      "messages": [
+        {
+          "id": "1cc16b9a-cb63-5f72-bdbb-362fcf5bdba1",
+          "body": "We've hit a wall with dashboard loading error \u2014 Crucible needs multi-region data residency and the current architecture doesn't support it. What's the plan?",
+          "author": {
+            "type": "agent",
+            "email": "support@internal.example.com",
+            "name": "Support Agent"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "event_name": "integration_connected",
+  "contact_email": "alex.anderson@phalanxsystems.io",
+  "event_properties": {
+    "plan": "pro",
+    "feature": "analytics",
+    "duration_ms": 19218
+  },
+  "event_id": "2ea3f71d-5a60-5381-a159-c028471a0f8a",
+  "occurred_at": "2026-01-19T08:00:14Z"
+}

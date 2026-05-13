@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "scenario_name": "seed-stage-saas",
+  "scenario_seed": 7214,
+  "scenario_input_hash": "e9716fb42374bae38c87602bfca21134e5bbc9d11cd8f414274b54e07b06c016",
+  "generator_version": "0.1.0",
+  "signal_count": 132,
+  "account_slugs": [
+    "phalanx-systems",
+    "driftwood-labs",
+    "ironclad-pipeline",
+    "crucible",
+    "cascade-infra",
+    "petal-analytics",
+    "stonebridge-devops",
+    "orca-cloud",
+    "thornfield-ai",
+    "meridian-cloud",
+    "revenant-systems",
+    "helix-platforms"
+  ]
+}

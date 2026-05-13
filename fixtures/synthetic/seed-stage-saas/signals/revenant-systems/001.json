@@ -1,0 +1,19 @@
+{
+  "external_id": "9d3306cb-103f-597e-8c54-c21480fad734",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-05-08T08:53:14Z",
+  "from_email": "alex.jones@revenanthq.com",
+  "from_name": "Alex Jones",
+  "to_emails": [
+    "alex.jackson@revenanthq.com",
+    "taylor.white@revenanthq.com"
+  ],
+  "subject": "Re: webhook configuration",
+  "thread_id": "thread-seed-stage-saas-revenant-systems",
+  "body": "For webhook configuration: Revenant Systems needs read-only API access with scoped permissions. The current all-or-nothing key model is a security issue for us.",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

@@ -1,0 +1,19 @@
+{
+  "external_id": "ca0bd99e-cd4a-53b0-8eb4-59878a3ae271",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-03-08T12:07:14Z",
+  "from_email": "jordan.anderson@cascadeinfra.io",
+  "from_name": "Jordan Anderson",
+  "to_emails": [
+    "jordan.miller@cascadeinfra.io",
+    "riley.miller@cascadeinfra.io"
+  ],
+  "subject": "Data migration",
+  "thread_id": "thread-seed-stage-saas-cascade-infra",
+  "body": "Following up on the data migration incident from yesterday \u2014 Cascade Infra is still seeing elevated error rates (p99 latency 8x normal). Not fully recovered.",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

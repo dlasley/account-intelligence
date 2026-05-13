@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "scenario_name": "frustrated-escalation",
+  "scenario_seed": 9163,
+  "scenario_input_hash": "9b28e295f8041dbdc431cfb70a49a7d3e7db58231e876ecc7d71cc71d9fe007e",
+  "generator_version": "0.1.0",
+  "signal_count": 13,
+  "account_slugs": [
+    "initech"
+  ]
+}

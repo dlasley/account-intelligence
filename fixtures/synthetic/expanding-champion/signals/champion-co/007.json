@@ -1,0 +1,16 @@
+{
+  "external_id": "df274ac8-fe46-5fd9-b94e-c3fb6d35e643",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-01-15T12:27:11Z",
+  "from_email": "jordan.wilson@champion-co.com",
+  "from_name": "Jordan Wilson",
+  "to_emails": [],
+  "subject": "Re: data migration",
+  "thread_id": "thread-expanding-champion-champion-co",
+  "body": "Champion Co formally requests a proposal for expanding data migration to cover our international subsidiaries. We anticipate a 3x increase in seat count.",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

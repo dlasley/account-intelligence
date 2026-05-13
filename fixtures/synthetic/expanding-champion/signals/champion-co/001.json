@@ -1,0 +1,16 @@
+{
+  "external_id": "8644d90c-9d28-5246-82c3-60b6e65bba28",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-01-01T14:27:11Z",
+  "from_email": "cameron.thomas@champion-co.com",
+  "from_name": "Cameron Thomas",
+  "to_emails": [],
+  "subject": "Re: user provisioning",
+  "thread_id": "thread-expanding-champion-champion-co",
+  "body": "Hey Cameron! Great news \u2014 Champion Co loves user provisioning and we want to roll it out to two more teams. Can we set up a call to plan it out?",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

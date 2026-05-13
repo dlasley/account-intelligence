@@ -1,0 +1,11 @@
+{
+  "event_name": "comment_added",
+  "contact_email": "avery.brown@helixplatforms.io",
+  "event_properties": {
+    "plan": "enterprise",
+    "feature": "workflows",
+    "duration_ms": 2730
+  },
+  "event_id": "51d30c3b-d370-5350-9aa6-e3e3975f47cb",
+  "occurred_at": "2026-06-07T15:53:14Z"
+}

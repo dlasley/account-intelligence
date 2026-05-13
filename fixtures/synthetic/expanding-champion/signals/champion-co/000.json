@@ -1,0 +1,16 @@
+{
+  "external_id": "55feab37-94d2-54bb-9b94-7cec33f1fa2e",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2025-12-31T14:27:11Z",
+  "from_email": "cameron.thomas@champion-co.com",
+  "from_name": "Cameron Thomas",
+  "to_emails": [],
+  "subject": "Feature roadmap",
+  "thread_id": "thread-expanding-champion-champion-co",
+  "body": "Quick win to share: Champion Co's feature roadmap usage is up 200% this quarter and leadership wants to expand. Exciting times!",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

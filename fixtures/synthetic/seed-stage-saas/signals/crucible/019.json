@@ -1,0 +1,26 @@
+{
+  "id": "not_e1139614f76c54d0a1f73022c22e958c",
+  "title": "Crucible \u2014 growth sync",
+  "createdAt": "2026-03-04T02:26:14Z",
+  "owner": {
+    "name": "Riley Thomas",
+    "email": "riley.thomas@crucible.dev"
+  },
+  "summary": "Solid sync with Crucible. Riley Thomas confirmed the team is seeing strong adoption across both use cases we discussed. Key highlights: feature roadmap rollout is on track, two new team members are onboarding next month, and they're already thinking about expanding to the European team. No blockers. Next steps: share updated pricing proposal by Friday.",
+  "transcript": [
+    {
+      "speaker": {
+        "name": "Priya Nair",
+        "source": "microphone"
+      },
+      "text": "Before we get into the agenda \u2014 any quick wins to share since our last call?"
+    },
+    {
+      "speaker": {
+        "name": "Riley Thomas",
+        "source": "speaker"
+      },
+      "text": "Yeah, we shipped two new integrations using feature roadmap last week. The team is really happy with how it works."
+    }
+  ]
+}

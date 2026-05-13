@@ -1,0 +1,11 @@
+{
+  "event_name": "plan_changed",
+  "contact_email": "alex.davis@driftwoodlabs.com",
+  "event_properties": {
+    "plan": "enterprise",
+    "feature": "mentions",
+    "duration_ms": 15584
+  },
+  "event_id": "dfa34d54-186e-57d8-a03e-78942b70e719",
+  "occurred_at": "2026-01-29T23:00:14Z"
+}

@@ -1,0 +1,11 @@
+{
+  "event_name": "search_performed",
+  "contact_email": "dana.harris@ironcladpipeline.com",
+  "event_properties": {
+    "plan": "free",
+    "feature": "pdf_export",
+    "duration_ms": 13715
+  },
+  "event_id": "d777982e-9bea-5575-8a2d-eabd7e92278b",
+  "occurred_at": "2026-02-09T12:12:14Z"
+}

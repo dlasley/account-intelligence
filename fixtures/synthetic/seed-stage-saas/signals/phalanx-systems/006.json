@@ -1,0 +1,11 @@
+{
+  "event_name": "dashboard_viewed",
+  "contact_email": "alex.anderson@phalanxsystems.io",
+  "event_properties": {
+    "plan": "enterprise",
+    "feature": "workflows",
+    "duration_ms": 29587
+  },
+  "event_id": "ec8da6b0-cccc-5479-b010-4a16c70475fe",
+  "occurred_at": "2026-01-10T08:00:14Z"
+}

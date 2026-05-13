@@ -1,0 +1,16 @@
+{
+  "external_id": "14d0bd0b-38f7-55bb-9dae-504c30f6c7c9",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-01-22T19:00:14Z",
+  "from_email": "morgan.johnson@driftwoodlabs.com",
+  "from_name": "Morgan Johnson",
+  "to_emails": [],
+  "subject": "Executive business review",
+  "thread_id": "thread-seed-stage-saas-driftwood-labs",
+  "body": "Quick question: does executive business review support bulk operations at Driftwood Labs's scale? We're talking 50k records per batch and the current API doesn't seem to handle it.",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

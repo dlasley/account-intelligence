@@ -1,0 +1,11 @@
+{
+  "event_name": "comment_added",
+  "contact_email": "blake.brown@stonebridgedevops.com",
+  "event_properties": {
+    "plan": "pro",
+    "feature": "saved_views",
+    "duration_ms": 1475
+  },
+  "event_id": "21503a62-d049-5c1d-8823-ecb836dfb94c",
+  "occurred_at": "2026-04-03T02:54:14Z"
+}

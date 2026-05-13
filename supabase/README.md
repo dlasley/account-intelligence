@@ -1,0 +1,1 @@
+-- Place Supabase migrations here. Run `supabase migration new <name>` to create one.

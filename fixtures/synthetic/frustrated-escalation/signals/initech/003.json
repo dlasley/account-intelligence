@@ -1,0 +1,16 @@
+{
+  "external_id": "b071150f-ec14-595a-aff1-aa1304188f5e",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-01-05T14:32:43Z",
+  "from_email": "dana.jackson@initech.com",
+  "from_name": "Dana Jackson",
+  "to_emails": [],
+  "subject": "Re: SSO configuration",
+  "thread_id": "thread-frustrated-escalation-initech",
+  "body": "Hi Dana, Initech Solutions is seeing complete failure on SSO configuration \u2014 all requests timing out since ~14:00 UTC. Is there a known incident?",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

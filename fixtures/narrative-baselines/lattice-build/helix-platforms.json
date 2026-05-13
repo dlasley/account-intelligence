@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-05-09T06:52:27.998775+00:00",
+  "account": {
+    "slug": "helix-platforms",
+    "vertical": "healthcare",
+    "status": "active",
+    "overall_health_score": 56
+  },
+  "deterministic": {
+    "engagement": 90,
+    "engagement_rationale": "10 signals in the last 14 days from 5 contacts.",
+    "overall_health_score": 56
+  },
+  "llm_produced": {
+    "sentiment": 18,
+    "narrative": "Engagement at Helix Platforms is high, with 10 signals from 5 distinct contacts over the past 14 days, though product usage is concentrated \u2014 only a single contact (Avery Brown) is active in-product across both the recent and prior usage windows. Sentiment is clearly negative: multiple stakeholders have raised independent concerns about steep adoption declines \u2014 Alex Anderson reported on April 30 ('Dashboard access') that API calls dropped from ~1,200/day to ~300/day, Alex Davis flagged on April 28 ('Re: export functionality') a 40% drop in export usage, Avery Davis noted on April 27 ('Re: upgrade timeline') a parallel 40% decline and on April 26 ('Support ticket response') cited active users falling from 85 to 23 since last quarter, and Casey Jackson on April 29 ('Executive business review') requested session telemetry suspecting a team stopped using a feature after an update. Recent product activity from Avery Brown \u2014 a trial extension on May 6 and a comment on May 8, both on enterprise-plan workflows and dashboards \u2014 does not offset the broad adoption erosion reported by several other contacts. The convergence of multiple senior contacts independently flagging usage drops, combined with product activity narrowing to a single user, points to serious churn risk requiring immediate attention."
+  },
+  "dim_scores": [
+    {
+      "dimension_type": "email",
+      "weight": 0.35,
+      "score": 90
+    },
+    {
+      "dimension_type": "product_usage",
+      "weight": 0.35,
+      "score": 45
+    },
+    {
+      "dimension_type": "sentiment",
+      "weight": 0.2,
+      "score": 18
+    }
+  ],
+  "window": {
+    "signal_window_start": "2026-04-25T06:42:30.81698+00:00",
+    "signal_window_end": "2026-05-09T06:42:30.81698+00:00",
+    "signal_count": 10
+  },
+  "provenance": {
+    "prompt_version": "38d62038",
+    "generated_at": "2026-05-09T06:42:30.81698+00:00",
+    "audit_run_id": "manual_cli_1778309289",
+    "audit_overall_passed": true,
+    "audited_at": "2026-05-09T06:49:40.216283+00:00"
+  }
+}

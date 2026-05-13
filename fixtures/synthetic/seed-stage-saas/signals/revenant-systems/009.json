@@ -1,0 +1,11 @@
+{
+  "event_name": "file_uploaded",
+  "contact_email": "alex.anderson@revenanthq.com",
+  "event_properties": {
+    "plan": "free",
+    "feature": "sso_settings",
+    "duration_ms": 29877
+  },
+  "event_id": "25799f13-b962-5ed0-8bed-383bbfaf3782",
+  "occurred_at": "2026-05-25T23:53:14Z"
+}

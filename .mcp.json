@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp?project_ref=wrmptrsejzwnuarezjxf"
+    },
+    "supabase_ro": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp?project_ref=wrmptrsejzwnuarezjxf&read_only=true"
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"]
+    }
+  }
+}

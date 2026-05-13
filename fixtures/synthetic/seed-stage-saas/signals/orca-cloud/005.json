@@ -1,0 +1,11 @@
+{
+  "event_name": "integration_connected",
+  "contact_email": "morgan.jones@orcacloud.io",
+  "event_properties": {
+    "plan": "enterprise",
+    "feature": "bulk_actions",
+    "duration_ms": 6888
+  },
+  "event_id": "f034be23-e000-59ef-b6f4-fb3da7628bd2",
+  "occurred_at": "2026-04-10T23:54:14Z"
+}

@@ -1,0 +1,16 @@
+{
+  "external_id": "278d5087-e9c9-5cd3-acf9-4dc22d58e039",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2025-12-31T19:27:17Z",
+  "from_email": "blake.johnson@acme.com",
+  "from_name": "Blake Johnson",
+  "to_emails": [],
+  "subject": "Re: user provisioning",
+  "thread_id": "thread-single-champion-then-silence-acme-corp",
+  "body": "Quick question on user provisioning telemetry: Acme Corp suspects a specific team stopped using the feature after an update. Can you share session data?",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

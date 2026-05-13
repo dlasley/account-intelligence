@@ -1,0 +1,11 @@
+{
+  "event_name": "workspace_created",
+  "contact_email": "cameron.johnson@ironcladpipeline.com",
+  "event_properties": {
+    "plan": "enterprise",
+    "feature": "csv_export",
+    "duration_ms": 21045
+  },
+  "event_id": "68e1429a-52e5-58f9-905c-e52cf6e38f96",
+  "occurred_at": "2026-02-08T16:22:14Z"
+}

@@ -1,0 +1,11 @@
+{
+  "event_name": "export_started",
+  "contact_email": "morgan.jones@orcacloud.io",
+  "event_properties": {
+    "plan": "pro",
+    "feature": "bulk_actions",
+    "duration_ms": 24178
+  },
+  "event_id": "5f04bdf5-e5f9-53d3-abdc-a1691ecb1973",
+  "occurred_at": "2026-04-11T23:54:14Z"
+}

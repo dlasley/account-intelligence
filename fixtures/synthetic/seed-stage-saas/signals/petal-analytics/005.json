@@ -1,0 +1,11 @@
+{
+  "event_name": "comment_added",
+  "contact_email": "casey.johnson@petalanalytics.com",
+  "event_properties": {
+    "plan": "enterprise",
+    "feature": "api_keys",
+    "duration_ms": 19674
+  },
+  "event_id": "2d8095c8-6bee-53f5-a387-9d818bd970ae",
+  "occurred_at": "2026-03-17T16:55:14Z"
+}

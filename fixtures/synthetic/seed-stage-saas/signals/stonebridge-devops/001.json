@@ -1,0 +1,18 @@
+{
+  "external_id": "6074d8ac-ca1a-5e68-881f-3e14b60e40c4",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-03-21T12:54:14Z",
+  "from_email": "casey.white@stonebridgedevops.com",
+  "from_name": "Casey White",
+  "to_emails": [
+    "blake.johnson@stonebridgedevops.com"
+  ],
+  "subject": "Re: executive business review",
+  "thread_id": "thread-seed-stage-saas-stonebridge-devops",
+  "body": "Stonebridge DevOps formally acknowledges receipt of the executive business review renewal notice. We will require an updated proposal reflecting current usage levels.",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

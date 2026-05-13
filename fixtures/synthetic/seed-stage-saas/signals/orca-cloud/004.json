@@ -1,0 +1,16 @@
+{
+  "external_id": "4669568a-518d-5467-bd3d-45b30724a6b5",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-04-09T06:54:14Z",
+  "from_email": "riley.harris@orcacloud.io",
+  "from_name": "Riley Harris",
+  "to_emails": [],
+  "subject": "Upgrade timeline",
+  "thread_id": "thread-seed-stage-saas-orca-cloud",
+  "body": "The alternative vendor's upgrade timeline API supports GraphQL. Is that on your roadmap? Orca Cloud uses GraphQL internally and the REST-only model is a friction point.",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

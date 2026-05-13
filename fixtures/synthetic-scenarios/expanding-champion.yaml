@@ -1,0 +1,62 @@
+version: 1
+name: expanding-champion
+seed: 8831
+description: >
+  A champion account showing positive momentum and expansion signals.
+  Product usage is heavy relative to email; the champion's communications
+  are optimistic and forward-looking. Exercises the narrative generator's
+  ability to synthesise a success story from mixed modal inputs.
+  concern_topic: success_expansion surfaces expansion-readiness language
+  in the email templates (ADR-015 Rev 2).
+workspace_slug: synth-champion
+
+accounts:
+  - slug: champion-co
+    name: Champion Co
+    primary_domain: champion-co.com
+    vertical: software
+    status: active
+
+signals:
+  # Inbound emails — champion contact, positive tone, mixed casual/formal
+  - source_type: inbound_email
+    account_slug: champion-co
+    count: 5
+    axes:
+      contact_diversity: single
+      contact_email_origin: corporate
+      response_cadence: steady
+      sentiment_trajectory: flat
+      email_tone: casual
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: product_heavy
+      concern_topic: success_expansion
+
+  - source_type: inbound_email
+    account_slug: champion-co
+    count: 3
+    axes:
+      contact_diversity: single
+      contact_email_origin: corporate
+      response_cadence: steady
+      sentiment_trajectory: flat
+      email_tone: formal
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: product_heavy
+      concern_topic: success_expansion
+
+  # Product events — heavy usage signals driving the cross_modal: product_heavy shape
+  - source_type: product_event
+    account_slug: champion-co
+    count: 6
+    axes:
+      cross_modal: product_heavy
+
+target:
+  # reserved for v1.5 — ignored in v1
+  outcome: null
+  health_score: null
+  dimension_scores: []
+  verification_method: null

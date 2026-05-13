@@ -1,0 +1,11 @@
+{
+  "event_name": "share_link_generated",
+  "contact_email": "alex.anderson@revenanthq.com",
+  "event_properties": {
+    "plan": "pro",
+    "feature": "templates",
+    "duration_ms": 13887
+  },
+  "event_id": "09b9aa81-910f-5b19-a62c-338a917df064",
+  "occurred_at": "2026-05-30T23:53:14Z"
+}

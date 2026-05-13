@@ -1,0 +1,19 @@
+{
+  "external_id": "b03bf21a-34b4-599b-ad83-25f6797fa0e6",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-02-07T20:36:14Z",
+  "from_email": "alex.miller@ironcladpipeline.com",
+  "from_name": "Alex Miller",
+  "to_emails": [
+    "casey.jackson@ironcladpipeline.com",
+    "avery.smith@ironcladpipeline.com"
+  ],
+  "subject": "Upgrade timeline",
+  "thread_id": "thread-seed-stage-saas-ironclad-pipeline",
+  "body": "Sorry for the poor utilization on upgrade timeline. Ironclad Pipeline Co went through a leadership change and the initiative lost sponsorship temporarily.",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

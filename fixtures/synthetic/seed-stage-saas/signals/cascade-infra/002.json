@@ -1,0 +1,18 @@
+{
+  "external_id": "bfdcaea9-22d6-5771-b912-b7cd5be0804b",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-03-05T23:10:14Z",
+  "from_email": "cameron.harris@cascadeinfra.io",
+  "from_name": "Cameron Harris",
+  "to_emails": [
+    "drew.harris@cascadeinfra.io"
+  ],
+  "subject": "Re: export functionality",
+  "thread_id": "thread-seed-stage-saas-cascade-infra",
+  "body": "Urgent: export functionality is down for Cascade Infra. Getting 503s on all endpoints. Status page shows green but we're clearly impacted. Any updates?",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

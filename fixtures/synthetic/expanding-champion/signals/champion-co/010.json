@@ -1,0 +1,11 @@
+{
+  "event_name": "workspace_created",
+  "contact_email": "skylar.thomas@champion-co.com",
+  "event_properties": {
+    "plan": "enterprise",
+    "feature": "workspace_created",
+    "duration_ms": 12417
+  },
+  "event_id": "d3b7adfb-4347-5305-b00c-4613ce861ce3",
+  "occurred_at": "2026-01-20T15:27:11Z"
+}

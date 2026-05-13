@@ -1,0 +1,16 @@
+{
+  "external_id": "720fe4b2-16ee-59f4-9a26-f6bfca122004",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-04-15T02:54:14Z",
+  "from_email": "riley.brown@thornfield.ai",
+  "from_name": "Riley Brown",
+  "to_emails": [],
+  "subject": "Data migration",
+  "thread_id": "thread-seed-stage-saas-thornfield-ai",
+  "body": "Hey Riley! Quick note about data migration \u2014 things at Thornfield AI have been going really well since we turned it on.",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

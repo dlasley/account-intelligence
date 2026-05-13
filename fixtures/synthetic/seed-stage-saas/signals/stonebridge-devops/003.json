@@ -1,0 +1,19 @@
+{
+  "external_id": "0abf20b2-6b41-54e6-a788-47c1906d67fe",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-03-24T12:54:14Z",
+  "from_email": "riley.brown@stonebridgedevops.com",
+  "from_name": "Riley Brown",
+  "to_emails": [
+    "kendall.thomas@stonebridgedevops.com",
+    "taylor.anderson@stonebridgedevops.com"
+  ],
+  "subject": "Reporting accuracy",
+  "thread_id": "thread-seed-stage-saas-stonebridge-devops",
+  "body": "Hey Riley! Stonebridge DevOps's reporting accuracy renewal is coming up and I wanted to get ahead of it. Let's set up a quick call?",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

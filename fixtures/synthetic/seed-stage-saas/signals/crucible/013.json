@@ -1,0 +1,11 @@
+{
+  "event_name": "share_link_generated",
+  "contact_email": "cameron.jackson@crucible.dev",
+  "event_properties": {
+    "plan": "pro",
+    "feature": "saved_views",
+    "duration_ms": 29166
+  },
+  "event_id": "19a7480c-9fa9-53a0-ba75-2a366118d3fb",
+  "occurred_at": "2026-02-22T17:26:14Z"
+}

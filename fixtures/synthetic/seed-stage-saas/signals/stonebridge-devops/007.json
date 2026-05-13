@@ -1,0 +1,11 @@
+{
+  "event_name": "file_uploaded",
+  "contact_email": "blake.brown@stonebridgedevops.com",
+  "event_properties": {
+    "plan": "pro",
+    "feature": "workflows",
+    "duration_ms": 11287
+  },
+  "event_id": "bcb07348-3ca1-5a43-b77d-ecbe4a487ac4",
+  "occurred_at": "2026-04-01T02:54:14Z"
+}

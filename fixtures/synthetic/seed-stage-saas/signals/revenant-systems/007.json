@@ -1,0 +1,11 @@
+{
+  "event_name": "trial_extended",
+  "contact_email": "alex.anderson@revenanthq.com",
+  "event_properties": {
+    "plan": "pro",
+    "feature": "templates",
+    "duration_ms": 1103
+  },
+  "event_id": "0adccee3-b4ec-5167-83e0-fdf975d408d0",
+  "occurred_at": "2026-05-19T23:53:14Z"
+}

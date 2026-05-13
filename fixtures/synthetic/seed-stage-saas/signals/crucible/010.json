@@ -1,0 +1,11 @@
+{
+  "event_name": "integration_connected",
+  "contact_email": "quinn.williams@crucible.dev",
+  "event_properties": {
+    "plan": "free",
+    "feature": "alerts",
+    "duration_ms": 1088
+  },
+  "event_id": "3e92810a-cb6b-5207-a98c-a10e95cef95c",
+  "occurred_at": "2026-02-20T21:49:14Z"
+}

@@ -1,0 +1,11 @@
+{
+  "event_name": "settings_updated",
+  "contact_email": "drew.brown@thornfield.ai",
+  "event_properties": {
+    "plan": "free",
+    "feature": "api_keys",
+    "duration_ms": 14684
+  },
+  "event_id": "5a2741f9-bc53-5ae4-9e29-eeae1f70778d",
+  "occurred_at": "2026-04-20T09:54:14Z"
+}

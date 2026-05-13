@@ -1,0 +1,18 @@
+{
+  "external_id": "7b185888-654c-5556-abf8-3b53bd13f2dc",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-02-05T00:00:14Z",
+  "from_email": "morgan.miller@ironcladpipeline.com",
+  "from_name": "Morgan Miller",
+  "to_emails": [
+    "reese.smith@ironcladpipeline.com"
+  ],
+  "subject": "Upgrade timeline",
+  "thread_id": "thread-seed-stage-saas-ironclad-pipeline",
+  "body": "Ironclad Pipeline Co requests a formal account review for upgrade timeline to understand utilization patterns and develop a reengagement plan.",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

@@ -1,0 +1,11 @@
+{
+  "event_name": "workspace_created",
+  "contact_email": "skylar.brown@cascadeinfra.io",
+  "event_properties": {
+    "plan": "free",
+    "feature": "saved_views",
+    "duration_ms": 22682
+  },
+  "event_id": "28303a4b-088e-57a1-a562-c9e6ebc58b31",
+  "occurred_at": "2026-03-09T18:47:14Z"
+}

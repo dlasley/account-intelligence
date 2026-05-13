@@ -1,0 +1,11 @@
+{
+  "event_name": "file_uploaded",
+  "contact_email": "skylar.thomas@champion-co.com",
+  "event_properties": {
+    "plan": "enterprise",
+    "feature": "file_uploaded",
+    "duration_ms": 10039
+  },
+  "event_id": "e236308e-f4cb-53f7-ace0-53d0e71bff82",
+  "occurred_at": "2026-01-26T15:27:11Z"
+}

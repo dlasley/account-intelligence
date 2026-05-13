@@ -1,0 +1,11 @@
+{
+  "event_name": "settings_updated",
+  "contact_email": "alex.anderson@phalanxsystems.io",
+  "event_properties": {
+    "plan": "pro",
+    "feature": "csv_export",
+    "duration_ms": 9143
+  },
+  "event_id": "672bf001-0b69-5ab0-a595-f0a605623fdd",
+  "occurred_at": "2026-01-15T08:00:14Z"
+}

@@ -1,0 +1,19 @@
+{
+  "external_id": "a1e10289-31dd-56b0-a5bb-6dea21fff47a",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-05-06T08:53:14Z",
+  "from_email": "taylor.white@revenanthq.com",
+  "from_name": "Taylor White",
+  "to_emails": [
+    "alex.jackson@revenanthq.com",
+    "alex.jones@revenanthq.com"
+  ],
+  "subject": "Reporting accuracy",
+  "thread_id": "thread-seed-stage-saas-revenant-systems",
+  "body": "Quick question: does reporting accuracy support bulk operations at Revenant Systems's scale? We're talking 50k records per batch and the current API doesn't seem to handle it.",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

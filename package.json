@@ -1,0 +1,12 @@
+{
+  "name": "account-intelligence-tools",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Build tooling for the Python worker (event.js bundle).",
+  "scripts": {
+    "build:event-js": "esbuild src/server/static/event.js --bundle --minify --target=es2018 --format=iife --outfile=src/server/static/dist/event.js"
+  },
+  "devDependencies": {
+    "esbuild": "^0.21.0"
+  }
+}

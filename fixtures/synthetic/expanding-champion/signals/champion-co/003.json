@@ -1,0 +1,16 @@
+{
+  "external_id": "82df7259-2dde-51d4-a778-211ad1c004ff",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-01-06T14:27:11Z",
+  "from_email": "cameron.thomas@champion-co.com",
+  "from_name": "Cameron Thomas",
+  "to_emails": [],
+  "subject": "Re: onboarding progress",
+  "thread_id": "thread-expanding-champion-champion-co",
+  "body": "Hi! Just wanted to share that onboarding progress has been a huge hit at Champion Co. The team keeps asking for more. Let's talk expansion!",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

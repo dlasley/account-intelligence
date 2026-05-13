@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-05-09T06:52:28.001013+00:00",
+  "account": {
+    "slug": "stonebridge-devops",
+    "vertical": "financial_services",
+    "status": "active",
+    "overall_health_score": 63
+  },
+  "deterministic": {
+    "engagement": 90,
+    "engagement_rationale": "10 signals in the last 14 days from 6 contacts.",
+    "overall_health_score": 63
+  },
+  "llm_produced": {
+    "sentiment": 40,
+    "narrative": "Engagement is high, with 10 signals over the past 14 days from multiple contacts spanning product usage, renewal conversations, and competitive evaluation threads. Sentiment is mixed: on one hand, Alex Johnson proactively reached out on 2026-05-01 ('Re: compliance requirements') to get ahead of an upcoming renewal, Riley Smith requested a review call on 2026-04-28 ('User provisioning') for a Q3 renewal, and Skylar Garcia confirmed active data migration renewal discussions on 2026-04-25 ('Re: data migration'). On the other hand, two signals introduce competitive pressure \u2014 an 'Upgrade timeline' email on 2026-04-28 citing claims of 3x faster data sync and a 'Re: SSO configuration' email on 2026-04-26 requesting a competitive review meeting with pricing from several alternative providers. Product usage is concentrated entirely on Blake Brown, who performed multiple actions (file uploads, a comment, an export) across features including audit_log, saved_views, workflows, shareable_links, and dashboards, but no other contacts show any product activity, indicating narrow adoption."
+  },
+  "dim_scores": [
+    {
+      "dimension_type": "email",
+      "weight": 0.35,
+      "score": 90
+    },
+    {
+      "dimension_type": "product_usage",
+      "weight": 0.35,
+      "score": 50
+    },
+    {
+      "dimension_type": "sentiment",
+      "weight": 0.2,
+      "score": 40
+    }
+  ],
+  "window": {
+    "signal_window_start": "2026-04-25T06:42:00.945644+00:00",
+    "signal_window_end": "2026-05-09T06:42:00.945644+00:00",
+    "signal_count": 10
+  },
+  "provenance": {
+    "prompt_version": "38d62038",
+    "generated_at": "2026-05-09T06:42:00.945644+00:00",
+    "audit_run_id": "manual_cli_1778309289",
+    "audit_overall_passed": true,
+    "audited_at": "2026-05-09T06:51:15.745084+00:00"
+  }
+}

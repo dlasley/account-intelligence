@@ -1,0 +1,11 @@
+{
+  "event_name": "comment_added",
+  "contact_email": "cameron.johnson@ironcladpipeline.com",
+  "event_properties": {
+    "plan": "free",
+    "feature": "reports",
+    "duration_ms": 4523
+  },
+  "event_id": "597a91dd-19f5-5dd5-bf2a-44e3cf83ece0",
+  "occurred_at": "2026-02-08T23:12:14Z"
+}

@@ -1,0 +1,16 @@
+{
+  "external_id": "1bfbc983-b6e1-5b8b-90ca-eefd625f5e98",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2025-12-31T15:30:17Z",
+  "from_email": "blake.johnson@acme.com",
+  "from_name": "Blake Johnson",
+  "to_emails": [],
+  "subject": "Re: performance issues",
+  "thread_id": "thread-single-champion-then-silence-acme-corp",
+  "body": "The performance issues dashboard at Acme Corp is barely being used. Can we get a report on which modules have zero activity in the last 60 days?",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

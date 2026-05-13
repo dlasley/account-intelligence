@@ -1,0 +1,11 @@
+{
+  "event_name": "export_started",
+  "contact_email": "skylar.brown@cascadeinfra.io",
+  "event_properties": {
+    "plan": "free",
+    "feature": "team_management",
+    "duration_ms": 29195
+  },
+  "event_id": "f3e6c630-86b5-5d3a-9162-eeead7471d33",
+  "occurred_at": "2026-03-09T17:39:14Z"
+}

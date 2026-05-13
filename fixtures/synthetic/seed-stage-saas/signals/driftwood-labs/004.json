@@ -1,0 +1,11 @@
+{
+  "event_name": "integration_connected",
+  "contact_email": "alex.davis@driftwoodlabs.com",
+  "event_properties": {
+    "plan": "pro",
+    "feature": "api_keys",
+    "duration_ms": 7998
+  },
+  "event_id": "9bbb3453-3d07-5cf9-b7d6-7fbaa728642c",
+  "occurred_at": "2026-01-28T23:00:14Z"
+}

@@ -1,0 +1,16 @@
+{
+  "external_id": "6189b884-6695-5340-b621-b55e916d8427",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-01-12T12:27:11Z",
+  "from_email": "jordan.wilson@champion-co.com",
+  "from_name": "Jordan Wilson",
+  "to_emails": [],
+  "subject": "Re: integration setup",
+  "thread_id": "thread-expanding-champion-champion-co",
+  "body": "On behalf of Champion Co, I am writing to initiate a formal expansion discussion for integration setup. Our pilot results have exceeded expectations.",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

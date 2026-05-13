@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-05-09T06:52:27.995701+00:00",
+  "account": {
+    "slug": "phalanx-systems",
+    "vertical": "public_sector",
+    "status": "active",
+    "overall_health_score": 51
+  },
+  "deterministic": {
+    "engagement": 50,
+    "engagement_rationale": "13 signals in the last 30 days from 5 contacts.",
+    "overall_health_score": 51
+  },
+  "llm_produced": {
+    "sentiment": 88,
+    "narrative": "Engagement is medium with 13 signals from 5 contacts over the past 30 days, though product usage is concentrated entirely in Alex Anderson, who accounts for all eight product events \u2014 spanning dashboard views, report generation, integration connection (May 5), and a workspace creation (May 8) \u2014 while the other four contacts contributed exclusively through email. Sentiment is strongly positive: multiple stakeholders have expressed clear expansion intent, including Quinn Williams (Apr 16, 'Webhook configuration') requesting rollout to additional teams, Avery Davis (Apr 17, 'Re: contract renewal') signaling org-wide readiness, Morgan Miller (Apr 22, 'Compliance requirements') formally initiating an expansion discussion citing pilot results exceeding expectations, and Blake Thomas (Apr 24, 'Re: integration setup') requesting an executive briefing for the next deployment phase. A notable concern is that several of Alex Anderson's product events show plan=free, which may indicate the account is not yet on a tier that supports the scale of deployment being discussed. Whether any of the enthusiastic expansion conversations have progressed into formal procurement or budget approval is unknown."
+  },
+  "dim_scores": [
+    {
+      "dimension_type": "email",
+      "weight": 0.35,
+      "score": 50
+    },
+    {
+      "dimension_type": "product_usage",
+      "weight": 0.35,
+      "score": 30
+    },
+    {
+      "dimension_type": "sentiment",
+      "weight": 0.2,
+      "score": 88
+    }
+  ],
+  "window": {
+    "signal_window_start": "2026-04-09T06:44:34.986291+00:00",
+    "signal_window_end": "2026-05-09T06:44:34.986291+00:00",
+    "signal_count": 13
+  },
+  "provenance": {
+    "prompt_version": "38d62038",
+    "generated_at": "2026-05-09T06:44:34.986291+00:00",
+    "audit_run_id": "manual_cli_1778309289",
+    "audit_overall_passed": true,
+    "audited_at": "2026-05-09T06:49:20.43636+00:00"
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-05-09T06:52:27.998112+00:00",
+  "account": {
+    "slug": "petal-analytics",
+    "vertical": "media_entertainment",
+    "status": "active",
+    "overall_health_score": 61
+  },
+  "deterministic": {
+    "engagement": 90,
+    "engagement_rationale": "12 signals in the last 14 days from 6 contacts.",
+    "overall_health_score": 61
+  },
+  "llm_produced": {
+    "sentiment": 40,
+    "narrative": "Engagement is high, with 12 signals from 6 contacts over the past two weeks, though product usage is concentrated entirely in Casey Johnson, who on May 8 connected integrations, added comments, and generated a report across multiple features \u2014 with zero activity in the prior window, this represents a new usage burst rather than a sustained pattern. Sentiment is mixed: Drew Davis expressed affection for the product on May 5 ('Re: data retention policy') but flagged a recurring blocker around data retention, and on May 4 ('Sso configuration') asked about CSV export capability; Cameron Jackson reported being blocked on May 3 ('Integration setup') due to missing webhook retry support with exponential backoff; and Blake Williams on May 3 ('Re: support ticket response') requested API filtering by custom metadata fields \u2014 multiple unresolved feature and roadmap requests are accumulating without documented responses. Three late-April signals (April 25\u201328) reference 'Stonebridge DevOps' and appear misrouted to this account, which should be investigated. The combination of several open blockers, usage concentrated in a single contact, and no prior usage baseline warrants prompt follow-up."
+  },
+  "dim_scores": [
+    {
+      "dimension_type": "email",
+      "weight": 0.35,
+      "score": 90
+    },
+    {
+      "dimension_type": "product_usage",
+      "weight": 0.35,
+      "score": 45
+    },
+    {
+      "dimension_type": "sentiment",
+      "weight": 0.2,
+      "score": 40
+    }
+  ],
+  "window": {
+    "signal_window_start": "2026-04-25T06:41:28.299335+00:00",
+    "signal_window_end": "2026-05-09T06:41:28.299335+00:00",
+    "signal_count": 12
+  },
+  "provenance": {
+    "prompt_version": "38d62038",
+    "generated_at": "2026-05-09T06:41:28.299335+00:00",
+    "audit_run_id": "manual_cli_1778309510",
+    "audit_overall_passed": true,
+    "audited_at": "2026-05-09T06:52:05.262709+00:00"
+  }
+}

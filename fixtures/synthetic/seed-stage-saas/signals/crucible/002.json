@@ -1,0 +1,16 @@
+{
+  "external_id": "51671050-f05e-5b91-8ef1-51f9c77e5a1e",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-02-16T01:12:14Z",
+  "from_email": "dana.wilson@crucible.dev",
+  "from_name": "Dana Wilson",
+  "to_emails": [],
+  "subject": "Re: executive business review",
+  "thread_id": "thread-seed-stage-saas-crucible",
+  "body": "Hey, following up on executive business review \u2014 Crucible hit a major milestone last week and your product was a big part of it. Time to grow!",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

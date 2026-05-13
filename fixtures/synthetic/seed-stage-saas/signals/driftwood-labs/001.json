@@ -1,0 +1,16 @@
+{
+  "external_id": "581a70d3-5ff8-596e-ae7d-501a8bdbfe93",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-01-25T19:00:14Z",
+  "from_email": "morgan.johnson@driftwoodlabs.com",
+  "from_name": "Morgan Johnson",
+  "to_emails": [],
+  "subject": "Re: integration setup",
+  "thread_id": "thread-seed-stage-saas-driftwood-labs",
+  "body": "For integration setup: Driftwood Labs needs read-only API access with scoped permissions. The current all-or-nothing key model is a security issue for us.",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

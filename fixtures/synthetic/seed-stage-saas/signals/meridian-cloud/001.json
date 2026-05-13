@@ -1,0 +1,18 @@
+{
+  "external_id": "041f0753-d3b4-5f49-aa3d-18eab85b92db",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-04-28T14:37:14Z",
+  "from_email": "drew.williams@meridiancloud.com",
+  "from_name": "Drew Williams",
+  "to_emails": [
+    "taylor.garcia@meridiancloud.com"
+  ],
+  "subject": "Re: onboarding progress",
+  "thread_id": "thread-seed-stage-saas-meridian-cloud",
+  "body": "Dear Drew, Meridian Cloud wishes to formally review the pricing structure for onboarding progress. We request a detailed cost breakdown at your earliest convenience.",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

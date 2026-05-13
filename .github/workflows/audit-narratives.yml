@@ -1,0 +1,99 @@
+name: Narrative Audit
+
+# Per-PR: fires when narrative-touching files change (ADR-016 D5).
+# Writes results to production Supabase with audit_source=ci.
+# Fails the PR on any hard-gate criterion failure.
+on:
+  pull_request:
+    paths:
+      - "src/pipeline/generator.py"
+      - "src/pipeline/confidence.py"
+      - "config/**/*.json"
+      - "src/domain/narrative.py"
+
+  # Nightly audit for trend baseline (ADR-016 D5b).
+  schedule:
+    - cron: "0 2 * * *"  # 02:00 UTC nightly
+
+  # Allow manual trigger for ad-hoc audits.
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "Audit at most N narratives (default: all)"
+        required: false
+        default: ""
+      dry_run:
+        description: "Dry run (no DB writes)"
+        type: boolean
+        required: false
+        default: false
+
+env:
+  AUDIT_MAX_COST_USD: "0.50"
+
+jobs:
+  audit:
+    name: Cross-model narrative audit
+    runs-on: ubuntu-latest
+    # Production environment gate: secrets (OPENAI_API_KEY, SUPABASE_URL,
+    # SUPABASE_SERVICE_ROLE_KEY) are only injected after a maintainer's manual
+    # approval. Required setup (one-time, in GitHub UI):
+    #   Settings → Environments → New environment → "production"
+    #   → Required reviewers: [your GitHub user]
+    # The reviewer reviews the PR diff (including any workflow file changes)
+    # before approving. This defends against the compromised-collaborator
+    # threat where a malicious PR modifies the workflow to exfiltrate secrets.
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install uv
+        run: pip install uv
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Determine audit parameters
+        id: params
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "audit_source=ci" >> "$GITHUB_OUTPUT"
+            echo "sha=${{ github.event.pull_request.head.sha }}" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.event_name }}" == "schedule" ]]; then
+            echo "audit_source=nightly" >> "$GITHUB_OUTPUT"
+            echo "sha=" >> "$GITHUB_OUTPUT"
+          else
+            echo "audit_source=manual" >> "$GITHUB_OUTPUT"
+            echo "sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run narrative audit
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          AUDIT_MAX_COST_USD: ${{ env.AUDIT_MAX_COST_USD }}
+        run: |
+          ARGS="--audit-source ${{ steps.params.outputs.audit_source }} --write-db"
+
+          if [[ -n "${{ steps.params.outputs.sha }}" ]]; then
+            ARGS="$ARGS --sha ${{ steps.params.outputs.sha }}"
+          fi
+
+          if [[ "${{ github.event.inputs.dry_run }}" == "true" ]]; then
+            ARGS="--dry-run"
+          fi
+
+          if [[ -n "${{ github.event.inputs.limit }}" ]]; then
+            ARGS="$ARGS --limit ${{ github.event.inputs.limit }}"
+          fi
+
+          uv run python scripts/audit_narratives.py $ARGS
+        # Exit code 1 = hard-gate failure → fails the PR check.
+        # Exit code 2 = runtime error → also fails.

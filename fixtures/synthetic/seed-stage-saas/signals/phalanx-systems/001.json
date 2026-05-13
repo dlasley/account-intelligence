@@ -1,0 +1,19 @@
+{
+  "external_id": "307f5478-5c74-529f-aec1-e1f613bc54f4",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-01-01T14:00:14Z",
+  "from_email": "avery.davis@phalanxsystems.io",
+  "from_name": "Avery Davis",
+  "to_emails": [
+    "quinn.williams@phalanxsystems.io",
+    "cameron.miller@phalanxsystems.io"
+  ],
+  "subject": "Re: contract renewal",
+  "thread_id": "thread-seed-stage-saas-phalanx-systems",
+  "body": "Hi Avery, Phalanx Systems is ready to bring contract renewal to our whole org. Been waiting for the right moment and it's now!",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

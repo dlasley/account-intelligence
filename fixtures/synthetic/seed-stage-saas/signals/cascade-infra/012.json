@@ -1,0 +1,26 @@
+{
+  "id": "not_7fc6de31689d58438fbb893d429b1510",
+  "title": "Cascade Infra outage debrief",
+  "createdAt": "2026-03-10T14:29:14Z",
+  "owner": {
+    "name": "Casey Brown",
+    "email": "casey.brown@cascadeinfra.io"
+  },
+  "summary": "Difficult sync with Cascade Infra. Casey Brown opened with escalation concerns around renewal terms \u2014 there have been two incidents in the past month and the team is frustrated. We acknowledged the issues, committed to a root cause summary by Thursday, and proposed a dedicated engineering review. Relationship is strained but recoverable.\n\nCompetitive evaluation call with Cascade Infra. Casey Brown disclosed they've been evaluating an alternative to renewal terms. We presented our differentiated capabilities, walked through the roadmap, and addressed the pricing gap. The call was professional but tense. They've agreed to a 30-day hold on the evaluation while we prepare a counter-proposal.",
+  "transcript": [
+    {
+      "speaker": {
+        "name": "Sarah Chen",
+        "source": "microphone"
+      },
+      "text": "We wanted to check in on the adoption numbers. They've been a bit lower than we expected."
+    },
+    {
+      "speaker": {
+        "name": "Casey Brown",
+        "source": "speaker"
+      },
+      "text": "Yeah, I know. We had some internal restructuring and it slowed things down. We're back on track now but renewal terms got deprioritised for a few weeks."
+    }
+  ]
+}

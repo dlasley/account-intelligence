@@ -1,0 +1,54 @@
+version: 1
+name: divergent-churn-risk
+seed: 3391
+description: >
+  Classic churn-risk shape: early product engagement, then product activity drops
+  while email goes silent (drift then nothing). Divergent: product use and
+  email communication tell decoupled stories, both declining.
+workspace_slug: synth-divergent
+
+accounts:
+  - slug: verdant-labs
+    name: Verdant Labs
+    primary_domain: verdantlabs.com
+    vertical: life_sciences
+    status: active
+
+signals:
+  # Early burst of product usage
+  - source_type: product_event
+    account_slug: verdant-labs
+    count: 15
+    axes:
+      contact_email_origin: corporate
+      response_cadence: burst
+      cross_modal: divergent
+      concern_topic: competitive
+      # exercises: high initial product engagement
+
+  # Product activity tapering off
+  - source_type: product_event
+    account_slug: verdant-labs
+    count: 5
+    axes:
+      contact_email_origin: corporate
+      response_cadence: drift
+      cross_modal: divergent
+      concern_topic: competitive
+      # exercises: declining product engagement -> lower product_usage score
+
+  # Email: present early, drifting to silence
+  - source_type: inbound_email
+    account_slug: verdant-labs
+    count: 4
+    axes:
+      contact_diversity: single
+      contact_email_origin: corporate
+      response_cadence: drift
+      sentiment_trajectory: declining
+      email_tone: technical
+      cross_modal: divergent
+      concern_topic: competitive
+      # exercises: drift cadence + declining sentiment trajectory together
+
+  # silence: no further email entries — structural gap, not a generator parameter

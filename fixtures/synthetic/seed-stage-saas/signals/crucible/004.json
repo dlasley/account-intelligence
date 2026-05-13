@@ -1,0 +1,16 @@
+{
+  "external_id": "be545e78-fe47-5ba2-a473-adc010d32cab",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-02-18T17:12:14Z",
+  "from_email": "alex.jones@crucible.dev",
+  "from_name": "Alex Jones",
+  "to_emails": [],
+  "subject": "Re: renewal terms",
+  "thread_id": "thread-seed-stage-saas-crucible",
+  "body": "Hey, is renewal terms on the roadmap for this year? Crucible keeps working around the gap and it'd be great to know if we should build internally or wait.",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

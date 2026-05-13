@@ -1,0 +1,11 @@
+{
+  "event_name": "search_performed",
+  "contact_email": "avery.brown@helixplatforms.io",
+  "event_properties": {
+    "plan": "free",
+    "feature": "bulk_actions",
+    "duration_ms": 7171
+  },
+  "event_id": "e766ac67-a900-512f-aea1-e56730c8ff17",
+  "occurred_at": "2026-06-03T15:53:14Z"
+}

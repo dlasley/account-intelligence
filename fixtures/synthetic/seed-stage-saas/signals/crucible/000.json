@@ -1,0 +1,16 @@
+{
+  "external_id": "90b989a8-40bc-5b52-85b1-a55d9fef219b",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-02-11T01:12:14Z",
+  "from_email": "dana.wilson@crucible.dev",
+  "from_name": "Dana Wilson",
+  "to_emails": [],
+  "subject": "User provisioning",
+  "thread_id": "thread-seed-stage-saas-crucible",
+  "body": "Quick win to share: Crucible's user provisioning usage is up 200% this quarter and leadership wants to expand. Exciting times!",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

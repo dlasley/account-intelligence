@@ -1,0 +1,11 @@
+{
+  "event_name": "report_generated",
+  "contact_email": "alex.anderson@phalanxsystems.io",
+  "event_properties": {
+    "plan": "pro",
+    "feature": "comments",
+    "duration_ms": 4334
+  },
+  "event_id": "5fa94f4d-b754-566c-a0a1-7c8a2a6b0d5b",
+  "occurred_at": "2026-01-11T08:00:14Z"
+}

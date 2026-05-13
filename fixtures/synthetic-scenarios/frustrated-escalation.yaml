@@ -1,0 +1,68 @@
+version: 1
+name: frustrated-escalation
+seed: 9163
+description: >
+  Clear sentiment decline with language-register shift from formal to escalation.
+  Starts with polite formal inquiries, transitions through apologetic tone mid-thread,
+  then escalates to explicit dissatisfaction language. Tests that sentiment scoring
+  captures declining trajectory and that narrative generation reflects the arc.
+workspace_slug: synth-escalation
+
+accounts:
+  - slug: initech
+    name: Initech Solutions
+    primary_domain: initech.com
+    vertical: financial_services
+    status: active
+
+signals:
+  # Phase 1: formal opening — polite, professional
+  - source_type: inbound_email
+    account_slug: initech
+    count: 4
+    axes:
+      contact_diversity: single
+      contact_email_origin: corporate
+      response_cadence: steady
+      sentiment_trajectory: declining
+      email_tone: formal
+      message_length: paragraph
+      threading_topology: linear
+      cross_modal: email_heavy
+      concern_topic: outage
+
+  # Phase 2: frustration builds — longer messages, register drifting to apologetic
+  - source_type: inbound_email
+    account_slug: initech
+    count: 4
+    axes:
+      contact_diversity: single
+      contact_email_origin: corporate
+      response_cadence: steady
+      sentiment_trajectory: declining
+      email_tone: apologetic
+      message_length: multi
+      threading_topology: linear
+      cross_modal: email_heavy
+      concern_topic: outage
+
+  # Phase 3: full escalation — explicit dissatisfaction, short high-urgency messages
+  - source_type: inbound_email
+    account_slug: initech
+    count: 5
+    axes:
+      contact_diversity: single
+      contact_email_origin: corporate
+      response_cadence: burst
+      sentiment_trajectory: sudden_escalation
+      email_tone: escalation
+      message_length: short
+      threading_topology: standalone
+      cross_modal: email_heavy
+      concern_topic: outage
+
+target:
+  outcome: null
+  health_score: null
+  dimension_scores: []
+  verification_method: null

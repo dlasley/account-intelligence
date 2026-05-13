@@ -1,0 +1,11 @@
+{
+  "event_name": "file_uploaded",
+  "contact_email": "morgan.jones@orcacloud.io",
+  "event_properties": {
+    "plan": "free",
+    "feature": "csv_export",
+    "duration_ms": 23281
+  },
+  "event_id": "85ae5b21-05cc-5c36-a79a-573c8e574d88",
+  "occurred_at": "2026-04-14T23:54:14Z"
+}

@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-05-09T06:52:28.000137+00:00",
+  "account": {
+    "slug": "orca-cloud",
+    "vertical": "software",
+    "status": "active",
+    "overall_health_score": 56
+  },
+  "deterministic": {
+    "engagement": 90,
+    "engagement_rationale": "10 signals in the last 14 days from 7 contacts.",
+    "overall_health_score": 56
+  },
+  "llm_produced": {
+    "sentiment": 18,
+    "narrative": "Engagement is high with 10 signals from 7 contacts over the past 14 days, but sentiment is decidedly negative \u2014 the dominant theme is active competitive evaluation across multiple stakeholders. Avery Johnson formally requested a vendor capabilities review on Apr 28 ('Data migration'), Dana White on Apr 30 ('Data migration') cited a competitor claiming 3x faster data sync, Riley Wilson on Apr 30 ('Data migration') questioned native Salesforce integration support at Orca Cloud's scale, Blake Brown on May 3 ('Dashboard access') raised Vendor X's data residency approach, and Avery Garcia on May 3 ('User provisioning') disclosed a competitor offering a 90-day POC and requested an equivalent trial environment. Product usage is flat and narrow: only Morgan Jones is active in the product with low-volume events (integration_connected, export_started, settings_updated, file_uploaded between May 4\u20138), and the Apr 25 'Api rate limits' signal acknowledged slow internal responsiveness, compounding service-confidence concerns. The breadth of competitive inquiries from multiple contacts \u2014 spanning data migration, provisioning, dashboard access, and integration \u2014 signals a coordinated vendor evaluation that puts this account at serious churn risk."
+  },
+  "dim_scores": [
+    {
+      "dimension_type": "email",
+      "weight": 0.35,
+      "score": 90
+    },
+    {
+      "dimension_type": "product_usage",
+      "weight": 0.35,
+      "score": 45
+    },
+    {
+      "dimension_type": "sentiment",
+      "weight": 0.2,
+      "score": 18
+    }
+  ],
+  "window": {
+    "signal_window_start": "2026-04-25T06:44:18.503145+00:00",
+    "signal_window_end": "2026-05-09T06:44:18.503145+00:00",
+    "signal_count": 10
+  },
+  "provenance": {
+    "prompt_version": "38d62038",
+    "generated_at": "2026-05-09T06:44:18.503145+00:00",
+    "audit_run_id": "manual_cli_1778309289",
+    "audit_overall_passed": true,
+    "audited_at": "2026-05-09T06:50:35.584972+00:00"
+  }
+}

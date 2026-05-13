@@ -1,0 +1,11 @@
+{
+  "event_name": "plan_changed",
+  "contact_email": "drew.brown@thornfield.ai",
+  "event_properties": {
+    "plan": "free",
+    "feature": "analytics",
+    "duration_ms": 14190
+  },
+  "event_id": "73497a65-1ec7-5dc9-9b72-afaae680b715",
+  "occurred_at": "2026-04-23T09:54:14Z"
+}

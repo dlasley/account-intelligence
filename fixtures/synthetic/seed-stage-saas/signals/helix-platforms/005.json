@@ -1,0 +1,11 @@
+{
+  "event_name": "trial_extended",
+  "contact_email": "avery.brown@helixplatforms.io",
+  "event_properties": {
+    "plan": "enterprise",
+    "feature": "dashboards",
+    "duration_ms": 24513
+  },
+  "event_id": "c76bc84a-f0d6-5339-8f35-008acfb0e52f",
+  "occurred_at": "2026-06-05T15:53:14Z"
+}

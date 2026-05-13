@@ -1,0 +1,11 @@
+{
+  "event_name": "workspace_created",
+  "contact_email": "alex.anderson@phalanxsystems.io",
+  "event_properties": {
+    "plan": "free",
+    "feature": "mentions",
+    "duration_ms": 19612
+  },
+  "event_id": "f30aa597-76d6-5082-9517-dc3a5b742bc1",
+  "occurred_at": "2026-01-22T08:00:14Z"
+}

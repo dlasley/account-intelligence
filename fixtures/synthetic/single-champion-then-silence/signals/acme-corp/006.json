@@ -1,0 +1,16 @@
+{
+  "external_id": "7cada66e-abc8-515e-95f2-9f8162c52911",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2025-12-31T20:42:17Z",
+  "from_email": "blake.johnson@acme.com",
+  "from_name": "Blake Johnson",
+  "to_emails": [],
+  "subject": "Re: compliance requirements",
+  "thread_id": "thread-single-champion-then-silence-acme-corp",
+  "body": "Hi Blake, Acme Corp's compliance requirements usage has dropped 40% over the last 30 days. Can you pull the detailed activity logs so we can investigate?",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

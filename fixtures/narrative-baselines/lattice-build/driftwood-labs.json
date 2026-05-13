@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-05-09T06:52:28.000619+00:00",
+  "account": {
+    "slug": "driftwood-labs",
+    "vertical": "life_sciences",
+    "status": "active",
+    "overall_health_score": 40
+  },
+  "deterministic": {
+    "engagement": 50,
+    "engagement_rationale": "8 signals in the last 30 days from 3 contacts.",
+    "overall_health_score": 40
+  },
+  "llm_produced": {
+    "sentiment": 42,
+    "narrative": "Engagement at Driftwood Labs is medium, with 8 signals over the past 30 days from 3 contacts, though product activity is driven almost entirely by Alex Davis. Sentiment is mixed: on the positive side, Alex Davis has been actively deepening adoption \u2014 connecting integrations on 2026-05-01 and 2026-05-02, executing a plan change to enterprise on 2026-05-03, uploading a file on 2026-05-05, and inviting a new team member on 2026-05-08. However, Riley Anderson raised two unresolved technical blockers \u2014 multi-region data residency ('Performance issues,' 2026-04-21) and webhook retry with exponential backoff ('Re: integration setup,' 2026-04-24) \u2014 and Jordan Wilson requested CSV export capability ('Support ticket response,' 2026-04-24), with no visible responses to any of these requests in the window. The gap between growing product investment and multiple unanswered blockers is the central risk: if Riley Anderson's infrastructure concerns remain unaddressed, the expansion momentum Alex Davis is driving could stall."
+  },
+  "dim_scores": [
+    {
+      "dimension_type": "email",
+      "weight": 0.35,
+      "score": 50
+    },
+    {
+      "dimension_type": "product_usage",
+      "weight": 0.35,
+      "score": 28
+    },
+    {
+      "dimension_type": "sentiment",
+      "weight": 0.2,
+      "score": 42
+    }
+  ],
+  "window": {
+    "signal_window_start": "2026-04-09T06:42:15.589696+00:00",
+    "signal_window_end": "2026-05-09T06:42:15.589696+00:00",
+    "signal_count": 8
+  },
+  "provenance": {
+    "prompt_version": "38d62038",
+    "generated_at": "2026-05-09T06:42:15.589696+00:00",
+    "audit_run_id": "manual_cli_1778309289",
+    "audit_overall_passed": true,
+    "audited_at": "2026-05-09T06:50:56.289054+00:00"
+  }
+}

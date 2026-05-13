@@ -1,0 +1,18 @@
+{
+  "external_id": "2401aedf-9def-5a47-bfc4-dd933cca3001",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-03-19T12:54:14Z",
+  "from_email": "casey.white@stonebridgedevops.com",
+  "from_name": "Casey White",
+  "to_emails": [
+    "blake.johnson@stonebridgedevops.com"
+  ],
+  "subject": "Data migration",
+  "thread_id": "thread-seed-stage-saas-stonebridge-devops",
+  "body": "Stonebridge DevOps formally acknowledges receipt of the data migration renewal notice. We will require an updated proposal reflecting current usage levels.",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

@@ -1,0 +1,16 @@
+{
+  "external_id": "47585b23-ff03-56fe-a031-09e7d105ec14",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2025-12-31T13:51:17Z",
+  "from_email": "blake.johnson@acme.com",
+  "from_name": "Blake Johnson",
+  "to_emails": [],
+  "subject": "Re: feature roadmap",
+  "thread_id": "thread-single-champion-then-silence-acme-corp",
+  "body": "Investigating the feature roadmap utilization drop at Acme Corp. The pattern suggests the change happened right after the v2.3 update \u2014 is that a known regression?",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

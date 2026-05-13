@@ -1,0 +1,16 @@
+{
+  "external_id": "e45e43fb-e5ae-5e67-aabe-59af3049be13",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2025-12-31T13:10:17Z",
+  "from_email": "blake.johnson@acme.com",
+  "from_name": "Blake Johnson",
+  "to_emails": [],
+  "subject": "Integration setup",
+  "thread_id": "thread-single-champion-then-silence-acme-corp",
+  "body": "The integration setup dashboard at Acme Corp is barely being used. Can we get a report on which modules have zero activity in the last 60 days?",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}

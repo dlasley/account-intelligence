@@ -1,0 +1,16 @@
+{
+  "external_id": "806981d8-483f-51cc-ad34-91d89c9618a0",
+  "source_type": "json_fixture",
+  "direction": "inbound",
+  "channel": "email",
+  "occurred_at": "2026-01-08T14:27:11Z",
+  "from_email": "cameron.thomas@champion-co.com",
+  "from_name": "Cameron Thomas",
+  "to_emails": [],
+  "subject": "Re: renewal terms",
+  "thread_id": "thread-expanding-champion-champion-co",
+  "body": "Hi Cameron, Champion Co is ready to bring renewal terms to our whole org. Been waiting for the right moment and it's now!",
+  "in_reply_to": null,
+  "references": null,
+  "metadata": null
+}
