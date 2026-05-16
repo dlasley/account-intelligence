@@ -381,6 +381,14 @@ def _process_structured_signal_dict(
 
     The synthetic credential_id is a zero UUID (no real credential exists during
     synthesis; the normalizer uses it only for audit tagging).
+
+    BOTH COPIES MUST CHANGE TOGETHER — see worker.py:317-326. The shape-based
+    partitioning cascade in worker._process_fixtures (Granola startswith → Pylon
+    "data" key → Plain top-level "type") is duplicated here. Adding a fifth
+    structured-signal source (Stripe, Intercom, Salesforce, Svix shapes would
+    collide) requires updating both call sites or the materialise path and
+    live-simulation path silently diverge — and this copy's bare ``else`` falls
+    through to Plain, so the misroute is silent, not a loud error.
     """
     from uuid import UUID as _UUID
 

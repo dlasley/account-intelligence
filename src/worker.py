@@ -73,6 +73,14 @@ def _shift_events_to_recent(
 
     The shift is applied at ingest time only — it does NOT alter the materialised
     fixture JSON on disk.
+
+    DEPRECATED — pre-simulator pragmatic fix. The trajectory simulator
+    (ADR-021, ``src/simulator/executor.py``) solves time-anchoring at the
+    correct layer via the ``now_anchor`` parameter to ``yield_events``,
+    which threads through without on-disk coupling to the materialised
+    signals directory. New trajectory-style workflows should use the
+    simulator. This helper remains for the ``process-fixtures`` one-shot
+    CLI path until that command itself is reconsidered.
     """
     import dataclasses
     import json as _json
@@ -332,6 +340,12 @@ def _process_fixtures(scenario: str, shift_to_recent: int | None = None) -> None
     # → account-slug mapping that _shift_events_to_recent relies on, and the demo
     # health scoring is driven by email + product signal recency.
     if shift_to_recent is not None:
+        print(
+            "WARNING: --shift-to-recent is deprecated. The trajectory simulator "
+            "(src/simulator/executor.py, ADR-021) uses now_anchor= to solve this "
+            "at the correct layer without on-disk coupling. This flag remains for "
+            "the process-fixtures one-shot path until that command is reconsidered."
+        )
         all_mixed = _shift_events_to_recent(
             [*email_events_raw, *product_payloads_raw],
             shift_to_recent,
@@ -645,9 +659,10 @@ def main(args: list[str] | None = None) -> None:
         default=None,
         metavar="N",
         help=(
-            "Shift all signal timestamps at ingest time so the latest signal "
+            "[DEPRECATED] Shift all signal timestamps at ingest time so the latest signal "
             "lands ~N days before now.  Per-account relative spacing is preserved. "
-            "Does not alter fixture files on disk."
+            "Does not alter fixture files on disk.  Prefer the trajectory simulator's "
+            "now_anchor parameter (ADR-021, src/simulator/executor.py) for new workflows."
         ),
     )
 
