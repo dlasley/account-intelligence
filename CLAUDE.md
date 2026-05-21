@@ -64,7 +64,7 @@ Copy [.env.example](.env.example) to `.env` and fill in values. Never commit `.e
 - **LLM providers**: `ANTHROPIC_API_KEY` (narrative generation only — outreach uses templates, no LLM); `OPENAI_API_KEY` (audit harness only — `scripts/audit_narratives.py` uses GPT-5-mini as the cross-vendor narrative auditor per ADR-016)
 - **Supabase (worker)**: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, plus `SUPABASE_ACCESS_TOKEN` for the MCP server
 - **Supabase (frontend)**: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` — same project values, `NEXT_PUBLIC_` prefix required for Next.js client bundle
-- **Inbound email**: `INBOUND_DOMAIN` (e.g. `signal.yourdomain.com`; placeholder `signal.example.com` until domain is decided)
+- **Inbound email**: `INBOUND_DOMAIN` (e.g. `signal.yourdomain.com`; production value is set in deploy env and gitignored `.env` — public repo files use `signal.example.com` as the RFC-2606 test placeholder, never the real value)
 - **Outreach send**: `SENDGRID_API_KEY` (SendGrid Transactional API key for outreach send), `CORS_ORIGINS` (comma-separated allowed origins for the worker API, e.g. `http://localhost:3000` locally or the Vercel URL in prod; unset = no CORS headers issued)
 
 ## Tooling Notes
