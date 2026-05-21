@@ -75,3 +75,17 @@ reportOptionalSubscript = "none"
 reportOptionalMemberAccess = "none"
 reportCallIssue = "none"
 reportOperatorIssue = "none"
+
+# scripts/ — same Supabase JSON-union problem: scripts/audit_narratives.py
+# iterates response rows (n_row["id"], n_row.get("workspace_id"), etc.) and
+# pyright can't narrow the union. Mirror the src/db suppression. Real type
+# errors in script logic that don't touch Supabase rows still surface.
+[[tool.pyright.executionEnvironments]]
+root = "scripts"
+reportArgumentType = "none"
+reportAttributeAccessIssue = "none"
+reportIndexIssue = "none"
+reportOptionalSubscript = "none"
+reportOptionalMemberAccess = "none"
+reportCallIssue = "none"
+reportOperatorIssue = "none"
