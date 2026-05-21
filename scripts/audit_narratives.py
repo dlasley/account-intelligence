@@ -784,8 +784,6 @@ def audit_one_narrative(
             if context.workspace_slug and context.workspace_slug != "unknown":
                 _span.set_attribute("workspace.slug", context.workspace_slug)
             _span.set_attribute("deploy_env", os.environ.get("DEPLOY_ENV", "development"))
-            _span.set_attribute("audit_source", audit_source)
-            _span.set_attribute("llm_call_kind", "audit")
     except Exception:
         pass
 
