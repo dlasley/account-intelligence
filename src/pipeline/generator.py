@@ -497,6 +497,7 @@ def generate_narrative(
         if _span.is_recording():
             _span.set_attribute("workspace.slug", workspace_slug)
             _span.set_attribute("deploy_env", os.environ.get("DEPLOY_ENV", "development"))
+            _span.set_attribute("llm_call_kind", "narrative")
     except Exception:
         pass
 
