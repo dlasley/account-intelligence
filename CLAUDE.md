@@ -227,7 +227,7 @@ Operational specifics (deployment URLs, GCP/Vercel/PostHog identifiers, etc.) li
 
 ## Open Questions
 
-- [x] **Domain name** — target split into two subdomains: `<target-inbound-domain>` (MX target for SendGrid Inbound Parse) and `<target-api-domain>` (Cloud Run worker — receives SendGrid POST callbacks + product telemetry event beacons). Code references updated 2026-05-07. **DNS + SendGrid + Cloud Run reconfig still pending**: MX record live at the legacy `<legacy-inbound-domain>`; new domain is target state. Placeholder `signal.example.com` remains in code/fixtures (cosmetic only).
+- [x] **Domain name** — split into two subdomains for inbound vs worker API; concrete values gitignored in `.claude/internal.md`. DNS + SendGrid Domain Auth + SendGrid Inbound Parse + Cloud Run custom domain mapping + scheduler retarget all complete (2026-05-21). Legacy inbound host left configured but inert (single-domain worker; legacy mail drops as `permanent_failure`). Public-repo files use `signal.example.com` as the RFC-2606 test placeholder.
 - [x] **Cloud provider for Python worker** — GCP Cloud Run (ADR-006). min-instances=0, 512Mi, port 8080. Cloud Scheduler running `*/15 * * * *` UTC.
 
 ## Claude Code workflow
