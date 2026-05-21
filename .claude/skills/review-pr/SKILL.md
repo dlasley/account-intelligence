@@ -1,1 +1,0 @@
-/Users/davidlasley/Projects/claude-harness/skills/review-pr/SKILL.md

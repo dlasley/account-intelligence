@@ -1,1 +1,0 @@
-/Users/davidlasley/Projects/claude-harness/skills/implement-design-handoff/SKILL.md

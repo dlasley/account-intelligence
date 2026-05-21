@@ -1,1 +1,0 @@
-/Users/davidlasley/Projects/claude-harness/skills/setup-llm-client/SKILL.md

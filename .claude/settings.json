@@ -1,8 +1,40 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "_comment": "Single-source-of-truth model: the curated Bash allow list lives in ~/.claude/settings.json (user-global) and is merged additively with this file at runtime. This template ships only (a) defaultMode + hooks (per-project, can't be in global), (b) a defensive minimum allow list of Claude built-in tools so a fresh machine without ~/.claude/settings.json is still workable, (c) deny rules duplicated from global for defense in depth. To extend allow rules globally, edit ~/.claude/settings.json. To override per-project (e.g. allow a project-specific command), add to .claude/settings.local.json (gitignored).",
   "defaultMode": "acceptEdits",
+  "permissions": {
+    "allow": [
+      "Read",
+      "Edit",
+      "Write",
+      "Grep",
+      "Glob",
+      "WebSearch",
+      "WebFetch"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(rm -r /)",
+      "Bash(git push --force *)",
+      "Bash(git push -f *)",
+      "Bash(git reset --hard *)",
+      "Bash(git clean -fd*)",
+      "Bash(git branch -D *)",
+      "Bash(sudo *)",
+      "Edit(.env)",
+      "Edit(.env.local)",
+      "Write(.env)",
+      "Write(.env.local)"
+    ]
+  },
   "hooks": {
     "UserPromptSubmit": [{"hooks": [{"type": "command", "command": ".claude/hooks/user_prompt_submit.sh"}]}],
-    "Stop": [{"hooks": [{"type": "command", "command": ".claude/hooks/stop.sh"}]}]
+    "Stop": [{"hooks": [{"type": "command", "command": ".claude/hooks/stop.sh"}]}],
+    "PreToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [{"type": "command", "command": ".claude/hooks/preflight_command_name.sh"}]
+      }
+    ]
   }
 }
