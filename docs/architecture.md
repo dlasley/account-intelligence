@@ -85,12 +85,53 @@ Unroutable signals (unknown workspace, malformed envelope) return HTTP 200 with 
 
 ### 4. Narrative Scheduler
 
-Cloud Scheduler fires `POST /run-narratives` every 15 minutes. The route:
-1. Calls `recover_stale_jobs()` once — promotes any jobs stuck in `processing` state past a timeout threshold
-2. Iterates over all active workspaces
-3. For each workspace, drains its `narrative_regen_jobs` queue — jobs are enqueued by `scheduler.py` at the end of each signal ingest
+The narrative regeneration system is a **two-layer queue**: an _enqueue_ layer (writes to `narrative_regen_jobs`) and a _drain_ layer (a 15-minute cron-driven processor). Nothing else triggers `generate_narrative`; the queue is the only path to Claude.
+
+#### Drain layer
+
+Cloud Scheduler fires `POST /run-narratives` every 15 minutes (`*/15 * * * *` UTC). The route ([`src/server/routes/scheduler.py`](../src/server/routes/scheduler.py)):
+1. Calls `recover_stale_jobs()` once — promotes any jobs stuck in `RUNNING` state past a timeout threshold (recovers from crashed prior runs).
+2. Iterates over all active workspaces.
+3. For each workspace, drains up to **20 pending jobs per tick** (`_MAX_JOBS_PER_WORKSPACE`). Job-by-job: mark `RUNNING` → call `generate_narrative(...)` → mark `DONE` or `FAILED`. Jobs against the `_unmatched` account are marked `FAILED` without a Claude call (the unmatched bucket has no semantic account view).
 
 Auth: `Authorization: Bearer <SCHEDULER_SECRET>` header. Unset secret returns 500 (fail closed). Wrong secret returns 401.
+
+#### Enqueue triggers
+
+The `narrative_regen_jobs.triggered_by` column carries one of four values, defined in `RegenTrigger` ([`src/domain/regen_job.py`](../src/domain/regen_job.py)). Two are live in code today; two are reserved enum values defined in the schema CHECK constraint but not yet wired into any call site.
+
+| Trigger | Status | Source |
+|---|---|---|
+| `new_signal` | Live | After a signal lands + routes to a non-`_unmatched` account. Call sites: [`src/pipeline/run.py`](../src/pipeline/run.py) (inbound email pipeline), [`src/server/routes/signal.py`](../src/server/routes/signal.py) (Plain + Pylon structured signals), [`src/server/routes/event.py`](../src/server/routes/event.py) (product telemetry). Routed via `schedule_regen()` → `enqueue_regen_job()`. |
+| `manual` | Live | Frontend "Regenerate" button (`frontend/src/components/NarrativeSection.tsx`) calls `supabase.rpc('enqueue_narrative_regen', { p_account_id })`. The SECURITY DEFINER RPC (migration 000002) enforces workspace ownership, applies the same debounce + rate cap as the Python path, and returns the new job id (or NULL if debounced). |
+| `reroute` | Reserved | Defined in enum + schema CHECK; no call site. For a future "signal manually reassigned to a different account" feature. |
+| `config_change` | Reserved | Same — defined but unwired. For a future "health-dimension weights changed, rebuild narratives" feature. |
+
+`_unmatched`-routed signals **do not** enqueue (gate in [`src/pipeline/scheduler.py`](../src/pipeline/scheduler.py): if `account_slug == "_unmatched"`, return without enqueueing).
+
+#### Debounce + rate cap
+
+The same logic exists in both the Python `enqueue_regen_job` and the Postgres `enqueue_narrative_regen` RPC. For a given `(workspace_id, account_id)` pair:
+
+1. **Debounce**: If a `pending` job already exists with `scheduled_for > now()`, the new enqueue is a no-op (RPC returns NULL; frontend surfaces "A regeneration is already scheduled"). Prevents enqueue storms when many signals arrive in quick succession.
+2. **Rate cap**: If a `DONE` job completed within the last 10 minutes, the new job is scheduled for `last_done + 10 min`. Bounds regen-per-account at roughly 6 / hour.
+3. **Default lag**: If neither debounce nor rate cap applies, `scheduled_for = now() + 60 seconds`. Even a fresh signal arrival waits 60s before becoming eligible for the next drain.
+
+#### UX implication for the Regenerate button
+
+A CSM clicking the in-app Regenerate button can hit any of three states:
+- **NULL return (debounce)**: an enqueued job from a prior `new_signal` or earlier click is still pending. UI shows "A regeneration is already scheduled." This is correct behavior, not an error. Browser console may show a 400 from the RPC layer; that's the RPC reporting the NULL return.
+- **Rate-cap delay**: the job enqueues with `scheduled_for ~10 min from now()`. Click succeeds; visible refresh takes up to 10 min + cron lag.
+- **Default-lag success**: job enqueues with `scheduled_for = now() + 60s`. Visible refresh on the next 15-min cron tick.
+
+Worst-case lag from click to visible refresh: ~15 minutes (drain interval). Best-case: ~60 seconds plus the time to the next tick. There is no fast-path "regenerate immediately" — by design, to keep Claude cost bounded and the operational model simple. A future "interactive immediate regen" feature would need an additional code path; see [`.private/product-manager/router-stage-6-body-contact-match.md`](../.private/product-manager/router-stage-6-body-contact-match.md) for the related lag discussion.
+
+#### What does NOT trigger a regen
+
+- Frontend page loads (just render the current narrative)
+- Audit harness runs (`scripts/audit_narratives.py` reads narratives; does not generate)
+- Signals arriving with routing to `_unmatched`
+- Direct calls to `generate_narrative` from scripts or tests (those paths exist but never run in production)
 
 ### 5. Narrative Generation
 
