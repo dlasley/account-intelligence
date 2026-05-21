@@ -223,9 +223,18 @@ uv run python -m src.worker serve    # Python worker → http://localhost:8080
 ### Load fixture data
 
 ```bash
+# Process the seed-stage-saas scenario (12 fictional accounts for a CI/CD observability
+# startup; populates the `lattice-build` workspace per the YAML's workspace_slug).
 uv run python -m src.worker process-fixtures --scenario seed-stage-saas
-uv run python -m src.worker generate-narratives --workspace-slug seed-stage-saas --all
+
+# Generate narratives for every account in the resulting workspace.
+uv run python -m src.worker generate-narratives --workspace-slug lattice-build --all
 ```
+
+The scenario name and workspace slug differ: `seed-stage-saas` is the YAML file name (and
+the conceptual scenario); `lattice-build` is the workspace slug it materialises into. See
+`fixtures/synthetic-scenarios/seed-stage-saas.yaml` (`workspace_slug:` field) for the
+mapping.
 
 ### Test
 
