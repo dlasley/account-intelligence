@@ -1,4 +1,4 @@
-type Contact = {
+export type Contact = {
   id: string
   display_name: string | null
   email: string

@@ -4,8 +4,11 @@ import { createClient } from '@/lib/supabase/server'
 import { scoreBadge } from '@/lib/utils'
 import NarrativeSection from '@/components/NarrativeSection'
 import SignalsTimeline from '@/components/SignalsTimeline'
+import type { Signal } from '@/components/SignalsTimeline'
 import ContactsList from '@/components/ContactsList'
+import type { Contact } from '@/components/ContactsList'
 import DimensionBreakdown from '@/components/DimensionBreakdown'
+import type { DimScore, DimConfig } from '@/components/DimensionBreakdown'
 import AuditBadge from '@/components/AuditBadge'
 import type { AuditCriterion } from '@/components/AuditBadge'
 
@@ -77,16 +80,10 @@ export default async function AdminAccountDetailPage({
     reasoning: r.reasoning,
   }))
 
-  const signals = (blob.signals ?? []) as unknown[]
-  const contacts = (blob.contacts ?? []) as Array<{ is_internal: boolean }>
-  const dimScores = (blob.dimension_scores ?? []) as unknown[]
-  const dimConfigs = (blob.dimension_configs ?? []) as Array<{
-    id: string
-    dimension_type: string
-    name: string
-    weight: number
-    enabled: boolean
-  }>
+  const signals = (blob.signals ?? []) as Signal[]
+  const contacts = (blob.contacts ?? []) as Contact[]
+  const dimScores = (blob.dimension_scores ?? []) as DimScore[]
+  const dimConfigs = (blob.dimension_configs ?? []) as DimConfig[]
 
   const healthBadge = scoreBadge(account.overall_health_score ?? null)
 

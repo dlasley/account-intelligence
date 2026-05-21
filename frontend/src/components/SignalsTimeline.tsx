@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { relativeTime } from '@/lib/utils'
 
-type Signal = {
+export type Signal = {
   id: string
   direction: 'inbound' | 'outbound' | 'internal'
   channel: string

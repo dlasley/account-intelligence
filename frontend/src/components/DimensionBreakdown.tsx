@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { scoreBadge, relativeTime } from '@/lib/utils'
 import { track } from '@/lib/analytics'
 
-type DimScore = {
+export type DimScore = {
   score: number
   rationale: string | null
   scored_by: string
@@ -15,7 +15,7 @@ type DimScore = {
   dimension_id: string
 }
 
-type DimConfig = {
+export type DimConfig = {
   id: string
   dimension_type: string
   name: string
