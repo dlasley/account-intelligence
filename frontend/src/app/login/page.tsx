@@ -3,13 +3,19 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
+type Mode = 'magic' | 'password'
+
 export default function LoginPage() {
   const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [mode, setMode] = useState<Mode>('magic')
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleGoogleSignIn = async () => {
     setLoading(true)
+    setError(null)
     const supabase = createClient()
     const origin = window.location.origin
     await supabase.auth.signInWithOAuth({
@@ -22,7 +28,22 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+    setError(null)
     const supabase = createClient()
+    if (mode === 'password') {
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+      if (signInError) {
+        setError(signInError.message)
+        setLoading(false)
+        return
+      }
+      // Session is set in cookies by the Supabase client; navigate to the app.
+      window.location.href = '/accounts'
+      return
+    }
     const origin = window.location.origin
     await supabase.auth.signInWithOtp({
       email,
@@ -98,12 +119,49 @@ export default function LoginPage() {
               placeholder="you@example.com"
             />
           </div>
+          {mode === 'password' && (
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          )}
+          {error && (
+            <p className="text-sm text-red-600" role="alert">
+              {error}
+            </p>
+          )}
           <button
             type="submit"
             disabled={loading}
             className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
           >
-            {loading ? 'Sending…' : 'Send sign-in link'}
+            {loading
+              ? mode === 'password'
+                ? 'Signing in…'
+                : 'Sending…'
+              : mode === 'password'
+                ? 'Sign in'
+                : 'Send sign-in link'}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setMode(mode === 'magic' ? 'password' : 'magic')
+              setError(null)
+              setPassword('')
+            }}
+            className="w-full text-xs text-gray-500 hover:text-gray-700 underline"
+          >
+            {mode === 'magic' ? 'Use password instead' : 'Use magic link instead'}
           </button>
         </form>
       </div>
