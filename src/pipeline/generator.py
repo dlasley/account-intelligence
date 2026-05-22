@@ -164,6 +164,43 @@ def _load_template(config: Config) -> str:
     return (config_root() / config.narrative_generation.prompt_template_path).read_text()
 
 
+def _resolve_prompt_variant(account_id: UUID) -> str:
+    """Evaluate the `narrative-prompt-variant` PostHog flag for this account.
+
+    Returns ``'v1'`` (control, current behavior) or ``'v2'`` (test variant)
+    based on the flag's variant assignment, randomized per account. Defaults
+    to ``'v1'`` if PostHog is disabled or the flag is undefined — guarantees
+    backward-compatible behavior when PostHog isn't wired in (e.g., tests,
+    local dev without POSTHOG_API_KEY).
+
+    The variant assignment is consistent for a given account_id: an account
+    always sees the same variant across regenerations, so trajectory analysis
+    isn't muddied by mid-experiment switching.
+    """
+    from src.analytics import get_feature_flag
+
+    variant = get_feature_flag(
+        "narrative-prompt-variant", str(account_id), default="v1"
+    )
+    return variant if variant in ("v1", "v2") else "v1"
+
+
+def _load_template_for_variant(config: Config, variant: str) -> str:
+    """Load the prompt template for the resolved variant.
+
+    Falls back to the configured (v1) path if the variant-specific file is
+    missing — defensive against config drift or missing v2 file in some
+    environments.
+    """
+    configured = config.narrative_generation.prompt_template_path
+    if variant == "v2":
+        variant_path = configured.replace("narrative.v1.md", "narrative.v2.md")
+        full_path = config_root() / variant_path
+        if full_path.exists():
+            return full_path.read_text()
+    return (config_root() / configured).read_text()
+
+
 def _strip_fences(text: str) -> str:
     """Remove markdown code fences and strip prose preambles before JSON.
 
@@ -418,8 +455,11 @@ def generate_narrative(
     window_signals = sorted(confidence.signals_in_window, key=lambda s: s.occurred_at, reverse=True)
     capped = window_signals[: config.narrative_generation.max_signals_in_context]
 
-    # 4. Load and render prompt
-    template = _load_template(config)
+    # 4. Resolve prompt variant via PostHog feature flag + load template.
+    # Variant assignment is consistent per account_id (same account always gets
+    # the same variant across regenerations). Defaults to 'v1' if PostHog is off.
+    prompt_variant = _resolve_prompt_variant(account.id)
+    template = _load_template_for_variant(config, prompt_variant)
     prompt_ver = _prompt_version(template, config.narrative_generation.model)
 
     vertical_hint_block = ""
@@ -498,6 +538,7 @@ def generate_narrative(
             _span.set_attribute("workspace.slug", workspace_slug)
             _span.set_attribute("deploy_env", os.environ.get("DEPLOY_ENV", "development"))
             _span.set_attribute("llm_call_kind", "narrative")
+            _span.set_attribute("prompt_variant", prompt_variant)
     except Exception:
         pass
 

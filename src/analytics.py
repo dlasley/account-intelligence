@@ -82,6 +82,41 @@ def flush() -> None:
         logger.warning("analytics.flush failed", exc_info=True)
 
 
+def get_feature_flag(
+    flag_key: str,
+    distinct_id: str,
+    *,
+    default: str | bool | None = None,
+) -> str | bool | None:
+    """
+    Evaluate a PostHog feature flag for a given distinct_id.
+
+    Returns the variant string for multivariate flags, a bool for boolean flags,
+    or ``default`` if the flag is undefined, PostHog is disabled, or the call
+    fails. Fire-and-log: exceptions are caught and logged at WARNING.
+
+    Use to gate product behavior (e.g., prompt variant selection) on a PostHog
+    flag so the variant assignment can drive an Experiment that compares
+    metrics across variants.
+    """
+    if not _is_enabled():
+        return default
+    try:
+        client = _get_client()
+        variant = client.get_feature_flag(flag_key, distinct_id)
+        if variant is None:
+            return default
+        return variant
+    except Exception:
+        logger.warning(
+            "analytics.get_feature_flag failed for flag %r distinct_id %r",
+            flag_key,
+            distinct_id,
+            exc_info=True,
+        )
+        return default
+
+
 def track_ai_evaluation(
     *,
     workspace_id: str | UUID,
