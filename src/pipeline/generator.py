@@ -520,7 +520,7 @@ def generate_narrative(
         _fill(system_template)
         if system_template
         else (
-            "You are an expert customer success analyst writing concise account health narratives."
+            "You are an expert account analyst writing concise account health narratives."
         )
     )
 

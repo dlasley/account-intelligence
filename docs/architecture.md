@@ -119,7 +119,7 @@ The same logic exists in both the Python `enqueue_regen_job` and the Postgres `e
 
 #### UX implication for the Regenerate button
 
-A CSM clicking the in-app Regenerate button can hit any of three states:
+A user clicking the in-app Regenerate button can hit any of three states:
 - **NULL return (debounce)**: an enqueued job from a prior `new_signal` or earlier click is still pending. UI shows "A regeneration is already scheduled." This is correct behavior, not an error. Browser console may show a 400 from the RPC layer; that's the RPC reporting the NULL return.
 - **Rate-cap delay**: the job enqueues with `scheduled_for ~10 min from now()`. Click succeeds; visible refresh takes up to 10 min + cron lag.
 - **Default-lag success**: job enqueues with `scheduled_for = now() + 60s`. Visible refresh on the next 15-min cron tick.

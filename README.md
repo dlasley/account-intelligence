@@ -73,7 +73,7 @@ See [docs/architecture.md](docs/architecture.md) for pipeline internals, health 
 
 **Deterministic health scoring, not LLM-decided.** Email engagement health is a pure function of signal count, recency window, and contact diversity — scaled by a per-account `frequency_multiplier`. The LLM narrates; it does not score. Sentiment is extracted from the narrative as an integer (1-100) and wired as a separate health dimension.
 
-**No LLM in the send path.** Outreach generation was initially LLM-based; hallucination risk led to replacing it with file-based templates and signal surfacing. The frontend displays the relevant signals and lets the CSM write the message. Templates use `[placeholder]` slots; the send button is blocked until all are filled.
+**No LLM in the send path.** Outreach generation was initially LLM-based; hallucination risk led to replacing it with file-based templates and signal surfacing. The frontend displays the relevant signals and lets the account team write the message. Templates use `[placeholder]` slots; the send button is blocked until all are filled.
 
 **Fire-and-log post-narrative scoring.** Health dimension scoring runs after narrative generation as a separate step that never fails the narrative. A scoring failure is logged and skipped; the narrative is always persisted.
 
