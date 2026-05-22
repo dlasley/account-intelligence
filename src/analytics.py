@@ -80,3 +80,58 @@ def flush() -> None:
         _get_client().flush()
     except Exception:
         logger.warning("analytics.flush failed", exc_info=True)
+
+
+def track_ai_evaluation(
+    *,
+    workspace_id: str | UUID,
+    audit_run_id: str,
+    narrative_id: str,
+    criterion: str,
+    passed: bool,
+    score: int | None,
+    audit_source: str,
+    auditor_model: str,
+    trace_id: str | None = None,
+) -> None:
+    """
+    Capture a `$ai_evaluation` event for a single audit-criterion verdict.
+
+    PostHog LLM Analytics treats `$ai_evaluation` as a distinct event type that
+    surfaces on the trace view alongside the `$ai_generation` it evaluates.
+    Distinct_id matches the OTel-emitted generation (`account-intelligence-<env>`)
+    so the events correlate cleanly in the LLM Analytics dashboard.
+
+    Properties follow PostHog's conventional `$ai_metric_*` shape so the events
+    light up the LLM Analytics evaluations surface without custom config.
+    Fire-and-log: exceptions are caught and logged at WARNING.
+    """
+    if not _is_enabled():
+        return
+    try:
+        deploy_env = os.environ.get("DEPLOY_ENV", "development")
+        distinct_id = f"account-intelligence-{deploy_env}"
+        properties: dict = {
+            "$ai_metric_name": criterion,
+            "$ai_metric_value": "pass" if passed else "fail",
+            "$ai_provider": "openai",
+            "$ai_model": auditor_model,
+            "audit_run_id": audit_run_id,
+            "narrative_id": narrative_id,
+            "audit_source": audit_source,
+            "workspace_id": str(workspace_id),
+            "passed": passed,
+            "score": score,
+        }
+        if trace_id:
+            properties["$ai_trace_id"] = trace_id
+        client = _get_client()
+        client.capture(
+            distinct_id=distinct_id,
+            event="$ai_evaluation",
+            properties=properties,
+        )
+    except Exception:
+        logger.warning(
+            "analytics.track_ai_evaluation failed for criterion %r", criterion, exc_info=True
+        )

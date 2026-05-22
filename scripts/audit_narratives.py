@@ -854,6 +854,34 @@ def audit_one_narrative(
         audit_result.tone_fit,
     ]
 
+    # PostHog $ai_evaluation events — one per criterion. Surface the audit's
+    # per-criterion verdicts in PostHog LLM Analytics, linked to the underlying
+    # $ai_generation auto-emitted by the OpenAI OTel instrumentation. The trace
+    # ID grabs the active OTel span (the OpenAI call's span, since we're inside
+    # its context) so PostHog can correlate the events on the trace view.
+    try:
+        from opentelemetry import trace as _otel_trace_eval
+
+        from src.analytics import track_ai_evaluation
+
+        _eval_span = _otel_trace_eval.get_current_span()
+        _eval_ctx = _eval_span.get_span_context() if _eval_span.is_recording() else None
+        _trace_id_hex = format(_eval_ctx.trace_id, "032x") if _eval_ctx else None
+        for _cr in criteria_data:
+            track_ai_evaluation(
+                workspace_id=ws_id,
+                audit_run_id=audit_run_id,
+                narrative_id=narrative_id,
+                criterion=_cr.criterion,
+                passed=_cr.passed,
+                score=_cr.score,
+                audit_source=audit_source,
+                auditor_model=auditor_model,
+                trace_id=_trace_id_hex,
+            )
+    except Exception:
+        logger.warning("PostHog $ai_evaluation capture failed", exc_info=True)
+
     # Write 5 criterion rows
     for cr in criteria_data:
         # Size guard on the LLM-generated details JSONB. The schema permits
