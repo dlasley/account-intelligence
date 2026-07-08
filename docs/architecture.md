@@ -341,6 +341,8 @@ narrative_audit_runs  ← 1 aggregate row (overall_passed, hard_gate_failures,
 
 **Privacy**: signal body excerpts (300 chars per signal) are sent to OpenAI under the enterprise API agreement. `narrative_audits.reasoning` and `narrative_audits.details` JSONB may contain signal-derived content and are treated as PII-equivalent. Future pilot-data audit requires workspace consent.
 
+**PostHog `$ai_evaluation` events**: PostHog LLM Analytics distinguishes `$ai_generation` (any LLM call, auto-captured by the OTel instrumentation described under LLM Observability in CLAUDE.md) from `$ai_evaluation` (a verdict on an AI event's output, which requires explicit capture). After writing the 5 criterion rows, the audit harness calls `track_ai_evaluation()` (`src/analytics.py`) once per criterion — one `$ai_evaluation` event per criterion, 5 per narrative audit — carrying `$ai_metric_name`/`$ai_metric_value` plus `audit_run_id`, `narrative_id`, and `audit_source`, and tagged with the OTel trace ID of the underlying OpenAI call so the evaluation correlates with its `$ai_generation` in the PostHog trace view. Fire-and-log: a capture failure logs a warning and does not fail the audit write.
+
 ### Test Layer (planning report §4.3 + §4.4)
 
 Three test surfaces sit on top of the synthetic data substrate:
@@ -478,7 +480,7 @@ If `WEBHOOK_SECRET` is unset, the handler returns 500 (fail closed, not silently
 
 ### Frontend Auth
 
-Magic-link OTP via `supabase.auth.signInWithOtp`. Middleware guards all routes except `/login` and `/auth/*`. The auth callback route exchanges the code for a session and redirects to `/accounts`.
+Three sign-in modes on `/login`: Google OAuth (`supabase.auth.signInWithOAuth({ provider: 'google' })`), email+password (`supabase.auth.signInWithPassword`), and magic-link OTP (`supabase.auth.signInWithOtp`). Middleware guards all routes except `/login` and `/auth/*`. The auth callback route exchanges the code for a session and redirects to `/accounts`.
 
 For RLS to return data, a user must have a row in the `users` table with the correct `workspace_id`. New users are not provisioned automatically — a workspace admin inserts them manually or via a future provisioning flow.
 
