@@ -10,17 +10,17 @@ from src.domain.signal import RoutingMethod
 from src.domain.workspace import Workspace
 from src.pipeline.router import PERSONAL_PROVIDER_DOMAINS, _stage0_outbound_bcc, route
 
-_WS_ID = uuid5(NAMESPACE_DNS, "elicit")
-_ORG_ID = uuid5(NAMESPACE_DNS, "elicit-org")
+_WS_ID = uuid5(NAMESPACE_DNS, "quantas-labs")
+_ORG_ID = uuid5(NAMESPACE_DNS, "quantas-labs-org")
 _NOW = datetime.now(UTC)
-_INBOUND_ADDRESS = "elicit@signal.example.com"
+_INBOUND_ADDRESS = "quantas-labs@signal.example.com"
 
 WORKSPACE = Workspace(
     id=_WS_ID,
     organization_id=_ORG_ID,
-    slug="elicit",
-    name="Elicit",
-    internal_domains=("elicit.org",),
+    slug="quantas-labs",
+    name="Quantas Labs",
+    internal_domains=("quantaslabs.com",),
     crm_url_template=None,
     crm_portal_id=None,
     outbound_sender_email=None,
@@ -61,7 +61,7 @@ ACCOUNTS = [FORMATION_BIO]
 def test_stage0_returns_none_for_external_sender():
     payload = {
         "from_email": "priya@formationbio.com",
-        "to_emails": ["csm@elicit.org"],
+        "to_emails": ["csm@quantaslabs.com"],
     }
     result = _stage0_outbound_bcc(
         payload, WORKSPACE, ACCOUNTS, PERSONAL_PROVIDER_DOMAINS, _INBOUND_ADDRESS
@@ -76,7 +76,7 @@ def test_stage0_returns_none_for_external_sender():
 
 def test_stage0_routes_internal_to_known_account():
     payload = {
-        "from_email": "csm@elicit.org",
+        "from_email": "csm@quantaslabs.com",
         "to_emails": ["priya@formationbio.com", _INBOUND_ADDRESS],
     }
     result = _stage0_outbound_bcc(
@@ -95,7 +95,7 @@ def test_stage0_routes_internal_to_known_account():
 
 def test_stage0_returns_none_for_personal_email_recipient():
     payload = {
-        "from_email": "csm@elicit.org",
+        "from_email": "csm@quantaslabs.com",
         "to_emails": ["user@gmail.com", _INBOUND_ADDRESS],
     }
     result = _stage0_outbound_bcc(
@@ -111,7 +111,7 @@ def test_stage0_returns_none_for_personal_email_recipient():
 
 def test_stage0_returns_none_when_only_inbound_address():
     payload = {
-        "from_email": "csm@elicit.org",
+        "from_email": "csm@quantaslabs.com",
         "to_emails": [_INBOUND_ADDRESS],
     }
     result = _stage0_outbound_bcc(
@@ -127,7 +127,7 @@ def test_stage0_returns_none_when_only_inbound_address():
 
 def test_stage0_creates_candidate_for_unknown_domain():
     payload = {
-        "from_email": "csm@elicit.org",
+        "from_email": "csm@quantaslabs.com",
         "to_emails": ["cto@newcorp.io", _INBOUND_ADDRESS],
     }
     result = _stage0_outbound_bcc(
@@ -149,7 +149,7 @@ def test_stage0_creates_candidate_for_unknown_domain():
 
 def test_route_internal_sender_routes_as_outbound_bcc():
     payload = {
-        "from_email": "csm@elicit.org",
+        "from_email": "csm@quantaslabs.com",
         "to_emails": ["priya@formationbio.com", _INBOUND_ADDRESS],
         "thread_id": None,
     }
@@ -173,7 +173,7 @@ def test_normalize_outbound_signal_has_no_author_contact():
     from src.domain.signal import Direction, SourceType
     from src.pipeline.normalizer import normalize
 
-    ws_id = uuid5(NAMESPACE_DNS, "elicit")
+    ws_id = uuid5(NAMESPACE_DNS, "quantas-labs")
     payload = {
         "external_id": "outbound-test-001",
         "source_type": "outbound_email",
@@ -182,7 +182,7 @@ def test_normalize_outbound_signal_has_no_author_contact():
         "occurred_at": "2026-04-24T10:00:00Z",
         "subject": "Following up",
         "body": "Hi, just checking in.",
-        "from_email": "csm@elicit.org",
+        "from_email": "csm@quantaslabs.com",
         "from_name": "CSM",
         "to_emails": ["priya@formationbio.com"],
     }
@@ -207,7 +207,7 @@ def test_normalize_outbound_signal_has_no_author_contact():
         ),
         patch("src.pipeline.normalizer.insert_audit_event"),
     ):
-        result = normalize(event, ws_id, ["elicit.org"], client=None)
+        result = normalize(event, ws_id, ["quantaslabs.com"], client=None)
 
     assert result.author_contact is None
     assert result.signal.author_contact_id is None

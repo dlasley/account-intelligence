@@ -13,8 +13,8 @@ from uuid import NAMESPACE_DNS, uuid4, uuid5
 # Helpers shared by integration tests
 # ---------------------------------------------------------------------------
 
-FIXTURE_DIR = Path("fixtures/elicit-shaped")
-_WS_ID = uuid5(NAMESPACE_DNS, "elicit")
+FIXTURE_DIR = Path("fixtures/quantas-labs-shaped")
+_WS_ID = uuid5(NAMESPACE_DNS, "quantas-labs")
 _NOW = datetime.now(UTC)
 
 
@@ -497,7 +497,7 @@ def test_narrative_generated_fires_after_db_write(monkeypatch):
 
     from src.config.loader import load_config
 
-    config = load_config("elicit")
+    config = load_config("quantas-labs")
     account = _make_account("test-account")
     mock_db = MagicMock()
     mock_anthropic = Mock()
@@ -529,7 +529,7 @@ def test_narrative_generated_fires_after_db_write(monkeypatch):
             contacts={},
             prior_narrative=None,
             config=config,
-            workspace_slug="elicit",
+            workspace_slug="quantas-labs",
             client_db=mock_db,
             client_anthropic=mock_anthropic,
         )
@@ -665,7 +665,7 @@ def test_generate_narrative_does_not_raise_when_analytics_fails(monkeypatch):
 
     from src.config.loader import load_config
 
-    config = load_config("elicit")
+    config = load_config("quantas-labs")
     account = _make_account("test-account")
     mock_db = MagicMock()
     mock_anthropic = Mock()
@@ -701,7 +701,7 @@ def test_generate_narrative_does_not_raise_when_analytics_fails(monkeypatch):
             contacts={},
             prior_narrative=None,
             config=config,
-            workspace_slug="elicit",
+            workspace_slug="quantas-labs",
             client_db=mock_db,
             client_anthropic=mock_anthropic,
         )

@@ -17,13 +17,13 @@ _ORG_ID = UUID("00000000-0000-0000-0000-000000000002")
 _WS_ROW = {
     "id": str(_WS_ID),
     "organization_id": str(_ORG_ID),
-    "slug": "elicit",
-    "name": "Elicit",
-    "internal_domains": ["elicit.org"],
+    "slug": "quantas-labs",
+    "name": "Quantas Labs",
+    "internal_domains": ["quantaslabs.com"],
     "crm_url_template": None,
     "crm_portal_id": None,
-    "outbound_sender_email": "cs@elicit.org",
-    "outbound_sender_name": "Elicit CS",
+    "outbound_sender_email": "cs@quantaslabs.com",
+    "outbound_sender_name": "Quantas Labs CS",
     "created_at": _NOW.isoformat(),
     "updated_at": _NOW.isoformat(),
     "deleted_at": None,
@@ -48,16 +48,16 @@ def _mock_id_chain(data: list[dict]) -> MagicMock:
 
 def test_get_workspace_by_slug_returns_workspace():
     client = _mock_slug_chain([_WS_ROW])
-    result = get_workspace_by_slug(client, "elicit")
+    result = get_workspace_by_slug(client, "quantas-labs")
     assert isinstance(result, Workspace)
-    assert result.slug == "elicit"
-    assert result.outbound_sender_email == "cs@elicit.org"
+    assert result.slug == "quantas-labs"
+    assert result.outbound_sender_email == "cs@quantaslabs.com"
 
 
 def test_get_workspace_by_slug_filters_deleted_at():
     """Verify the query includes .is_('deleted_at', 'null')."""
     client = _mock_slug_chain([_WS_ROW])
-    get_workspace_by_slug(client, "elicit")
+    get_workspace_by_slug(client, "quantas-labs")
     is_call = client.table.return_value.select.return_value.eq.return_value.is_
     is_call.assert_called_once_with("deleted_at", "null")
 
@@ -76,4 +76,4 @@ def test_get_workspace_by_id_returns_workspace():
     result = get_workspace_by_id(client, _WS_ID)
     assert isinstance(result, Workspace)
     assert result.id == _WS_ID
-    assert result.name == "Elicit"
+    assert result.name == "Quantas Labs"

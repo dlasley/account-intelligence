@@ -36,8 +36,8 @@ Examples:
 
 | Recipient | Resolves to |
 |---|---|
-| `elicit@<target-inbound-domain>` | workspace `elicit`, no account hint |
-| `elicit+harvard@<target-inbound-domain>` | workspace `elicit`, account hint `harvard` |
+| `quantas-labs@<target-inbound-domain>` | workspace `quantas-labs`, no account hint |
+| `quantas-labs+harvard@<target-inbound-domain>` | workspace `quantas-labs`, account hint `harvard` |
 | `lattice-build+crucible@<target-inbound-domain>` | workspace `lattice-build`, account hint `crucible` |
 | `lattice-build-thornfield-ai@<target-inbound-domain>` | **workspace lookup for `lattice-build-thornfield-ai` — fails (no such workspace); email rejected.** Hyphen has no special meaning to the parser. |
 

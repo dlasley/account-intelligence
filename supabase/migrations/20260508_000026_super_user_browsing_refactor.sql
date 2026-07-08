@@ -14,7 +14,7 @@ ALTER TABLE users DROP COLUMN IF EXISTS home_workspace_id;
 -- This UPDATE was removed from the migration (contained a hardcoded email address).
 -- Post-deploy bootstrap step: run manually via Supabase SQL editor:
 --   UPDATE users
---   SET workspace_id = (SELECT id FROM workspaces WHERE slug = 'elicit' LIMIT 1)
+--   SET workspace_id = (SELECT id FROM workspaces WHERE slug = 'quantas-labs' LIMIT 1)
 --   WHERE email = '<super-user-email>';
 -- The migration has already run on production; this comment is for re-deploy clarity.
 

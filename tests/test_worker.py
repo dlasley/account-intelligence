@@ -4,17 +4,17 @@ import pytest
 
 from src.worker import main
 
-_ELICIT_SHAPED = Path("fixtures/elicit-shaped")
+_QUANTAS_LABS_SHAPED = Path("fixtures/quantas-labs-shaped")
 
 
 @pytest.mark.skipif(
-    not _ELICIT_SHAPED.exists(),
-    reason="elicit pilot data moved to .private/; not present in tracked tree",
+    not _QUANTAS_LABS_SHAPED.exists(),
+    reason="quantas-labs pilot data moved to .private/; not present in tracked tree",
 )
 def test_worker_ingest_fixtures(capsys) -> None:
-    main(["ingest-fixtures", "--scenario", "elicit-shaped"])
+    main(["ingest-fixtures", "--scenario", "quantas-labs-shaped"])
     out = capsys.readouterr().out
-    assert "elicit-shaped" in out
+    assert "quantas-labs-shaped" in out
     assert "external_id" in out
 
 

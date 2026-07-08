@@ -30,7 +30,7 @@ _WS_ID = uuid.uuid4()
 _CONTACT_ID = uuid.uuid4()
 _DRAFT_ID = uuid.uuid4()
 _USER_ID = str(uuid.uuid4())
-_USER_EMAIL = "csm@elicit.org"
+_USER_EMAIL = "csm@quantaslabs.com"
 
 FAKE_TOKEN = "valid-jwt-token"
 
@@ -125,13 +125,13 @@ def _make_fake_workspace():
     return Workspace(
         id=_WS_ID,
         organization_id=uuid.uuid4(),
-        slug="elicit",
-        name="Elicit",
-        internal_domains=("elicit.org",),
+        slug="quantas-labs",
+        name="Quantas Labs",
+        internal_domains=("quantaslabs.com",),
         crm_url_template=None,
         crm_portal_id=None,
-        outbound_sender_email="cs@elicit.org",
-        outbound_sender_name="Elicit CS",
+        outbound_sender_email="cs@quantaslabs.com",
+        outbound_sender_name="Quantas Labs CS",
         created_at=now,
         updated_at=now,
         deleted_at=None,

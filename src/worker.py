@@ -644,14 +644,14 @@ def main(args: list[str] | None = None) -> None:
         "ingest-fixtures", help="Load fixture scenario and print summary (no DB)"
     )
     ingest_parser.add_argument(
-        "--scenario", required=True, help="Fixture scenario name (e.g. elicit-shaped)"
+        "--scenario", required=True, help="Fixture scenario name (e.g. quantas-labs-shaped)"
     )
 
     process_parser = subparsers.add_parser(
         "process-fixtures", help="Run full pipeline against Supabase (requires .env)"
     )
     process_parser.add_argument(
-        "--scenario", required=True, help="Fixture scenario name (e.g. elicit-shaped)"
+        "--scenario", required=True, help="Fixture scenario name (e.g. quantas-labs-shaped)"
     )
     process_parser.add_argument(
         "--shift-to-recent",

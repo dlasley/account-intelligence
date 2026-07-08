@@ -10,11 +10,11 @@ from src.domain.raw_inbound_event import ParseStatus, RawInboundEvent
 from src.domain.signal import SourceType
 from src.signals.fixture_source import JsonFixtureSource
 
-SCENARIO = Path("fixtures/elicit-shaped")
+SCENARIO = Path("fixtures/quantas-labs-shaped")
 
 if not SCENARIO.exists():
     pytest.skip(
-        "elicit pilot data moved to .private/; not present in tracked tree",
+        "quantas-labs pilot data moved to .private/; not present in tracked tree",
         allow_module_level=True,
     )
 ROUTING_TEST_FILES = [
@@ -31,7 +31,7 @@ ROUTING_TEST_FILES = [
 _SINCE = datetime.min.replace(tzinfo=UTC)
 
 
-def test_elicit_fixture_loads():
+def test_quantas_labs_fixture_loads():
     source = JsonFixtureSource(SCENARIO)
     events = asyncio.run(source.fetch(workspace_id=uuid4(), since=_SINCE))
     assert len(events) > 0

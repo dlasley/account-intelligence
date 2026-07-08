@@ -20,8 +20,8 @@ from src.domain.account import Account, AccountStatus, Vertical
 from src.domain.contact import Contact
 from src.domain.signal import Channel, Direction, Signal, SourceType
 
-FIXTURE_DIR = Path("fixtures/elicit-shaped")
-_WS_ID = uuid5(NAMESPACE_DNS, "elicit")
+FIXTURE_DIR = Path("fixtures/quantas-labs-shaped")
+_WS_ID = uuid5(NAMESPACE_DNS, "quantas-labs")
 _NOW = datetime.now(UTC)
 
 
@@ -62,7 +62,7 @@ def _load_fixture_signals(account_slug: str) -> tuple[list[Signal], dict]:
                 account_id=None,
                 email=from_email,
                 display_name=payload.get("from_name"),
-                is_internal=from_email.endswith("@elicit.org"),
+                is_internal=from_email.endswith("@quantaslabs.com"),
                 created_at=_NOW,
                 updated_at=_NOW,
                 deleted_at=None,
@@ -142,7 +142,7 @@ def test_sentiment_clamped_above_100(caplog):
     """LLM returns sentiment=105 → stored as 100, warning is logged."""
     from src.pipeline.generator import generate_narrative
 
-    config = load_config("elicit")
+    config = load_config("quantas-labs")
     account = _make_account("test-account")
     mock_db = _make_mock_db(account.id, config)
     mock_anthropic = Mock()
@@ -172,7 +172,7 @@ def test_sentiment_clamped_above_100(caplog):
                 contacts={},
                 prior_narrative=None,
                 config=config,
-                workspace_slug="elicit",
+                workspace_slug="quantas-labs",
                 client_db=mock_db,
                 client_anthropic=mock_anthropic,
             )
@@ -185,7 +185,7 @@ def test_sentiment_clamped_below_one(caplog):
     """LLM returns sentiment=0 → stored as 1, warning is logged."""
     from src.pipeline.generator import generate_narrative
 
-    config = load_config("elicit")
+    config = load_config("quantas-labs")
     account = _make_account("test-account")
     mock_db = _make_mock_db(account.id, config)
     mock_anthropic = Mock()
@@ -215,7 +215,7 @@ def test_sentiment_clamped_below_one(caplog):
                 contacts={},
                 prior_narrative=None,
                 config=config,
-                workspace_slug="elicit",
+                workspace_slug="quantas-labs",
                 client_db=mock_db,
                 client_anthropic=mock_anthropic,
             )
@@ -228,7 +228,7 @@ def test_sentiment_string_becomes_none():
     """LLM returns sentiment as a string → treated as wrong type, stored as None."""
     from src.pipeline.generator import generate_narrative
 
-    config = load_config("elicit")
+    config = load_config("quantas-labs")
     account = _make_account("test-account")
     mock_db = _make_mock_db(account.id, config)
     mock_anthropic = Mock()
@@ -257,7 +257,7 @@ def test_sentiment_string_becomes_none():
             contacts={},
             prior_narrative=None,
             config=config,
-            workspace_slug="elicit",
+            workspace_slug="quantas-labs",
             client_db=mock_db,
             client_anthropic=mock_anthropic,
         )
@@ -269,7 +269,7 @@ def test_sentiment_missing_from_response():
     """LLM omits sentiment key → stored as None."""
     from src.pipeline.generator import generate_narrative
 
-    config = load_config("elicit")
+    config = load_config("quantas-labs")
     account = _make_account("test-account")
     mock_db = _make_mock_db(account.id, config)
     mock_anthropic = Mock()
@@ -297,7 +297,7 @@ def test_sentiment_missing_from_response():
             contacts={},
             prior_narrative=None,
             config=config,
-            workspace_slug="elicit",
+            workspace_slug="quantas-labs",
             client_db=mock_db,
             client_anthropic=mock_anthropic,
         )
@@ -309,7 +309,7 @@ def test_score_and_snapshot_called_once(caplog):
     """generate_narrative calls _score_and_snapshot exactly once after insert."""
     from src.pipeline.generator import generate_narrative
 
-    config = load_config("elicit")
+    config = load_config("quantas-labs")
     account = _make_account("test-account")
     mock_db = _make_mock_db(account.id, config)
     mock_anthropic = Mock()
@@ -338,7 +338,7 @@ def test_score_and_snapshot_called_once(caplog):
             contacts={},
             prior_narrative=None,
             config=config,
-            workspace_slug="elicit",
+            workspace_slug="quantas-labs",
             client_db=mock_db,
             client_anthropic=mock_anthropic,
         )
@@ -655,7 +655,7 @@ def test_valid_contact_list_placeholder_populated_in_prompt():
     """generate_narrative fills {{valid_contact_list}} in the rendered user prompt."""
     from src.pipeline.generator import generate_narrative
 
-    config = load_config("elicit")
+    config = load_config("quantas-labs")
     account = _make_account("test-account")
     cid = uuid4()
     external_contact = Contact(
@@ -702,7 +702,7 @@ def test_valid_contact_list_placeholder_populated_in_prompt():
             contacts={cid: external_contact},
             prior_narrative=None,
             config=config,
-            workspace_slug="elicit",
+            workspace_slug="quantas-labs",
             client_db=mock_db,
             client_anthropic=mock_anthropic,
         )
@@ -717,7 +717,7 @@ def test_signal_count_placeholder_populated_in_prompt():
     """generate_narrative fills {{signal_count}} in the rendered user prompt."""
     from src.pipeline.generator import generate_narrative
 
-    config = load_config("elicit")
+    config = load_config("quantas-labs")
     account = _make_account("test-account")
     mock_db = _make_mock_db(account.id, config)
     captured_prompts: list[dict] = []
@@ -752,7 +752,7 @@ def test_signal_count_placeholder_populated_in_prompt():
             contacts={},
             prior_narrative=None,
             config=config,
-            workspace_slug="elicit",
+            workspace_slug="quantas-labs",
             client_db=mock_db,
             client_anthropic=mock_anthropic,
         )
@@ -771,7 +771,7 @@ def test_generate_narrative_max_tokens_at_least_4096():
     """
     from src.pipeline.generator import generate_narrative
 
-    config = load_config("elicit")
+    config = load_config("quantas-labs")
     account = _make_account("test-account")
     mock_db = _make_mock_db(account.id, config)
     captured_kwargs: list[dict] = []
@@ -806,7 +806,7 @@ def test_generate_narrative_max_tokens_at_least_4096():
             contacts={},
             prior_narrative=None,
             config=config,
-            workspace_slug="elicit",
+            workspace_slug="quantas-labs",
             client_db=mock_db,
             client_anthropic=mock_anthropic,
         )
@@ -854,7 +854,7 @@ def test_generate_narrative_retries_once_on_json_decode_error(caplog):
     """On JSONDecodeError, generate_narrative retries once; second valid response is used."""
     from src.pipeline.generator import generate_narrative
 
-    config = load_config("elicit")
+    config = load_config("quantas-labs")
     account = _make_account("test-account")
     mock_db = _make_mock_db(account.id, config)
 
@@ -894,7 +894,7 @@ def test_generate_narrative_retries_once_on_json_decode_error(caplog):
             contacts={},
             prior_narrative=None,
             config=config,
-            workspace_slug="elicit",
+            workspace_slug="quantas-labs",
             client_db=mock_db,
             client_anthropic=mock_anthropic,
         )
@@ -915,7 +915,7 @@ def test_generate_narrative_retries_once_on_json_decode_error(caplog):
 )
 @pytest.mark.skipif(
     not FIXTURE_DIR.exists(),
-    reason="elicit pilot data moved to .private/; not present in tracked tree",
+    reason="quantas-labs pilot data moved to .private/; not present in tracked tree",
 )
 def test_generate_formation_bio():
     """Full generation against real Claude API using fixture signals (no Supabase)."""
@@ -925,7 +925,7 @@ def test_generate_formation_bio():
 
     account = _make_account("formation-bio", Vertical.LIFE_SCIENCES)
     signals, contacts = _load_fixture_signals("formation-bio")
-    config = load_config("elicit")
+    config = load_config("quantas-labs")
     mock_db = _make_mock_db(account.id, config)
 
     client_ai = anthropic_sdk.Anthropic()
@@ -944,7 +944,7 @@ def test_generate_formation_bio():
             contacts=contacts,
             prior_narrative=None,
             config=config,
-            workspace_slug="elicit",
+            workspace_slug="quantas-labs",
             client_db=mock_db,
             client_anthropic=client_ai,
         )

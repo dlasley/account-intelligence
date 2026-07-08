@@ -16,11 +16,11 @@ config/defaults.json. With a single dimension, overall_health == engagement scor
 (weighted average of one value = that value), so we assert directly on
 engagement scores throughout.
 
-The elicit-baseline.yaml is excluded: it contains 5 Elicit account sub-scenarios
-with 63 total signals; computing per-account engagement from the merged stream
-is non-trivial and not the intent of the distribution test (it has its own
-equivalence test in test_elicit_equivalence.py). The 7 named scenarios are the
-corpus the distribution test exists for.
+The quantas-labs-baseline.yaml is excluded: it contains 5 Quantas Labs account
+sub-scenarios with 63 total signals; computing per-account engagement from the
+merged stream is non-trivial and not the intent of the distribution test (it
+has its own equivalence test in test_quantas_labs_equivalence.py). The 7 named
+scenarios are the corpus the distribution test exists for.
 """
 
 import json
@@ -39,7 +39,7 @@ from src.synthetic.orchestrator import load_scenario, yield_events
 
 SCENARIOS_DIR = Path("fixtures/synthetic-scenarios")
 
-# The 6 named corpus scenarios (elicit-baseline excluded — see module docstring).
+# The 6 named corpus scenarios (quantas-labs-baseline excluded — see module docstring).
 _CORPUS_SCENARIOS = [
     "single-champion-then-silence",
     "multi-stakeholder-mixed-domain",

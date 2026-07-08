@@ -1,9 +1,9 @@
--- Migration 000028: expand accounts.vertical taxonomy from 7 Elicit-shaped values to 13
+-- Migration 000028: expand accounts.vertical taxonomy from 7 Quantas Labs-shaped values to 13
 -- standard B2B industry buckets.
 --
 -- Rationale: the original allow-list (pharma, academia, policy, tech, medtech, cpg, other)
--- reflected Elicit's specific customer mix. The platform now serves customers in any
--- industry, and the Elicit-flavoured values forced demo accounts to either misclassify
+-- reflected Quantas Labs's specific customer mix. The platform now serves customers in any
+-- industry, and the Quantas Labs-flavoured values forced demo accounts to either misclassify
 -- (everyone into "tech") or fall back to the "other" escape hatch. New taxonomy is the
 -- standard B2B industry shape (recognisable to anyone reading Salesforce/HubSpot).
 --

@@ -1,13 +1,13 @@
 """One-shot baseline derivation tool for Phase 2c (ADR-015 §Test Req 8).
 
 Run once to capture routing-distribution + sender-domain set from the 63
-hand-authored Elicit fixtures.  Output is YAML-formatted expected_routing
-ready to paste into fixtures/synthetic-scenarios/elicit-baseline.yaml.
+hand-authored Quantas Labs fixtures.  Output is YAML-formatted expected_routing
+ready to paste into fixtures/synthetic-scenarios/quantas-labs-baseline.yaml.
 
 NOT a regular test or CI target — throw-away script, run once.
 
 Usage:
-    uv run python scripts/derive_elicit_baseline.py
+    uv run python scripts/derive_quantas_labs_baseline.py
 """
 
 import json
@@ -28,7 +28,7 @@ from src.domain.signal import Channel, Direction, RoutingMethod, Signal, SourceT
 from src.domain.workspace import Workspace
 from src.pipeline.run import UNMATCHED_ACCOUNT_SLUG, process_event
 
-_FIXTURES_ROOT = Path("fixtures/elicit-shaped")
+_FIXTURES_ROOT = Path("fixtures/quantas-labs-shaped")
 _ACCOUNTS_DIR = _FIXTURES_ROOT / "accounts"
 _NOW = datetime(2026, 1, 1, 0, 0, 0, tzinfo=UTC)
 
@@ -131,7 +131,7 @@ def main() -> None:
     sender_domains: dict[str, set[str]] = defaultdict(set)
     thread_map: dict[str, list[uuid.UUID]] = defaultdict(list)
     # signal_id → Signal so update_signal_routing's stub can look up thread_id
-    # post-routing (mirrors test_elicit_equivalence.py — same code path so the
+    # post-routing (mirrors test_quantas_labs_equivalence.py — same code path so the
     # baseline counts use the same mock semantics the test asserts against).
     signals_by_id: dict[uuid.UUID, Signal] = {}
 

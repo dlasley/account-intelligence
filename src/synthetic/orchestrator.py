@@ -173,8 +173,8 @@ def yield_events(
 
         acc_spec = account_map.get(spec.account_slug)
         if acc_spec is None:
-            # Allow referencing elicit-shaped accounts by slug without re-declaring them
-            # in the scenario's accounts list (empty accounts: [] re-uses elicit fixtures).
+            # Allow referencing quantas-labs-shaped accounts by slug without re-declaring them
+            # in the scenario's accounts list (empty accounts: [] re-uses quantas-labs fixtures).
             # Use a safe fallback domain derived from the slug.
             account_name = spec.account_slug.replace("-", " ").title()
             primary_domain = f"{spec.account_slug}.com"

@@ -84,7 +84,7 @@ class SignalSpec(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     source_type: str  # must be a valid SourceType value
-    account_slug: str  # must match an entry in accounts or an elicit-shaped account
+    account_slug: str  # must match an entry in accounts or a quantas-labs-shaped account
     count: int = 1
     axes: AxesSpec = AxesSpec()
     overrides: dict = {}  # field-level overrides applied after generation
@@ -92,8 +92,8 @@ class SignalSpec(BaseModel):
 
 class ExpectedSignalSpec(BaseModel):
     """Per-account routing expectations for equivalence assertions.
-    Populated by the YAML author from the derive_elicit_baseline.py script;
-    read by tests/synthetic/test_elicit_equivalence.py.
+    Populated by the YAML author from the derive_quantas_labs_baseline.py script;
+    read by tests/synthetic/test_quantas_labs_equivalence.py.
     """
 
     model_config = ConfigDict(extra="forbid")
@@ -114,8 +114,8 @@ class ScenarioSpec(BaseModel):
     name: str
     seed: int
     description: str = ""
-    workspace_slug: str = "elicit"  # reuse elicit workspace unless overridden
-    accounts: list[AccountSpec] = []  # empty = reuse elicit-shaped accounts/
+    workspace_slug: str = "quantas-labs"  # reuse quantas-labs workspace unless overridden
+    accounts: list[AccountSpec] = []  # empty = reuse quantas-labs-shaped accounts/
     signals: list[SignalSpec]
     target: TargetSpec | None = None  # reserved; ignored by orchestrator in v1
     expected_routing: list[ExpectedSignalSpec] = []  # equivalence anchors; ignored by orchestrator

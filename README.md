@@ -131,7 +131,7 @@ account-intelligence/
 │   ├── audit_narratives.py            # Cross-vendor narrative audit harness (ADR-016, OpenAI GPT-5-mini)
 │   ├── capture_narrative_baselines.py # Phase 4c: snapshot active narratives + scores; refuses non-audit-clean
 │   ├── check_narrative_baselines.py   # Phase 4c: DB-coupled drift detector vs committed baselines
-│   └── derive_elicit_baseline.py      # One-shot fixture-equivalence baseline derivation
+│   └── derive_quantas_labs_baseline.py # One-shot fixture-equivalence baseline derivation
 ├── tests/                        # pytest tests (asyncio_mode = "auto")
 │   ├── synthetic/                # Orchestrator, equivalence, audit integration, dimension distribution
 │   ├── test_invariants.py        # Hypothesis property tests

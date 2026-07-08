@@ -1,6 +1,6 @@
 """Materialise synthetic scenarios to disk.
 
-Writes a directory tree matching the elicit-shaped layout so JsonFixtureSource
+Writes a directory tree matching the quantas-labs-shaped layout so JsonFixtureSource
 can consume the output without modification:
 
     <out>/

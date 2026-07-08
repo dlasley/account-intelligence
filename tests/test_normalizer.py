@@ -14,8 +14,8 @@ from src.domain.raw_inbound_event import ParseStatus, RawInboundEvent
 from src.domain.signal import SourceType
 from src.pipeline.normalizer import InboundPayload, normalize
 
-_WS_ID = uuid5(NAMESPACE_DNS, "elicit")
-_INTERNAL_DOMAINS = ["elicit.org"]
+_WS_ID = uuid5(NAMESPACE_DNS, "quantas-labs")
+_INTERNAL_DOMAINS = ["quantaslabs.com"]
 
 _PAYLOAD = {
     "external_id": "fixture-test-001",
@@ -27,7 +27,7 @@ _PAYLOAD = {
     "body": "Hello, this is a test.",
     "from_email": "priya.sharma@formationbio.com",
     "from_name": "Priya Sharma",
-    "to_emails": ["elicit@signal.example.com"],
+    "to_emails": ["quantas-labs@signal.example.com"],
     "thread_id": "thread-test-001",
     "in_reply_to": None,
 }
@@ -77,7 +77,7 @@ def test_normalize_author_contact_extracted():
 def test_normalize_recipient_contacts_extracted():
     result = _run_normalize(_make_event())
     assert len(result.recipient_contacts) == 1
-    assert result.recipient_contacts[0].email == "elicit@signal.example.com"
+    assert result.recipient_contacts[0].email == "quantas-labs@signal.example.com"
 
 
 def test_normalize_is_internal_false_for_external_sender():
@@ -87,7 +87,7 @@ def test_normalize_is_internal_false_for_external_sender():
 
 def test_normalize_internal_sender_author_contact_is_none():
     # Internal sender → outbound signal; no contact record is created for the CSM
-    payload = dict(_PAYLOAD, from_email="engineer@elicit.org")
+    payload = dict(_PAYLOAD, from_email="engineer@quantaslabs.com")
     result = _run_normalize(_make_event(payload))
     assert result.author_contact is None
 
@@ -120,7 +120,7 @@ def test_normalize_routing_fields_are_none_before_routing():
 
 
 def test_normalize_upserts_one_contact_per_recipient():
-    payload = dict(_PAYLOAD, to_emails=["a@elicit.org", "b@elicit.org"])
+    payload = dict(_PAYLOAD, to_emails=["a@quantaslabs.com", "b@quantaslabs.com"])
     with (
         patch("src.pipeline.normalizer.get_account_by_email_domain", return_value=None),
         patch(
@@ -155,7 +155,7 @@ def test_inbound_payload_parses_valid_payload():
     p = InboundPayload.model_validate(_PAYLOAD)
     assert p.from_email == "priya.sharma@formationbio.com"
     assert p.body == "Hello, this is a test."
-    assert p.to_emails == ["elicit@signal.example.com"]
+    assert p.to_emails == ["quantas-labs@signal.example.com"]
 
 
 def test_inbound_payload_rejects_empty_from_email():

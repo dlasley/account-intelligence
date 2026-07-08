@@ -20,7 +20,7 @@ export function init(): void {
   posthog.init(key, {
     api_host: host,
     capture_pageview: false, // manual page tracking only
-    autocapture: false, // explicit per-event tracking only — URLs contain customer-identifiable account slugs (e.g. /accounts/elicit), and capturing every DOM click is broader than the brief intends
+    autocapture: false, // explicit per-event tracking only — URLs contain customer-identifiable account slugs (e.g. /accounts/quantas-labs), and capturing every DOM click is broader than the brief intends
     persistence: 'localStorage+cookie',
   })
 }

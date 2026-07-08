@@ -265,7 +265,7 @@ The frontend renders a template picker (intent tabs + radio buttons), a recommen
 
 ## Synthetic Data + Cross-Vendor Audit
 
-ADR-015 (synthetic data generator contract) and ADR-016 (cross-model audit harness) extend the test substrate beyond the 71 hand-authored Elicit fixtures. The 71 stay as the canonical regression anchor; synthetic generation is additive.
+ADR-015 (synthetic data generator contract) and ADR-016 (cross-model audit harness) extend the test substrate beyond the 71 hand-authored Quantas Labs fixtures. The 71 stay as the canonical regression anchor; synthetic generation is additive.
 
 ### Synthetic Data Generator (ADR-015)
 
@@ -297,7 +297,7 @@ Scenarios are defined by an `AxesSpec` with 9 axes:
 - 8 structural: `contact_diversity`, `domain_mixing`, `message_length`, `response_cadence`, `language_register`, `threading_topology`, `sentiment_trajectory`, `cross_modal`
 - 1 topical: `concern_topic` (Rev 1) — 8 values: `none | pricing | outage | feature_gap | utilization_decline | competitive | success_expansion | renewal_pending`. Drives template-family selection.
 
-The audit corpus today comprises 11 narratives spanning 7 of 8 topic values (only `pricing` not yet exercised by a corpus scenario): 5 Phase 2a-b scenarios + 5 from `elicit-baseline.yaml` (regenerates the 71 hand-authored fixtures via `expected_routing` equivalence assertion) + 1 `expanding-champion` scenario.
+The audit corpus today comprises 11 narratives spanning 7 of 8 topic values (only `pricing` not yet exercised by a corpus scenario): 5 Phase 2a-b scenarios + 5 from `quantas-labs-baseline.yaml` (regenerates the 71 hand-authored fixtures via `expected_routing` equivalence assertion) + 1 `expanding-champion` scenario.
 
 ### Audit Harness (ADR-016)
 
@@ -348,7 +348,7 @@ narrative_audit_runs  ← 1 aggregate row (overall_passed, hard_gate_failures,
 Three test surfaces sit on top of the synthetic data substrate:
 
 - **`tests/synthetic/test_orchestrator.py` + `test_email_generator.py` + `test_product_generator.py`**: structural correctness of generators and orchestrator dispatch.
-- **`tests/synthetic/test_elicit_equivalence.py`**: routing equivalence between synthetic regeneration and the 71 hand-authored fixtures (per-account signal count + routing-method distribution + sender-domain set; ADR-015 §Test Req 8).
+- **`tests/synthetic/test_quantas_labs_equivalence.py`**: routing equivalence between synthetic regeneration and the 71 hand-authored fixtures (per-account signal count + routing-method distribution + sender-domain set; ADR-015 §Test Req 8).
 - **`tests/synthetic/test_audit_integration.py`**: audit harness end-to-end with mocked OpenAI + Supabase (5 criterion rows + 1 aggregate row, atomic on failure).
 - **`tests/synthetic/test_dimension_distribution.py`**: per-scenario engagement-score band assertions (`_EXPECTED_AT_RISK` ≤ 30, `_EXPECTED_HEALTHY` ≥ 50).
 - **`tests/test_invariants.py`**: Hypothesis property tests (500 examples per `@given`) for the three highest-value invariants: overall_health weighted-average, routing_confidence ∈ [0,1] across all router outcomes, uuid5 ID stability.
@@ -553,7 +553,7 @@ Per-workspace overrides can change weights, window, model, or any other field. O
 | 000025 | Super-user role: `users.is_super_user`, `list_all_workspaces_with_metadata` RPC (ADR-018) |
 | 000026 | Super-user browsing refactor: drop impersonation RPCs, switch to direct RLS-bypass SECURITY DEFINER pattern (ADR-018 amendment) |
 | 000027 | Single mutation surface: SECURITY DEFINER RPCs for all frontend writes; REVOKE INSERT/UPDATE/DELETE from `authenticated` on all tables (ADR-019) |
-| 000028 | Expand `accounts.vertical` taxonomy from 7 Elicit-shaped values to 13 standard B2B industry buckets |
+| 000028 | Expand `accounts.vertical` taxonomy from 7 Quantas Labs-shaped values to 13 standard B2B industry buckets |
 | 000029 | Multi-source structured signals: `external_credentials`, `integration_state` tables; `signal_metadata` JSONB on signals; `plain_ticket`, `granola_note` source types (ADR-020 Phase 1) |
 | 000030 | Pylon push adapter: extend `external_credentials.kind` and `signals.source_type` CHECKs for Pylon (ADR-020 Phase 2.5) |
 
@@ -660,7 +660,7 @@ flowchart TB
 
     CSP["The platform<br/>Frontend + Worker + Supabase +<br/>Synthetic Generator + Audit Script +<br/>vendor-neutral Analytics Wrapper"]
 
-    WS["Workspace<br/>your customer — AI/SaaS team<br/>e.g. elicit, acme-saas"]
+    WS["Workspace<br/>your customer — AI/SaaS team<br/>e.g. quantas-labs, acme-saas"]
     ACC["Account<br/>your customer's customer — a company they track<br/>e.g. cdc, formation-bio, brightpath-co"]
     CON["Contact<br/>individual at the Account<br/>e.g. alice@cdc.gov"]
     SIG["Signal<br/>an email or product event"]

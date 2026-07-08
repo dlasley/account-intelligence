@@ -8,7 +8,7 @@ const EXTERNAL = [
 ]
 
 const INTERNAL = [
-  { id: 'c-3', display_name: 'CSM Dave', email: 'dave@elicit.org', is_internal: true },
+  { id: 'c-3', display_name: 'CSM Dave', email: 'dave@quantaslabs.com', is_internal: true },
 ]
 
 describe('ContactsList', () => {
@@ -35,6 +35,6 @@ describe('ContactsList', () => {
   it('does not render internal contacts', () => {
     render(<ContactsList contacts={[...EXTERNAL, ...INTERNAL]} />)
     expect(screen.queryByText('CSM Dave')).toBeNull()
-    expect(screen.queryByText('dave@elicit.org')).toBeNull()
+    expect(screen.queryByText('dave@quantaslabs.com')).toBeNull()
   })
 })

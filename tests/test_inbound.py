@@ -17,11 +17,11 @@ DOMAIN = "signal.example.com"
 SECRET = "test-secret-abc123"
 
 # Minimal SendGrid-style form data that routes cleanly
-_ENVELOPE = json.dumps({"from": "sender@customer.com", "to": [f"elicit@{DOMAIN}"]})
+_ENVELOPE = json.dumps({"from": "sender@customer.com", "to": [f"quantas-labs@{DOMAIN}"]})
 _FORM_DATA = {
     "envelope": _ENVELOPE,
     "from": "Sender <sender@customer.com>",
-    "to": f"elicit@{DOMAIN}",
+    "to": f"quantas-labs@{DOMAIN}",
     "subject": "Hello",
     "text": "Test body",
     "timestamp": "1714000000",

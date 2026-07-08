@@ -73,22 +73,22 @@ DOMAIN = "inbound.example.com"
 
 
 def test_extract_workspace_slug_simple():
-    ws, acct = extract_workspace_slug(_envelope([f"elicit@{DOMAIN}"]), DOMAIN)
-    assert ws == "elicit"
+    ws, acct = extract_workspace_slug(_envelope([f"quantas-labs@{DOMAIN}"]), DOMAIN)
+    assert ws == "quantas-labs"
     assert acct is None
 
 
 def test_extract_workspace_slug_plus_addressing():
-    ws, acct = extract_workspace_slug(_envelope([f"elicit+formation-bio@{DOMAIN}"]), DOMAIN)
-    assert ws == "elicit"
+    ws, acct = extract_workspace_slug(_envelope([f"quantas-labs+formation-bio@{DOMAIN}"]), DOMAIN)
+    assert ws == "quantas-labs"
     assert acct == "formation-bio"
 
 
 def test_extract_workspace_slug_ignores_other_domains():
     ws, _acct = extract_workspace_slug(
-        _envelope(["other@otherdomain.com", f"elicit@{DOMAIN}"]), DOMAIN
+        _envelope(["other@otherdomain.com", f"quantas-labs@{DOMAIN}"]), DOMAIN
     )
-    assert ws == "elicit"
+    assert ws == "quantas-labs"
 
 
 def test_extract_workspace_slug_raises_if_no_match():
@@ -110,13 +110,13 @@ def test_extract_workspace_slug_empty_to_raises():
 
 SAMPLE_FORM = {
     "from": "Priya Patel <priya@formationbio.com>",
-    "to": f"elicit@{DOMAIN}",
+    "to": f"quantas-labs@{DOMAIN}",
     "subject": "Quick question about the API",
     "text": "Hi, can you clarify the rate limits?",
     "html": "<p>Hi, can you clarify the rate limits?</p>",
     "timestamp": "1714000000",
     "headers": SAMPLE_HEADERS,
-    "envelope": _envelope([f"elicit@{DOMAIN}"]),
+    "envelope": _envelope([f"quantas-labs@{DOMAIN}"]),
 }
 
 

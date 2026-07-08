@@ -42,8 +42,8 @@ DEFAULT_CONFIG = AccountHealthConfig(
     sentiment_bands=_SENTIMENT_BANDS,
 )
 
-# Elicit workspace config override
-ELICIT_CONFIG = AccountHealthConfig(
+# Quantas Labs workspace config override
+QUANTAS_LABS_CONFIG = AccountHealthConfig(
     engagement_tiers=[
         _tier("high", 90, min_signals=3, window_days=21, min_contacts=2),
         _tier("good", 70, min_signals=2, window_days=21, min_contacts=1),
@@ -223,11 +223,11 @@ def test_window_boundary_inclusive():
     assert outside.tier_name != "high"
 
 
-def test_elicit_config_lower_thresholds():
-    """With Elicit config (min_signals=3 for HIGH), 3 signals qualifies for HIGH."""
+def test_quantas_labs_config_lower_thresholds():
+    """With Quantas Labs config (min_signals=3 for HIGH), 3 signals qualifies for HIGH."""
     c1, c2 = uuid4(), uuid4()
     signals = [_signal(5, c1), _signal(10, c2), _signal(15, c1)]
-    result = determine_account_health(signals, ELICIT_CONFIG)
+    result = determine_account_health(signals, QUANTAS_LABS_CONFIG)
     assert result.score == 90
     assert result.tier_name == "high"
 

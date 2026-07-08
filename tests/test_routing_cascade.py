@@ -21,16 +21,16 @@ from src.pipeline.router import RoutingResult, route
 # Shared fixtures
 # ---------------------------------------------------------------------------
 
-_WS_ID = uuid5(NAMESPACE_DNS, "elicit")
-_ORG_ID = uuid5(NAMESPACE_DNS, "elicit-org")
+_WS_ID = uuid5(NAMESPACE_DNS, "quantas-labs")
+_ORG_ID = uuid5(NAMESPACE_DNS, "quantas-labs-org")
 _NOW = datetime.now(UTC)
 
 WORKSPACE = Workspace(
     id=_WS_ID,
     organization_id=_ORG_ID,
-    slug="elicit",
-    name="Elicit",
-    internal_domains=("elicit.org",),
+    slug="quantas-labs",
+    name="Quantas Labs",
+    internal_domains=("quantaslabs.com",),
     crm_url_template=None,
     crm_portal_id=None,
     outbound_sender_email=None,
@@ -67,16 +67,16 @@ NOVAGEN_BIO = _account("novagen-bio", "novagenb.io", vertical=Vertical.LIFE_SCIE
 
 ACCOUNTS = [FORMATION_BIO, JNJ, NOVAGEN_BIO]
 
-FIXTURE_DIR = Path("fixtures/elicit-shaped")
+FIXTURE_DIR = Path("fixtures/quantas-labs-shaped")
 
 if not FIXTURE_DIR.exists():
     pytest.skip(
-        "elicit pilot data moved to .private/; not present in tracked tree",
+        "quantas-labs pilot data moved to .private/; not present in tracked tree",
         allow_module_level=True,
     )
 
 # Explicit inbound address for test isolation (avoids env-var pollution from other test files)
-INBOUND_ADDRESS = "elicit@signal.example.com"
+INBOUND_ADDRESS = "quantas-labs@signal.example.com"
 
 
 def _load(path: str) -> dict:
@@ -95,7 +95,7 @@ def _load(path: str) -> dict:
         pytest.param(
             {
                 "from_email": "priya.sharma@formationbio.com",
-                "to_emails": ["elicit@signal.example.com"],
+                "to_emails": ["quantas-labs@signal.example.com"],
                 "thread_id": None,
             },
             {},
@@ -115,7 +115,7 @@ def _load(path: str) -> dict:
         pytest.param(
             {
                 "from_email": "user@gmail.com",
-                "to_emails": ["elicit@signal.example.com"],
+                "to_emails": ["quantas-labs@signal.example.com"],
                 "thread_id": "thread-formation-bio-002",
             },
             {"thread-formation-bio-002": [FORMATION_BIO.id]},
@@ -194,7 +194,7 @@ def test_plus_addressing_unknown_slug_falls_through():
     """Unknown slug in plus-address should fall through, NOT error."""
     payload = {
         "from_email": "user@formationbio.com",
-        "to_emails": ["elicit+nonexistent@signal.example.com"],
+        "to_emails": ["quantas-labs+nonexistent@signal.example.com"],
         "thread_id": None,
     }
     result = route(payload, WORKSPACE, ACCOUNTS, {}, inbound_address=INBOUND_ADDRESS)
@@ -207,7 +207,7 @@ def test_subdomain_match():
     """Subdomain of a known account domain should match via header_domain."""
     payload = {
         "from_email": "researcher@labs.formationbio.com",
-        "to_emails": ["elicit@signal.example.com"],
+        "to_emails": ["quantas-labs@signal.example.com"],
         "thread_id": None,
     }
     result = route(payload, WORKSPACE, ACCOUNTS, {}, inbound_address=INBOUND_ADDRESS)
@@ -218,8 +218,8 @@ def test_subdomain_match():
 def test_internal_sender_no_forward_is_unmatched():
     """Internal sender sending only to the workspace inbound address falls through to unmatched."""
     payload = {
-        "from_email": "engineer@elicit.org",
-        "to_emails": ["elicit@signal.example.com"],
+        "from_email": "engineer@quantaslabs.com",
+        "to_emails": ["quantas-labs@signal.example.com"],
         "body": "Just a regular internal note, no forwarded content.",
         "thread_id": None,
     }

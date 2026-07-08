@@ -1,7 +1,7 @@
-"""TDD: failing tests for Phase 2c elicit-baseline equivalence.
+"""TDD: failing tests for Phase 2c quantas-labs-baseline equivalence.
 
-Asserts that the synthetic scenario `elicit-baseline.yaml` reproduces the
-routing decisions produced by the 63 hand-authored Elicit account fixtures.
+Asserts that the synthetic scenario `quantas-labs-baseline.yaml` reproduces the
+routing decisions produced by the 63 hand-authored Quantas Labs account fixtures.
 Equivalence criterion (ADR-015 §Req 8):
   - signal count per account (exact)
   - routing-method distribution per account (exact)
@@ -31,13 +31,13 @@ from src.synthetic.orchestrator import load_scenario, run_scenario
 # This import is intentionally the red line: ExpectedSignalSpec does not exist yet.
 from src.synthetic.scenario import ExpectedSignalSpec  # noqa: F401
 
-_ACCOUNTS_DIR = Path("fixtures/elicit-shaped/accounts")
-_SCENARIO_PATH = Path("fixtures/synthetic-scenarios/elicit-baseline.yaml")
+_ACCOUNTS_DIR = Path("fixtures/quantas-labs-shaped/accounts")
+_SCENARIO_PATH = Path("fixtures/synthetic-scenarios/quantas-labs-baseline.yaml")
 _NOW = datetime(2026, 1, 1, 0, 0, 0, tzinfo=UTC)
 
 if not _ACCOUNTS_DIR.exists() or not _SCENARIO_PATH.exists():
     pytest.skip(
-        "elicit pilot data moved to .private/; not present in tracked tree",
+        "quantas-labs pilot data moved to .private/; not present in tracked tree",
         allow_module_level=True,
     )
 
@@ -65,7 +65,7 @@ def _routing_diff(account_slug: str, expected_dist: dict, actual_dist: dict) -> 
 
 @pytest.fixture(scope="module")
 def scenario_run():
-    """Load the elicit-baseline scenario, construct workspace + accounts,
+    """Load the quantas-labs-baseline scenario, construct workspace + accounts,
     execute run_scenario under mocked DB calls, and return:
         (scenario, signals, thread_map)
 
@@ -80,7 +80,7 @@ def scenario_run():
     scenario = load_scenario(_SCENARIO_PATH)
 
     # Workspace mirrors process-fixtures logic (src/worker.py:93-109)
-    ws_data = json.loads((Path("fixtures/elicit-shaped") / "workspace.json").read_text())
+    ws_data = json.loads((Path("fixtures/quantas-labs-shaped") / "workspace.json").read_text())
     ws_id = uuid.uuid5(uuid.NAMESPACE_DNS, ws_data["slug"])
     org_id = uuid.uuid5(uuid.NAMESPACE_DNS, ws_data["organization_slug"])
     workspace = Workspace(
@@ -98,7 +98,7 @@ def scenario_run():
         deleted_at=None,
     )
 
-    # Accounts: read from fixtures/elicit-shaped/accounts/*.json (src/worker.py:117-136)
+    # Accounts: read from fixtures/quantas-labs-shaped/accounts/*.json (src/worker.py:117-136)
     accounts: list[Account] = []
     for acc_file in sorted(_ACCOUNTS_DIR.glob("*.json")):
         a = json.loads(acc_file.read_text())
@@ -156,7 +156,7 @@ def scenario_run():
         update can find it. Routing fields (account_id, routing_method) are not
         yet populated here — they are set by update_signal_routing after the
         router decides."""
-        signal.id = uuid.uuid5(uuid.NAMESPACE_DNS, f"elicit:{signal.external_id}")
+        signal.id = uuid.uuid5(uuid.NAMESPACE_DNS, f"quantas-labs:{signal.external_id}")
         signals_by_id[signal.id] = signal
         return signal, False
 
@@ -249,8 +249,8 @@ def scenario_run():
 # ---------------------------------------------------------------------------
 
 
-class TestElicitSignalCounts:
-    def test_elicit_signal_counts(self, scenario_run):
+class TestQuantasLabsSignalCounts:
+    def test_quantas_labs_signal_counts(self, scenario_run):
         """Per-account signal count must match expected_routing baseline (exact)."""
         scenario, signals, _thread_map, id_to_slug = scenario_run
 
@@ -267,8 +267,8 @@ class TestElicitSignalCounts:
             )
 
 
-class TestElicitRoutingDistribution:
-    def test_elicit_routing_distribution(self, scenario_run):
+class TestQuantasLabsRoutingDistribution:
+    def test_quantas_labs_routing_distribution(self, scenario_run):
         """Per-account routing-method distribution must match expected_routing baseline."""
         scenario, signals, _thread_map, id_to_slug = scenario_run
 
@@ -286,8 +286,8 @@ class TestElicitRoutingDistribution:
             )
 
 
-class TestElicitSenderDomains:
-    def test_elicit_sender_domains(self, scenario_run):
+class TestQuantasLabsSenderDomains:
+    def test_quantas_labs_sender_domains(self, scenario_run):
         """Per-account unique sender email domains must match expected_routing baseline."""
         scenario, _signals, _thread_map, _id_to_slug = scenario_run
 
@@ -297,7 +297,7 @@ class TestElicitSenderDomains:
         from src.domain.raw_inbound_event import RawInboundEvent
         from src.synthetic.orchestrator import yield_events
 
-        ws_id_full = uuid.uuid5(uuid.NAMESPACE_DNS, "elicit")
+        ws_id_full = uuid.uuid5(uuid.NAMESPACE_DNS, "quantas-labs")
         account_sender_domains: dict[str, set[str]] = defaultdict(set)
 
         for slug, event in yield_events(scenario, ws_id_full):
@@ -319,15 +319,15 @@ class TestElicitSenderDomains:
             )
 
 
-class TestElicitCrossAccountThreadInherit:
-    def test_elicit_cross_account_thread_inherit(self, scenario_run):
+class TestQuantasLabsCrossAccountThreadInherit:
+    def test_quantas_labs_cross_account_thread_inherit(self, scenario_run):
         """Signals with thread_id == 'thread-cross-001' must appear under both
         formation-bio and jnj after processing (thread-map accumulator picked up
         both accounts)."""
         _scenario, _signals, thread_map, _id_to_slug = scenario_run
 
         cross_thread_id = "thread-cross-001"
-        ws_id = uuid.uuid5(uuid.NAMESPACE_DNS, "elicit")
+        ws_id = uuid.uuid5(uuid.NAMESPACE_DNS, "quantas-labs")
         formation_bio_id = uuid.uuid5(uuid.NAMESPACE_DNS, f"{ws_id}:formation-bio")
         jnj_id = uuid.uuid5(uuid.NAMESPACE_DNS, f"{ws_id}:jnj")
 

@@ -17,7 +17,7 @@ harness is what catches semantic regressions in those.
 
 Usage::
 
-    uv run python scripts/check_narrative_baselines.py --workspace-slug elicit
+    uv run python scripts/check_narrative_baselines.py --workspace-slug quantas-labs
 
 (``.env`` is loaded automatically via python-dotenv — no ``--env-file`` flag needed.)
 
