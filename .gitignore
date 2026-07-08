@@ -68,3 +68,6 @@ config/workspaces/*.json
 *.log
 htmlcov/
 .mypy_cache/
+
+# Playwright MCP session artifacts (screenshots, snapshots, console logs)
+.playwright-mcp/
