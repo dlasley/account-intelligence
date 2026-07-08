@@ -14,6 +14,7 @@
 # Claude Code
 .claude/settings.local.json
 .claude/internal.md
+.claude/internal-guidance.md
 CLAUDE.local.md
 .claude/data/
 .claude/logs/
