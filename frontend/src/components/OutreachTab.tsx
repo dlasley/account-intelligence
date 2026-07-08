@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { track } from '@/lib/analytics'
 
@@ -22,6 +22,7 @@ type Template = {
 type ContextResponse = {
   draft_id: string
   workspace_id: string
+  contact_id: string | null
   subject: string
   body: string
   recommended_template_id: string
@@ -39,6 +40,27 @@ type Props = {
 
 type Status = 'idle' | 'loading' | 'saving' | 'sending' | 'sent' | 'error'
 
+const CONTACT_NAME_SLOT = '[Contact Name]'
+
+function nameForContact(
+  c: { display_name: string | null; email: string } | undefined | null,
+): string {
+  return c ? c.display_name || c.email : CONTACT_NAME_SLOT
+}
+
+function nameForContactId(contacts: Props['contacts'], id: string | null): string {
+  return nameForContact(contacts.find((c) => c.id === id))
+}
+
+function escapeRegExp(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+function swapGreetingName(body: string, oldName: string, newName: string): string {
+  const greetingLine = new RegExp(`^Hi ${escapeRegExp(oldName)},`, 'm')
+  return body.replace(greetingLine, `Hi ${newName},`)
+}
+
 export default function OutreachTab({ accountSlug, accountId, contacts, overallHealthScore }: Props) {
   const [intent, setIntent] = useState<'check_in' | 'expansion' | 'renewal' | 'custom'>('check_in')
   const [context, setContext] = useState<ContextResponse | null>(null)
@@ -49,6 +71,12 @@ export default function OutreachTab({ accountSlug, accountId, contacts, overallH
   const [contactId, setContactId] = useState<string | null>(contacts[0]?.id ?? null)
   const [status, setStatus] = useState<Status>('idle')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  // Tracks the contact whose name is actually baked into subject/body text right now,
+  // independent of the dropdown's live `contactId` — required because "No recipient"
+  // (contactId = null) leaves the text untouched (see handleContactChange), so the next
+  // real recipient change must still know what name is currently in the text to swap.
+  const lastAppliedNameContactIdRef = useRef<string | null>(null)
 
   const supabase = createClient()
 
@@ -64,11 +92,23 @@ export default function OutreachTab({ accountSlug, accountId, contacts, overallH
     [context, intent],
   )
 
+  const loadedRecipientName = nameForContact(contacts[0])
+
   const handleTemplateSelect = useCallback(
     async (t: Template) => {
+      const recipientName = nameForContactId(contacts, contactId)
+      const filledSubject = t.subject.replaceAll(loadedRecipientName, recipientName)
+      const filledBody = t.body.replaceAll(loadedRecipientName, recipientName)
       setSelectedTemplateId(t.id)
-      setSubject(t.subject)
-      setBody(t.body)
+      setSubject(filledSubject)
+      setBody(filledBody)
+      // The ref must reflect the name actually baked into the text, including the
+      // placeholder-null case during a "No recipient" hop (contactId === null here
+      // means recipientName resolved to CONTACT_NAME_SLOT) — see code-review revision
+      // #1 in outreach-greeting-sync-spec-2026-07-08.md. Without this, a template
+      // select during a null hop leaves the ref pointing at a stale contact while the
+      // text now shows the placeholder, breaking the next real recipient swap.
+      lastAppliedNameContactIdRef.current = contactId
       track('Outreach Template Selected', {
         account_id: accountId,
         intent,
@@ -77,14 +117,14 @@ export default function OutreachTab({ accountSlug, accountId, contacts, overallH
       if (draftId) {
         await supabase.rpc('update_outreach_draft', {
           p_draft_id: draftId,
-          p_subject: t.subject,
-          p_body: t.body,
+          p_subject: filledSubject,
+          p_body: filledBody,
           p_intent: intent,
           p_template_id: t.id,
         })
       }
     },
-    [accountId, draftId, intent, supabase],
+    [accountId, contactId, contacts, draftId, intent, loadedRecipientName, supabase],
   )
 
   useEffect(() => {
@@ -105,6 +145,15 @@ export default function OutreachTab({ accountSlug, accountId, contacts, overallH
         setSubject(data.subject)
         setBody(data.body)
         setSelectedTemplateId(data.recommended_template_id)
+        // Validate against the live contacts list as defense-in-depth (e.g. a
+        // persisted draft's contact_id no longer resolving in `contacts`); fall back
+        // to contacts[0] rather than seeding an unselectable dropdown value.
+        const seededContactId =
+          data.contact_id && contacts.some((c) => c.id === data.contact_id)
+            ? data.contact_id
+            : contacts[0]?.id ?? null
+        setContactId(seededContactId)
+        lastAppliedNameContactIdRef.current = seededContactId
         setStatus('idle')
       } catch (err) {
         setErrorMessage(err instanceof Error ? err.message : 'Unknown error')
@@ -151,10 +200,30 @@ export default function OutreachTab({ accountSlug, accountId, contacts, overallH
 
   async function handleContactChange(newContactId: string | null) {
     setContactId(newContactId)
-    if (!draftId || newContactId === null) return
+    if (newContactId === null) {
+      // ADR-019 D8: update_outreach_draft cannot clear contact_id (NULL param means
+      // "leave unchanged"), so "No recipient" is UI-only — leave the text as-is and
+      // don't call the RPC. Deliberately do NOT advance lastAppliedNameContactIdRef:
+      // the text still bears the previous recipient's name, so the next real
+      // selection must still swap against that name, not the placeholder.
+      return
+    }
+    if (!draftId) return
+
+    const oldName = nameForContactId(contacts, lastAppliedNameContactIdRef.current)
+    const newName = nameForContactId(contacts, newContactId)
+    // Body-only swap (revision #4): no template carries [Contact Name] in its subject
+    // (only [Account Name]), so a subject swap could only ever mutate user-edited
+    // subject text — harm, never help.
+    const nextBody = oldName === newName ? body : swapGreetingName(body, oldName, newName)
+
+    setBody(nextBody)
+    lastAppliedNameContactIdRef.current = newContactId
+
     await supabase.rpc('update_outreach_draft', {
       p_draft_id: draftId,
       p_contact_id: newContactId,
+      p_body: nextBody,
     })
   }
 

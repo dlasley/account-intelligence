@@ -24,10 +24,12 @@ vi.mock('@/lib/supabase/client', () => ({
 const CONTACTS = [
   { id: 'contact-1', display_name: 'Priya Sharma', email: 'priya@formationbio.com' },
   { id: 'contact-2', display_name: null, email: 'bob@formationbio.com' },
+  { id: 'contact-3', display_name: null, email: 'bob+outreach@formationbio.com' },
 ]
 
 const CONTEXT_RESPONSE = {
   draft_id: 'draft-1',
+  contact_id: 'contact-1',
   subject: 'Checking in — Formation Bio',
   body: 'Hi Priya Sharma,\n\n[Reference something specific.]',
   recommended_template_id: 'check_in.casual',
@@ -56,6 +58,17 @@ const CONTEXT_RESPONSE = {
       body_excerpt: 'We are concerned about pricing.',
     },
   ],
+}
+
+// The display-value normalizer (testing-library) collapses newlines, so reading the
+// greeting/body text back for assertions must go through the raw DOM `.value`, not
+// `getByDisplayValue`.
+function bodyTextarea(): HTMLTextAreaElement {
+  return document.querySelector('textarea') as HTMLTextAreaElement
+}
+
+function contactSelect(): HTMLSelectElement {
+  return screen.getByRole('combobox') as HTMLSelectElement
 }
 
 beforeEach(() => {
@@ -156,5 +169,211 @@ describe('OutreachTab', () => {
       <OutreachTab accountSlug="formation-bio" accountId="acc-1" contacts={CONTACTS} overallHealthScore={55} />
     )
     await waitFor(() => expect(screen.queryByText(/low health score/i)).toBeNull())
+  })
+})
+
+describe('OutreachTab - greeting name sync', () => {
+  it('greeting follows the selected recipient and persists the re-filled name via RPC', async () => {
+    render(
+      <OutreachTab accountSlug="formation-bio" accountId="acc-1" contacts={CONTACTS} overallHealthScore={75} />
+    )
+    await waitFor(() => expect(bodyTextarea().value).toContain('Priya Sharma'))
+
+    fireEvent.change(contactSelect(), { target: { value: 'contact-2' } })
+
+    await waitFor(() =>
+      expect(bodyTextarea().value).toBe('Hi bob@formationbio.com,\n\n[Reference something specific.]')
+    )
+    await waitFor(() =>
+      expect(mockRpc).toHaveBeenCalledWith('update_outreach_draft', {
+        p_draft_id: 'draft-1',
+        p_contact_id: 'contact-2',
+        p_body: 'Hi bob@formationbio.com,\n\n[Reference something specific.]',
+      })
+    )
+  })
+
+  it('recipient change preserves a user-edited greeting (no seeded name present → no-op swap)', async () => {
+    render(
+      <OutreachTab accountSlug="formation-bio" accountId="acc-1" contacts={CONTACTS} overallHealthScore={75} />
+    )
+    await waitFor(() => expect(bodyTextarea().value).toContain('Priya Sharma'))
+
+    fireEvent.change(bodyTextarea(), { target: { value: 'Hey there,\n\nJust checking in.' } })
+    fireEvent.change(contactSelect(), { target: { value: 'contact-2' } })
+
+    await waitFor(() =>
+      expect(mockRpc).toHaveBeenCalledWith(
+        'update_outreach_draft',
+        expect.objectContaining({ p_contact_id: 'contact-2' })
+      )
+    )
+    expect(bodyTextarea().value).toBe('Hey there,\n\nJust checking in.')
+  })
+
+  it('recipient change preserves an edited body paragraph while still tracking the name', async () => {
+    render(
+      <OutreachTab accountSlug="formation-bio" accountId="acc-1" contacts={CONTACTS} overallHealthScore={75} />
+    )
+    await waitFor(() => expect(bodyTextarea().value).toContain('Priya Sharma'))
+
+    fireEvent.change(bodyTextarea(), {
+      target: {
+        value: 'Hi Priya Sharma,\n\nI wanted to follow up on your custom onboarding needs.',
+      },
+    })
+    fireEvent.change(contactSelect(), { target: { value: 'contact-2' } })
+
+    await waitFor(() =>
+      expect(bodyTextarea().value).toBe(
+        'Hi bob@formationbio.com,\n\nI wanted to follow up on your custom onboarding needs.'
+      )
+    )
+  })
+
+  it('selecting a template after a recipient change fills the current recipient, not the load-time one', async () => {
+    render(
+      <OutreachTab accountSlug="formation-bio" accountId="acc-1" contacts={CONTACTS} overallHealthScore={75} />
+    )
+    await waitFor(() => expect(bodyTextarea().value).toContain('Priya Sharma'))
+
+    fireEvent.change(contactSelect(), { target: { value: 'contact-2' } })
+    await waitFor(() => expect(bodyTextarea().value).toContain('bob@formationbio.com'))
+
+    const reengageRadio = screen.getByDisplayValue('check_in.reengagement')
+    fireEvent.click(reengageRadio)
+
+    await waitFor(() => expect(bodyTextarea().value).toBe('Hi bob@formationbio.com,\n\n[Add context.]'))
+    expect(bodyTextarea().value).not.toContain('Priya Sharma')
+  })
+
+  it('null-hop regression: A → No recipient → C shows C name in the greeting (surface 4)', async () => {
+    render(
+      <OutreachTab accountSlug="formation-bio" accountId="acc-1" contacts={CONTACTS} overallHealthScore={75} />
+    )
+    await waitFor(() => expect(bodyTextarea().value).toContain('Priya Sharma'))
+
+    fireEvent.change(contactSelect(), { target: { value: '' } })
+    await waitFor(() => expect(contactSelect().value).toBe(''))
+
+    fireEvent.change(contactSelect(), { target: { value: 'contact-2' } })
+
+    await waitFor(() =>
+      expect(bodyTextarea().value).toBe('Hi bob@formationbio.com,\n\n[Reference something specific.]')
+    )
+
+    const contactIdCalls = mockRpc.mock.calls.filter((call: unknown[]) => {
+      const args = call[1] as Record<string, unknown>
+      return 'p_contact_id' in args
+    })
+    expect(contactIdCalls).toHaveLength(1)
+    expect(contactIdCalls[0][1]).toMatchObject({
+      p_contact_id: 'contact-2',
+      p_body: 'Hi bob@formationbio.com,\n\n[Reference something specific.]',
+    })
+  })
+
+  it('substring-collision: only the greeting line updates, a later mention of the name is untouched', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          ...CONTEXT_RESPONSE,
+          body: 'Hi Priya Sharma,\n\nAs Priya Sharma mentioned last week, we should follow up.',
+        }),
+      })
+    )
+    render(
+      <OutreachTab accountSlug="formation-bio" accountId="acc-1" contacts={CONTACTS} overallHealthScore={75} />
+    )
+    await waitFor(() => expect(bodyTextarea().value).toContain('Priya Sharma'))
+
+    fireEvent.change(contactSelect(), { target: { value: 'contact-2' } })
+
+    await waitFor(() =>
+      expect(bodyTextarea().value).toBe(
+        'Hi bob@formationbio.com,\n\nAs Priya Sharma mentioned last week, we should follow up.'
+      )
+    )
+  })
+
+  it('regex-escaping: a name containing a regex metacharacter swaps out cleanly on the next change', async () => {
+    render(
+      <OutreachTab accountSlug="formation-bio" accountId="acc-1" contacts={CONTACTS} overallHealthScore={75} />
+    )
+    await waitFor(() => expect(bodyTextarea().value).toContain('Priya Sharma'))
+
+    // First hop bakes the '+'-bearing email into the greeting as the "current" name.
+    fireEvent.change(contactSelect(), { target: { value: 'contact-3' } })
+    await waitFor(() =>
+      expect(bodyTextarea().value).toBe(
+        'Hi bob+outreach@formationbio.com,\n\n[Reference something specific.]'
+      )
+    )
+
+    // Second hop swaps AWAY from the '+'-bearing name — this is what actually exercises
+    // escapeRegExp on oldName; an unescaped '+' in the pattern would fail to match and
+    // silently leave the old name in place.
+    fireEvent.change(contactSelect(), { target: { value: 'contact-2' } })
+
+    await waitFor(() =>
+      expect(bodyTextarea().value).toBe('Hi bob@formationbio.com,\n\n[Reference something specific.]')
+    )
+    expect(bodyTextarea().value).not.toContain('bob+outreach@formationbio.com')
+  })
+
+  it('deleted-contact dropdown fallback: seeded contact_id absent from contacts falls back to contacts[0]', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ ...CONTEXT_RESPONSE, contact_id: 'contact-deleted-999' }),
+      })
+    )
+    render(
+      <OutreachTab accountSlug="formation-bio" accountId="acc-1" contacts={CONTACTS} overallHealthScore={75} />
+    )
+    await waitFor(() => expect(bodyTextarea().value).toContain('Priya Sharma'))
+
+    expect(contactSelect().value).toBe('contact-1')
+  })
+
+  it('compound repro: A → No recipient → C shows C in the body greeting (currently RED pre-fix)', async () => {
+    render(
+      <OutreachTab accountSlug="formation-bio" accountId="acc-1" contacts={CONTACTS} overallHealthScore={75} />
+    )
+    await waitFor(() => expect(bodyTextarea().value).toContain('Priya Sharma'))
+
+    fireEvent.change(contactSelect(), { target: { value: '' } })
+    await waitFor(() => expect(contactSelect().value).toBe(''))
+
+    fireEvent.change(contactSelect(), { target: { value: 'contact-2' } })
+
+    await waitFor(() =>
+      expect(bodyTextarea().value).toBe('Hi bob@formationbio.com,\n\n[Reference something specific.]')
+    )
+  })
+
+  it('compound: A → No recipient → template-select → C shows C name, not the placeholder', async () => {
+    render(
+      <OutreachTab accountSlug="formation-bio" accountId="acc-1" contacts={CONTACTS} overallHealthScore={75} />
+    )
+    await waitFor(() => expect(bodyTextarea().value).toContain('Priya Sharma'))
+
+    fireEvent.change(contactSelect(), { target: { value: '' } })
+    await waitFor(() => expect(contactSelect().value).toBe(''))
+
+    // Radio click on a 2-template intent (check_in is the default intent, 2 templates).
+    const reengageRadio = screen.getByDisplayValue('check_in.reengagement')
+    fireEvent.click(reengageRadio)
+    await waitFor(() => expect(bodyTextarea().value).toContain('[Contact Name]'))
+
+    fireEvent.change(contactSelect(), { target: { value: 'contact-2' } })
+
+    await waitFor(() =>
+      expect(bodyTextarea().value).toBe('Hi bob@formationbio.com,\n\n[Add context.]')
+    )
+    expect(bodyTextarea().value).not.toContain('[Contact Name]')
   })
 })

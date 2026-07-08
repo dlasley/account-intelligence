@@ -234,6 +234,7 @@ def test_get_context_returns_200(monkeypatch):
     assert "recommendation_rationale" in data
     assert isinstance(data["templates"], list)
     assert isinstance(data["signals"], list)
+    assert data["contact_id"] == str(_CONTACT_ID)
 
 
 # ---------------------------------------------------------------------------

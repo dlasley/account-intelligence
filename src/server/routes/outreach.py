@@ -160,6 +160,7 @@ async def get_outreach_context(
         {
             "draft_id": str(active_draft.id),
             "workspace_id": str(workspace_id),
+            "contact_id": str(active_draft.contact_id) if active_draft.contact_id else None,
             "subject": active_draft.subject,
             "body": active_draft.body,
             "recommended_template_id": rec_id,
