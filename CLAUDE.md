@@ -46,7 +46,7 @@ For the full data-flow diagram (inbound email → routing → narrative generati
 
 - [src/](src/) — Python worker package (importable as `src.*`)
 - [src/synthetic/](src/synthetic/) — Synthetic data generator: scenario YAML loader, per-modality generators (email + product), orchestrator, materialise CLI (ADR-015)
-- [scripts/](scripts/) — Standalone CLI scripts: `audit_narratives.py` (cross-model audit harness, ADR-016), `derive_elicit_baseline.py` (one-shot fixture-equivalence baseline derivation)
+- [scripts/](scripts/) — Standalone CLI scripts: `audit_narratives.py` (cross-model audit harness, ADR-016), `derive_elicit_baseline.py` (one-shot fixture-equivalence baseline derivation), `reanchor_demo_data.py` (repeatable demo-data freshening: shifts a demo workspace's signal `occurred_at` + product-body embedded dates forward so the corpus reads as recent before a demo; dry-run default, snapshot-backed)
 - [tests/](tests/) — pytest tests (`testpaths = ["tests"]`)
 - [tests/synthetic/](tests/synthetic/) — Synthetic-pipeline tests: orchestrator, equivalence (vs Elicit baseline), audit integration, dimension distribution
 - [tests/test_invariants.py](tests/test_invariants.py) — Hypothesis property tests (overall_score, routing_confidence, uuid5 stability)
