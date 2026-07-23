@@ -71,7 +71,9 @@ See [docs/architecture.md](docs/architecture.md) for pipeline internals, health 
 
 **No configuration before value.** Accounts and contacts are auto-discovered from inbound email domains. The first email to the inbound address creates the account and contact; the first narrative generates without any setup step.
 
-**Deterministic health scoring, not LLM-decided.** Email engagement health is a pure function of signal count, recency window, and contact diversity — scaled by a per-account `frequency_multiplier`. The LLM narrates; it does not score. Sentiment is extracted from the narrative as an integer (1-100) and wired as a separate health dimension.
+**Deterministic health scoring, not LLM-decided.** Email engagement health is a pure function of signal count, recency window, and contact diversity — scaled by a per-account `frequency_multiplier`. A product-usage dimension, scored the same deterministic way from telemetry events, carries equal weight alongside email engagement. The LLM narrates; it does not score. Sentiment is extracted from the narrative as an integer (1-100) and wired as a separate health dimension.
+
+**Vendor-neutral analytics wrapper.** Both the worker and frontend emit product-analytics and LLM-observability events through a single internal interface rather than importing the PostHog SDK directly at each call site; swapping analytics providers means rewriting the wrapper body, not touching call sites.
 
 **No LLM in the send path.** Outreach generation was initially LLM-based; hallucination risk led to replacing it with file-based templates and signal surfacing. The frontend displays the relevant signals and lets the account team write the message. Templates use `[placeholder]` slots; the send button is blocked until all are filled.
 
@@ -124,7 +126,7 @@ account-intelligence/
 │   │   ├── generators/           # Pure functions: email.py (5 registers × 7 topical families), product.py
 │   │   └── materialise.py        # Write deterministic scenario output to fixtures/synthetic/<scenario>/
 │   ├── server/                   # FastAPI app (serve subcommand)
-│   │   └── routes/               # /inbound, /run-narratives, /outreach/{slug}/context, /outreach/send/{draft_id}, /event, /event.js
+│   │   └── routes/               # /inbound, /run-narratives, /run-polls, /outreach/{slug}/context, /outreach/send/{draft_id}, /event, /event.js, /signal/{kind}
 │   ├── signals/                  # SignalSource ABC + JsonFixtureSource
 │   └── config/                   # Config loader (deep-merge workspace overrides on defaults)
 ├── scripts/
@@ -247,8 +249,8 @@ cd frontend && npm test                # Vitest
 
 ## Deployment
 
-- **Python worker**: GCP Cloud Run. See [.private/deployment-runbook-gcp.md](.private/deployment-runbook-gcp.md).
-- **Frontend**: Vercel. See [.private/deployment-runbook-vercel.md](.private/deployment-runbook-vercel.md).
+- **Python worker**: GCP Cloud Run. Deployment runbook kept internally, not included in this repo.
+- **Frontend**: Vercel. Deployment runbook kept internally, not included in this repo.
 
 Production URLs:
 - Worker: `<your-cloud-run-url>`

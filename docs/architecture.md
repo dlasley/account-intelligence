@@ -124,7 +124,7 @@ A user clicking the in-app Regenerate button can hit any of three states:
 - **Rate-cap delay**: the job enqueues with `scheduled_for ~10 min from now()`. Click succeeds; visible refresh takes up to 10 min + cron lag.
 - **Default-lag success**: job enqueues with `scheduled_for = now() + 60s`. Visible refresh on the next 15-min cron tick.
 
-Worst-case lag from click to visible refresh: ~15 minutes (drain interval). Best-case: ~60 seconds plus the time to the next tick. There is no fast-path "regenerate immediately" — by design, to keep Claude cost bounded and the operational model simple. A future "interactive immediate regen" feature would need an additional code path; see [`.private/product-manager/router-stage-6-body-contact-match.md`](../.private/product-manager/router-stage-6-body-contact-match.md) for the related lag discussion.
+Worst-case lag from click to visible refresh: ~15 minutes (drain interval). Best-case: ~60 seconds plus the time to the next tick. There is no fast-path "regenerate immediately" — by design, to keep Claude cost bounded and the operational model simple. A future "interactive immediate regen" feature would need an additional code path — tracked internally, not included in this repo.
 
 #### What does NOT trigger a regen
 
@@ -147,7 +147,7 @@ Post-narrative steps are fire-and-log: a scoring failure never blocks narrative 
 
 ## Product Telemetry Path
 
-ADR-012 (telemetry ingest) and ADR-013 (contact-account linkage on ingest) added a second signal source parallel to inbound email.
+ADR-012 (telemetry ingest) and [ADR-013](adr/adr-013-contact-account-linkage.md) (contact-account linkage on ingest) added a second signal source parallel to inbound email.
 
 ### Ingest Endpoint
 
@@ -175,19 +175,65 @@ The auto_discovery path (ADR-013) uses `upsert_contact_safe` — a conflict-safe
 
 ---
 
+## Structured Signal Integrations
+
+ADR-020 (multi-source structured signals, phased) added a third category of inbound signal alongside email and product telemetry: structured records pushed or pulled from third-party support and meeting-notes tools. Two ingestion shapes — push and poll — share one normalizer.
+
+### Credential Model
+
+`external_credentials` stores both directions of integration secret:
+
+- **Inbound (push)**: a per-workspace webhook-signing secret for Plain and Pylon ticket events. `kind` is `plain_webhook_secret` or `pylon_webhook_secret`.
+- **Outbound (poll)**: a per-workspace Granola API key. `kind` is `granola_api_key`.
+
+Secrets are AES-256-GCM encrypted (`secret_enc`) under `INTEGRATION_ENCRYPTION_KEY`; the `authenticated` role's grant explicitly excludes `secret_enc` (a column-level grant, not just RLS) — only `service_role` (the worker) can ever read it. `integration_state` tracks one poll cursor plus error counters per credential (`UNIQUE (credential_id)`); it exists only for poll-based integrations (Granola today).
+
+### Push Path: Plain + Pylon Tickets
+
+**Endpoint**: `POST /signal/{kind}` ([`src/server/routes/signal.py`](../src/server/routes/signal.py)). Only `kind=ticket` has a registered adapter; any other `kind` — including the reserved `note` — returns 501.
+
+Both Plain and Pylon deliver ticket webhooks to the same URL. Vendor identity is determined by which signature header is present, not by a URL parameter:
+
+| Header present | Vendor | Workspace lookup |
+|---|---|---|
+| `Plain-Request-Signature` | Plain | `body.workspaceId` → `external_credentials` row |
+| `X-Pylon-Signature` | Pylon | `body.data.workspace_id` (or `.workspaceId`) → `external_credentials` row |
+| Neither | — | 401 (cannot determine vendor) |
+
+Per-request flow (identical shape for both vendors): read raw body bytes → parse JSON → look up the credential by vendor-specific workspace id → decrypt the signing secret → verify the HMAC signature (Pylon additionally requires a `Pylon-Webhook-Timestamp` header) → parse the vendor payload into a `StructuredSignalInput` → normalize → fire-and-log narrative regen. An unknown workspace ID returns HTTP 200 (`{"status": "workspace_unknown"}`) rather than 4xx — same reasoning as unroutable email returning 200 — to avoid the vendor's retry storm (Pylon retries up to 4 times) against a webhook that will never resolve.
+
+### Pull Path: Granola Meeting Notes
+
+**Endpoint**: `POST /run-polls` ([`src/server/routes/polls.py`](../src/server/routes/polls.py)). Mirrors `/run-narratives` exactly: `Authorization: Bearer <SCHEDULER_SECRET>`, fail-closed 500 if unset, 401 on mismatch, intended to be driven by its own Cloud Scheduler job (`integration-poller`, `*/15 * * * * UTC`) — creating that scheduler job is an ops step, not something the endpoint depends on to exist.
+
+Granola is pull-only; there is no `/signal/note` push adapter for it (that `kind` is reserved but unregistered). `POST /run-polls` fans out over every active workspace's active `granola_api_key` credentials and calls `poll_workspace_granola()` per credential:
+
+- **Cursor discipline**: the stored cursor is namespaced (`granola:<note_id>`) and only advances after a batch of notes is confirmed written to `signals` — a crash between write and cursor-advance re-fetches the same batch on the next poll; dedup on `(workspace_id, external_id)` treats the re-fetch as a no-op rather than a duplicate narrative-regen trigger.
+- **Auto-deactivation**: `consecutive_errors >= config.integrations.max_consecutive_errors` (default 5) deactivates the credential (`is_active = false`). At the 15-minute poll cadence, that's roughly 75 minutes of continuous failure before a broken integration stops being retried.
+- Recoverable errors (rate limit, 5xx, timeout) leave the cursor untouched and increment the error counter; auth errors (401/403) additionally record a human-readable `error_message` on the credential.
+
+### Shared Normalization
+
+Both paths funnel into [`src/pipeline/structured_signal.py`](../src/pipeline/structured_signal.py)`::normalize_structured_signal`, which mirrors the product-event 3-way contact routing exactly (known email → `API_KEY_IDENTITY`; new email matching an active account's domain → `AUTO_DISCOVERY` with `account_id` set; new email with no domain match → `AUTO_DISCOVERY` with `account_id = NULL`; no participant email → `UNMATCHED`). Like the product-event path, and unlike the email cascade, structured signals never create a `CANDIDATE` account — workspace identity here comes from the credential the event was authenticated against, not from any per-event routing decision.
+
+`signals.source_type` gained `plain_ticket`, `pylon_ticket`, and `granola_note`; `signals.channel` gained `ticket` and `meeting_note`; a new `signal_metadata` JSONB column carries vendor-specific fields the typed columns don't cover (migration 000029, extended by 000030 for Pylon).
+
+---
+
 ## Health Scoring
 
 ### Dimensions
 
-Three dimensions, each scored 1-100:
+Four dimensions, each scored 1-100:
 
 | Dimension | Type | Scored by | Weight |
 |---|---|---|---|
-| Email Engagement | `email` | System (deterministic) | 50% |
-| Sentiment | `sentiment` | LLM (extracted from narrative) | 30% |
-| CSM Score | `csm_score` | Human (manual input) | 20% |
+| Email Engagement | `email` | System (deterministic) | 35% |
+| Product Usage | `product_usage` | System (deterministic) | 35% |
+| Sentiment | `sentiment` | LLM (extracted from narrative) | 20% |
+| CSM Score | `csm_score` | Human (manual input) | 10% |
 
-Weights are configurable per workspace via `config/workspaces/<slug>.json` overrides on `config/defaults.json`.
+Weights are configurable per workspace via `config/workspaces/<slug>.json` overrides on `config/defaults.json`. `product_usage` was activated at its current weight in migration 000022 (ADR-017); migration 000023 is an ADR-017 amendment adding the cascading window described below.
 
 ### Email Engagement (Deterministic)
 
@@ -198,6 +244,15 @@ Weights are configurable per workspace via `config/workspaces/<slug>.json` overr
 - `account.frequency_multiplier` (per-account scaling for accounts with inherently high or low email volume)
 
 The LLM never decides engagement health. No model call is made in this path.
+
+### Product Usage (Deterministic)
+
+Scored from `POST /event` product-telemetry signals (see [Product Telemetry Path](#product-telemetry-path) above), on the same deterministic footing as Email Engagement — no model call. Config (`config/defaults.json` → `health_scoring.dimensions[dimension_type=product_usage].config`):
+
+- `window_days` (7) — primary recency window
+- `window_days_cascade` (`[7, 14, 30, 60]`, migration 000023 / ADR-017 amendment) — when the primary window has too few events to score confidently, the cascade widens the window stepwise rather than reporting "no data" for an account that's simply used the product less recently than the default window assumes
+- `min_events_for_active` (1) — minimum event count within a window to count the account as active at all
+- `trajectory_decay_ratio` (0.5) — weights more recent activity more heavily than older activity within the window
 
 ### Sentiment
 
@@ -219,7 +274,7 @@ Set manually via the frontend's "Update CSM Score" form. Calls the `set_csm_scor
 
 ## Outreach Templates
 
-Replaced LLM draft generation (ADR-010) after hallucination risk was identified as structural rather than a prompt engineering problem. No AI-generated text reaches the send path.
+Replaced LLM draft generation ([ADR-010](adr/adr-010-outreach-templates.md)) after hallucination risk was identified as structural rather than a prompt engineering problem. No AI-generated text reaches the send path.
 
 ### Template System
 
@@ -265,7 +320,7 @@ The frontend renders a template picker (intent tabs + radio buttons), a recommen
 
 ## Synthetic Data + Cross-Vendor Audit
 
-ADR-015 (synthetic data generator contract) and ADR-016 (cross-model audit harness) extend the test substrate beyond the 71 hand-authored Quantas Labs fixtures. The 71 stay as the canonical regression anchor; synthetic generation is additive.
+ADR-015 (synthetic data generator contract) and ADR-016 (cross-model audit harness) extend the test substrate beyond the 63 hand-authored Quantas Labs account fixtures that originally anchored the pipeline's regression tests. Those fixtures are pilot-derived and live in `.private/`, not in this tracked tree — see the Test Layer section below for how the equivalence test degrades gracefully in their absence. Synthetic generation is additive on top of them.
 
 ### Synthetic Data Generator (ADR-015)
 
@@ -297,7 +352,7 @@ Scenarios are defined by an `AxesSpec` with 9 axes:
 - 8 structural: `contact_diversity`, `domain_mixing`, `message_length`, `response_cadence`, `language_register`, `threading_topology`, `sentiment_trajectory`, `cross_modal`
 - 1 topical: `concern_topic` (Rev 1) — 8 values: `none | pricing | outage | feature_gap | utilization_decline | competitive | success_expansion | renewal_pending`. Drives template-family selection.
 
-The audit corpus today comprises 11 narratives spanning 7 of 8 topic values (only `pricing` not yet exercised by a corpus scenario): 5 Phase 2a-b scenarios + 5 from `quantas-labs-baseline.yaml` (regenerates the 71 hand-authored fixtures via `expected_routing` equivalence assertion) + 1 `expanding-champion` scenario.
+The audit corpus today comprises 11 narratives spanning 7 of 8 topic values (only `pricing` not yet exercised by a corpus scenario): 5 Phase 2a-b scenarios + 1 `expanding-champion` scenario — all 6 tracked in `fixtures/synthetic-scenarios/` — plus 5 from a `quantas-labs-baseline.yaml` scenario that regenerates the 63 hand-authored Quantas Labs fixtures via an `expected_routing` equivalence assertion. That baseline scenario and its underlying fixtures are pilot-derived and kept in `.private/`; they are not part of the public/tracked scenario set, so a contributor working from this repo can reproduce 6 of the 11 corpus narratives directly, not all 11.
 
 ### Audit Harness (ADR-016)
 
@@ -348,7 +403,7 @@ narrative_audit_runs  ← 1 aggregate row (overall_passed, hard_gate_failures,
 Three test surfaces sit on top of the synthetic data substrate:
 
 - **`tests/synthetic/test_orchestrator.py` + `test_email_generator.py` + `test_product_generator.py`**: structural correctness of generators and orchestrator dispatch.
-- **`tests/synthetic/test_quantas_labs_equivalence.py`**: routing equivalence between synthetic regeneration and the 71 hand-authored fixtures (per-account signal count + routing-method distribution + sender-domain set; ADR-015 §Test Req 8).
+- **`tests/synthetic/test_quantas_labs_equivalence.py`**: routing equivalence between synthetic regeneration and the 63 hand-authored Quantas Labs fixtures (per-account signal count + routing-method distribution + sender-domain set; ADR-015 §Test Req 8). The fixture data is pilot-derived and lives in `.private/`, not in this tracked tree — the test skips itself (rather than failing) when that data isn't present, which is the case in this public checkout.
 - **`tests/synthetic/test_audit_integration.py`**: audit harness end-to-end with mocked OpenAI + Supabase (5 criterion rows + 1 aggregate row, atomic on failure).
 - **`tests/synthetic/test_dimension_distribution.py`**: per-scenario engagement-score band assertions (`_EXPECTED_AT_RISK` ≤ 30, `_EXPECTED_HEALTHY` ≥ 50).
 - **`tests/test_invariants.py`**: Hypothesis property tests (500 examples per `@given`) for the three highest-value invariants: overall_health weighted-average, routing_confidence ∈ [0,1] across all router outcomes, uuid5 ID stability.
@@ -425,6 +480,18 @@ api_keys (mutable)
 service_accounts (mutable)
   id, workspace_id, name, description
   deleted_at, created_at, updated_at
+
+external_credentials (mutable)
+  id, workspace_id, kind, direction, label
+  secret_enc (bytea, AES-256-GCM, service_role-only column grant)
+  key_hint, metadata (JSONB)
+  is_active, last_verified_at, error_at, error_message
+  deleted_at, created_at, updated_at
+
+integration_state (mutable)
+  id, workspace_id, credential_id (FK, unique)
+  kind, cursor, last_polled_at, last_success_at, consecutive_errors
+  deleted_at, created_at, updated_at
 ```
 
 ### Timestamp Conventions
@@ -449,7 +516,7 @@ Append-only tables have **no `updated_at`** (the row is never edited; supersessi
 
 ### Soft Delete
 
-Every mutable table has `deleted_at timestamptz NULL`. Append-only tables are excluded — they use `superseded_at` instead. This includes config tables (`health_dimension_configs`, `api_keys`, `service_accounts`); hard-deleting a config row FKed by historical scoring data would force destructive cascade or orphaned references.
+Every mutable table has `deleted_at timestamptz NULL`. Append-only tables are excluded — they use `superseded_at` instead. This includes config tables (`health_dimension_configs`, `api_keys`, `service_accounts`, `external_credentials`, `integration_state`); hard-deleting a config row FKed by historical scoring or signal data would force destructive cascade or orphaned references.
 
 ---
 
@@ -494,29 +561,30 @@ For RLS to return data, a user must have a row in the `users` table with the cor
 
 Config is resolved at runtime: `load_config(workspace_slug)` deep-merges `config/workspaces/<slug>.json` on top of `config/defaults.json`. Both levels are safe to call repeatedly — defaults are cached with `@functools.cache`.
 
-Key defaults:
+Key defaults (trimmed excerpt of `config/defaults.json` — the full file also carries `account_health` engagement-tier and sentiment-band tables, and a `routing.personal_provider_domains` list):
 
 ```json
 {
   "health_scoring": {
+    "formula": "weighted_average",
     "dimensions": [
-      { "type": "email",     "weight": 0.5 },
-      { "type": "sentiment", "weight": 0.3 },
-      { "type": "csm_score", "weight": 0.2 }
-    ],
-    "recency_window_days": 14
+      { "dimension_type": "email",         "weight": 0.35 },
+      { "dimension_type": "product_usage", "weight": 0.35 },
+      { "dimension_type": "sentiment",     "weight": 0.2 },
+      { "dimension_type": "csm_score",     "weight": 0.1 }
+    ]
   },
   "narrative_generation": {
-    "model": "claude-opus-4-7"
+    "model": "claude-opus-4-6"
   },
-  "outreach": {
+  "outreach_generation": {
     "max_signals_in_context": 5,
     "templates_path": "config/templates/outreach"
   }
 }
 ```
 
-Per-workspace overrides can change weights, window, model, or any other field. Only the override keys need to be present — unset fields inherit from defaults.
+Per-workspace overrides can change weights, per-dimension config (e.g. a dimension's own window), model, or any other field. Only the override keys need to be present — unset fields inherit from defaults.
 
 ---
 

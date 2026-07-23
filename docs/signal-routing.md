@@ -15,7 +15,7 @@ The codebase is mid-migration from the legacy domain to the target domain. **Liv
 | Email inbound MX | `<legacy-inbound-domain>` | `<target-inbound-domain>` |
 | Tracker beacon URL fallback | (legacy) | `https://<target-api-domain>/event` |
 
-This document uses the **target domain** for examples (`<target-inbound-domain>`, `<target-api-domain>`) for forward-compatibility. **Real forwarding tests today must use the legacy domain** — `<workspace>@<legacy-inbound-domain>`. The reconfig is a deferred operational task (see PROGRESS.md).
+This document uses the **target domain** for examples (`<target-inbound-domain>`, `<target-api-domain>`) for forward-compatibility. **Real forwarding tests today must use the legacy domain** — `<workspace>@<legacy-inbound-domain>`. The reconfig is a deferred operational task, tracked internally.
 
 ---
 
@@ -90,13 +90,13 @@ Candidate creation is **scoped to the workspace the email was sent to**. The rec
 - An unknown prospect emailing two workspace-specific addresses (e.g., `acme-enterprise@...` and `acme-smb@...`) creates **two independent candidates** — one per workspace. There's no org-aware dedup.
 - The candidate's deterministic UUID is namespaced by `workspace.id`, so the same domain producing candidates in two workspaces gives two distinct UUIDs.
 
-For multi-workspace organizations, this cross-workspace duplication is a known gap; see PROGRESS.md "Deferred (not blocking)" → "Multi-workspace organization architecture."
+For multi-workspace organizations, this cross-workspace duplication is a known gap, tracked internally as a deferred (not blocking) item — multi-workspace organization architecture.
 
 ---
 
 ## Product event signal path
 
-**Endpoint**: `POST /event` on the FastAPI worker (renamed from `/ingest` on 2026-05-08 — privacy-aware naming, lower ad-blocker filter-list rate, matches Plausible's `/api/event` convention; the API key scope name remains `"ingest"` as an internal auth identifier). Called by the embeddable browser bundle (`src/server/static/dist/event.js`) running on the customer's product surface, OR by direct integrations (Segment-shape payloads supported; ADR-012).
+**Endpoint**: `POST /event` on the FastAPI worker (renamed from `/ingest` on 2026-05-08 — privacy-aware naming, lower ad-blocker filter-list rate, matches Plausible's `/api/event` convention; the API key scope name remains `"ingest"` as an internal auth identifier). Called by the embeddable browser bundle (`src/server/static/event.js`, built via `npm run build:event-js`) running on the customer's product surface, OR by direct integrations (Segment-shape payloads supported; ADR-012).
 
 **Auth**: `Authorization: Bearer <key>` checked against the `api_keys` table. Keys with the `pk_live_` prefix carry the `ingest` scope; the key's `workspace_id` column establishes which workspace the events belong to. Workspace identity is **established by the API key**, not by anything in the payload.
 
@@ -123,11 +123,17 @@ For multi-workspace organizations, this cross-workspace duplication is a known g
 | Personal-provider email (gmail / yahoo / etc.) | unmatched | not directly excluded; if `gmail.com` matches no active account → unmatched anyway |
 | No email at all | (workspace identity is in the recipient envelope) | unmatched, no contact created |
 
-The product event path **never creates candidate accounts** for unknown domains. This was a deliberate design choice (product telemetry assumes the customer is already onboarded), but it leaves a real gap for product-led-growth flows: a self-serve sign-up where a prospect lands in the customer's app should ideally surface as a candidate. Captured in PROGRESS.md as a deferred future-ADR item.
+The product event path **never creates candidate accounts** for unknown domains. This was a deliberate design choice (product telemetry assumes the customer is already onboarded), but it leaves a real gap for product-led-growth flows: a self-serve sign-up where a prospect lands in the customer's app should ideally surface as a candidate. Captured internally as a deferred future-ADR item.
 
 ### Browser bundle defaults
 
-The embeddable browser bundle (`src/server/static/event.js`, served at `/event.js` — renamed from `/tracker.js` on 2026-05-08, same privacy-aware reasoning as the endpoint rename) reads `data-key` and `data-url` attributes from its `<script>` tag. If `data-url` is absent, it falls back to **`https://<target-api-domain>/event`** (target state in code; legacy DNS not yet pointed there — see top of doc). Customers can override `data-url` to point at any environment-specific worker.
+The embeddable browser bundle (`src/server/static/event.js`, built via `npm run build:event-js`; served at `/event.js` — renamed from `/tracker.js` on 2026-05-08, same privacy-aware reasoning as the endpoint rename — from the built output at `src/server/static/dist/event.js`) reads `data-key` and `data-url` attributes from its `<script>` tag. If `data-url` is absent, it falls back to **`https://<target-api-domain>/event`** (target state in code; legacy DNS not yet pointed there — see top of doc). Customers can override `data-url` to point at any environment-specific worker.
+
+---
+
+## Structured signal path (Plain / Pylon / Granola)
+
+A third and fourth signal category — ticket and meeting-note records pushed or pulled from Plain, Pylon, and Granola — routes on a different identity model than either path above: workspace identity comes from the `external_credentials` row the request authenticates against (a per-workspace webhook secret or API key), not from an envelope address or an `Authorization: Bearer` API key against the `api_keys` table. Within that workspace, contact/account resolution mirrors the product-event path's 3-way logic exactly (known contact → matched; new contact whose email domain matches an active account → auto-linked; no domain match → orphaned; no participant email → unmatched) — no candidate-account creation, same as product events. See [architecture.md § Structured Signal Integrations](architecture.md#structured-signal-integrations) for the full push (`POST /signal/{kind}`) and poll (`POST /run-polls`) treatment; it isn't duplicated here since this document's scope is the email and product-event cascades specifically.
 
 ---
 
@@ -164,12 +170,12 @@ The embeddable browser bundle (`src/server/static/event.js`, served at `/event.j
   - [src/server/routes/inbound.py](../src/server/routes/inbound.py) — `POST /inbound` handler
   - [src/server/routes/event.py](../src/server/routes/event.py) — `POST /event` handler
   - [src/server/static/event.js](../src/server/static/event.js) — embeddable browser script (served at `/event.js`)
-- ADRs (in `.private/architect/`):
-  - ADR-001 — inbound mail provider choice (SendGrid)
-  - ADR-012 — product telemetry ingest contract
-  - ADR-013 — contact-account linkage (auto-discovery for product events)
-  - ADR-019 — single mutation surface (replaces Confirm/Reject PATCH writes with RPCs)
+- ADRs:
+  - [ADR-001](adr/adr-001-inbound-mail-provider.md) — inbound mail provider choice (SendGrid) — public
+  - ADR-012 — product telemetry ingest contract (unpublished, internal only)
+  - [ADR-013](adr/adr-013-contact-account-linkage.md) — contact-account linkage (auto-discovery for product events) — public
+  - ADR-019 — single mutation surface, replaces Confirm/Reject PATCH writes with RPCs (unpublished, internal only)
 - Project docs:
   - [architecture.md](architecture.md) — wider system architecture
   - [../CLAUDE.md](../CLAUDE.md) — coding conventions including SECURITY DEFINER discipline
-  - [../PROGRESS.md](../PROGRESS.md) — deferred items including PLG signal coverage gap and multi-workspace org architecture
+  - Progress tracker — deferred items including PLG signal coverage gap and multi-workspace org architecture (kept internally, not included in this repo)
