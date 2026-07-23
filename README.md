@@ -69,7 +69,7 @@ See [docs/architecture.md](docs/architecture.md) for pipeline internals, health 
 
 ## Key Design Decisions
 
-**No configuration before value.** Accounts and contacts are auto-discovered from inbound email domains. The first email to the inbound address creates the account and contact; the first narrative generates without any setup step.
+**No configuration required before value.** Accounts and contacts are auto-discovered from inbound email domains. The first email to the inbound address creates the account and contact; the first narrative generates without any setup step.
 
 **Deterministic health scoring, not LLM-decided.** Email engagement health is a pure function of signal count, recency window, and contact diversity — scaled by a per-account `frequency_multiplier`. A product-usage dimension, scored the same deterministic way from telemetry events, carries equal weight alongside email engagement. The LLM narrates; it does not score. Sentiment is extracted from the narrative as an integer (1-100) and wired as a separate health dimension.
 
