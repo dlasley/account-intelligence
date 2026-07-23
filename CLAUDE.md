@@ -11,8 +11,9 @@ uv sync
 
 # Run
 cd frontend && npm run dev            # Next.js dev server (frontend/)
-uv run python -m src.worker           # Python worker (repo root)
 uv run python -m src.worker serve     # Worker HTTP server (webhooks/API), port 8080
+# other subcommands: ingest-fixtures, process-fixtures, generate-narratives, synthesise-fixtures
+# (bare `python -m src.worker` only prints help)
 
 # Test
 cd frontend && npm test               # Vitest (frontend)
@@ -45,9 +46,9 @@ Full data-flow (inbound email → routing → narrative generation → audit) in
 
 ## Key Files
 
-- [src/](src/) — Python worker package (`src.*`); domain models, DB layer, pipeline, HTTP server, synthetic generator, observability.
+- [src/](src/) — Python worker package (`src.*`): `domain/` models, `db/` layer, `config/`, `pipeline/`, `server/` (HTTP), `signals/` (inbound source adapters), `integrations/` (Plain/Pylon/Granola + credential crypto), `synthetic/` (fixture generator), `simulator/` (trajectory backfill), `observability/`.
 - [tests/](tests/) — pytest (`testpaths = ["tests"]`); Hypothesis property tests in `test_invariants.py`.
-- [scripts/](scripts/) — standalone CLIs: `audit_narratives.py` (cross-vendor audit harness), baseline capture/check, `reanchor_demo_data.py` (demo-data freshening).
+- [scripts/](scripts/) — standalone CLIs: `audit_narratives.py` (cross-vendor audit harness), `simulate_history.py` (trajectory simulator), `validate_per_week.py` (fast per-week regression check), baseline capture/check, `reanchor_demo_data.py` (demo-data freshening).
 - [fixtures/synthetic-scenarios/](fixtures/synthetic-scenarios/) — YAML scenarios driving the synthetic generator.
 - [frontend/src/app/](frontend/src/app/) — Next.js App Router pages/layouts.
 - [supabase/](supabase/) — SQL migrations.
@@ -104,9 +105,11 @@ Copy [.env.example](.env.example) to `.env`. Never commit `.env` (gitignored; se
 
 **Synthetic data generator** (`src/synthetic/`): YAML scenario authoring → per-modality generators → conversion/emission → orchestrator. Generators are pure + seeded (deterministic `uuid5` IDs; workspace ids are `uuid5(NAMESPACE_DNS, slug)`); no `datetime.now()`. Always routes through production normalisation — never bypass it. Synthesise via `uv run python -m src.worker synthesise-fixtures --scenario <path>.yaml`.
 
+**Trajectory simulator** (`src/simulator/`, CLI `scripts/simulate_history.py`): backfills per-week historical narratives from YAML specs at `fixtures/synthetic-scenarios/trajectory.<workspace-slug>.yaml`, replaying synthesised signals through the **production** pipeline with `now_anchor=week_start`. Two invariants the module docstrings state: it must never import `src.db.*` directly, and per-week generation is its only mode — current-snapshot narratives belong to the production scheduler. `scripts/validate_per_week.py` is the cheap targeted alternative for re-auditing a few accounts after a prompt edit.
+
 **Audit harness** (`scripts/audit_narratives.py`): a cross-vendor evaluator that grades generated narratives on 5 criteria (faithfulness, coverage, calibration, hallucination, tone-fit) using OpenAI GPT-5-mini (cross-vendor for training-priors independence). Two append-only tables (`narrative_audits`, `narrative_audit_runs`), committed atomically. Any single hard-gate failure blocks a PR. See [ADR-016](docs/adr/).
 
-**LLM observability** (`src/observability/llm.py`): OTel instrumentation auto-captures `$ai_generation` events in PostHog for both the Claude and audit paths. `src/analytics.py` covers business-level product events + `$ai_evaluation` (one per audit criterion). Both are application telemetry, distinct from the product domain-event model (`signals`, `narratives`, etc.).
+**LLM observability** (`src/observability/llm.py`): OTel instrumentation auto-captures `$ai_generation` events in PostHog for both the Claude and audit paths. `src/analytics.py` covers business-level product events + `$ai_evaluation` (one per audit criterion). Both are application telemetry, distinct from the product domain-event model (`signals`, `narratives`, etc.). Prompt/response **content** capture is hardcoded off at startup (`OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT=false`), overriding any env-var value — a deliberate compliance control guarded by `tests/test_observability_content_capture.py`. See [docs/debugging-llm-output.md](docs/debugging-llm-output.md) before changing it.
 
 ### SECURITY DEFINER discipline
 
@@ -132,6 +135,7 @@ When a change produces or modifies LLM output (narrative generation, audit harne
 
 - [docs/architecture.md](docs/architecture.md) — system architecture + data flow.
 - [docs/signal-routing.md](docs/signal-routing.md) — the inbound-email routing cascade.
+- [docs/debugging-llm-output.md](docs/debugging-llm-output.md) — how to temporarily enable prompt/response content capture for debugging. Content capture is hardcoded **off** in `src/observability/llm.py` (a compliance control) and a CI test enforces it; read this doc before touching that override.
 - [docs/adr/](docs/adr/) — Architecture Decision Records (curated public set; e.g. the cross-vendor audit harness, the prompt-variant flag gating).
 
 ## Deployment
