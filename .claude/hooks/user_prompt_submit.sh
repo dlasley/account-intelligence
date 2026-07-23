@@ -1,1 +1,0 @@
-/Users/davidlasley/Projects/claude-harness/hooks/user_prompt_submit.sh

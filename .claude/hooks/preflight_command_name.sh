@@ -1,1 +1,0 @@
-/Users/davidlasley/Projects/claude-harness/hooks/preflight_command_name.sh

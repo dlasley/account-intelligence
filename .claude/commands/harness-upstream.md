@@ -1,1 +1,0 @@
-/Users/davidlasley/Projects/claude-harness/commands/harness-upstream.md

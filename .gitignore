@@ -23,6 +23,15 @@ CLAUDE.local.md
 # Vendor agent skill bundles (materialized locally; not shipped in the repo)
 .agents/
 
+# Maintainer-local harness artifacts — symlinks into private sibling repos (claude-harness,
+# builder-skills). Dead in any public clone, so kept out of the tracked tree; loaded locally
+# via the symlinks plus a gitignored .claude/settings.local.json (hooks) and Claude Code's
+# skill/command auto-discovery.
+.claude/hooks/
+.claude/commands/
+.claude/skills/
+.claude/agents/postmortem.md
+
 # Hypothesis (property-based test) example database
 .hypothesis/
 
