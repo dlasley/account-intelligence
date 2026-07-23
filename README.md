@@ -24,9 +24,9 @@ Inbound Email
 │    router.py        → 6-stage routing cascade      │
 │    scheduler.py     → enqueue narrative regen job  │
 │                                                    │
-│  /run-narratives (Cloud Scheduler, every 15 min)  │
+│  /run-narratives (Cloud Scheduler, every 15 min)   │
 │    confidence.py    → engagement health score      │
-│    generator.py     → Claude API, prompt caching  │
+│    generator.py     → Claude API, prompt caching   │
 │    health.py        → weighted dimension average   │
 └─────────────────────────┬──────────────────────────┘
                           │

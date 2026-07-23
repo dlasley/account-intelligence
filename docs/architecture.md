@@ -14,19 +14,19 @@ SendGrid Inbound Parse
 │                                                                     │
 │  Inbound path (per webhook event):                                  │
 │    shared_inbox.py   extract workspace slug from envelope           │
-│    normalizer.py     upsert contact, insert raw_inbound_event,     │
+│    normalizer.py     upsert contact, insert raw_inbound_event,      │
 │                      insert signal                                  │
 │    router.py         6-stage routing cascade → account_id           │
 │    scheduler.py      enqueue narrative_regen_job                    │
 │                                                                     │
-│  Narrative path (POST /run-narratives, every 15 min):              │
+│  Narrative path (POST /run-narratives, every 15 min):               │
 │    recover_stale_jobs()  promote stuck jobs                         │
 │    confidence.py         engagement health score (deterministic)    │
 │    generator.py          Claude API call, prompt caching            │
 │    health.py             weighted dimension average                 │
 │    accounts table        update overall_health_score                │
 │                                                                     │
-│  Outreach path (POST /outreach/{account_slug}/context):                                     │
+│  Outreach path (POST /outreach/{account_slug}/context):             │
 │    JWT → workspace → account → contact                              │
 │    outreach.py       recommend template, build signal panel         │
 │    get-or-create     draft record in Supabase                       │
@@ -36,7 +36,7 @@ SendGrid Inbound Parse
                            Supabase (PostgreSQL + RLS)
                                       │
          ┌────────────────────────────┴─────────────────────────┐
-         │                                                       │
+         │                                                      │
          ▼  direct read (anon key + RLS)                        ▼  service role (worker only)
 ┌──────────────────────┐
 │  Next.js Frontend    │
