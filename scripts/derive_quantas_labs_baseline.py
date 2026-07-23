@@ -28,6 +28,10 @@ from src.domain.signal import Channel, Direction, RoutingMethod, Signal, SourceT
 from src.domain.workspace import Workspace
 from src.pipeline.run import UNMATCHED_ACCOUNT_SLUG, process_event
 
+# quantas-labs pilot data moved to .private/; these fixtures are NOT present in the tracked
+# tree (mirrors the skip reason in tests/synthetic/test_quantas_labs_equivalence.py). This
+# one-shot tool only runs against the maintainer's local copy — a fresh public clone will
+# raise FileNotFoundError here, which is expected.
 _FIXTURES_ROOT = Path("fixtures/quantas-labs-shaped")
 _ACCOUNTS_DIR = _FIXTURES_ROOT / "accounts"
 _NOW = datetime(2026, 1, 1, 0, 0, 0, tzinfo=UTC)
