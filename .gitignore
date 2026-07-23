@@ -22,6 +22,8 @@ CLAUDE.local.md
 
 # Vendor agent skill bundles (materialized locally; not shipped in the repo)
 .agents/
+# Skill lockfile pins the vendored skills in .agents/ — maintainer-local, same class.
+skills-lock.json
 
 # Maintainer-local harness artifacts — symlinks into private sibling repos (claude-harness,
 # builder-skills). Dead in any public clone, so kept out of the tracked tree; loaded locally
