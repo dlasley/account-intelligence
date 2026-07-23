@@ -1,5 +1,0 @@
-,
-  "hooks": {
-    "UserPromptSubmit": [{"hooks": [{"type": "command", "command": ".claude/hooks/user_prompt_submit.sh"}]}],
-    "Stop": [{"hooks": [{"type": "command", "command": ".claude/hooks/stop.sh"}]}]
-  }

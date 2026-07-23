@@ -20,6 +20,9 @@ CLAUDE.local.md
 .claude/logs/
 .claude/.cache/
 
+# Vendor agent skill bundles (materialized locally; not shipped in the repo)
+.agents/
+
 # Hypothesis (property-based test) example database
 .hypothesis/
 
@@ -59,8 +62,6 @@ dist/
 # Config — workspace overrides may contain secrets; all workspace configs are gitignored.
 # A fresh clone won't have demo workspace configs. Recreate from the maintainer or .private/.
 config/workspaces/*.json
-.vercel
-.env*.local
 
 # Claude Code runtime lock files
 .claude/scheduled_tasks.lock
