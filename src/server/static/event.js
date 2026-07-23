@@ -3,7 +3,7 @@
   var KEY = script && script.getAttribute('data-key');
   var INGEST_URL =
     (script && script.getAttribute('data-url')) ||
-    'https://api.amazingzebra.com/event';
+    'https://api.example.com/event';
   var BATCH_SIZE = 10;
   var FLUSH_INTERVAL_MS = 2000;
   var MAX_RETRIES = 3;
