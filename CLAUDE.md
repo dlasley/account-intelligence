@@ -62,6 +62,7 @@ Copy [.env.example](.env.example) to `.env`. Never commit `.env` (gitignored; se
 - **Supabase (frontend)**: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
 - **Inbound email**: `INBOUND_DOMAIN` (public-repo files use `signal.example.com` as the RFC-2606 placeholder).
 - **Outreach + API**: `SENDGRID_API_KEY`, `CORS_ORIGINS`, `WEBHOOK_SECRET`, `SCHEDULER_SECRET`.
+- **Integrations**: `INTEGRATION_ENCRYPTION_KEY` (required — encrypts Plain/Pylon/Granola credentials, ADR-020).
 - **Analytics**: `POSTHOG_API_KEY`, `POSTHOG_HOST`, `POSTHOG_ENABLED`.
 
 ## Tooling Notes
@@ -81,9 +82,9 @@ Copy [.env.example](.env.example) to `.env`. Never commit `.env` (gitignored; se
 
 **Pipeline** (`src/pipeline/`): `router.py` is a pure function (no DB, unit-testable). `confidence.py` is pure — engagement health is **deterministic** (signal count + window + contact diversity), not LLM-decided. `generator.py` calls Claude with prompt caching (static system block, per-account user block); the LLM returns `sentiment: int` alongside the narrative. Prompt content is A/B-gated via a per-account-sticky PostHog flag (`_resolve_prompt_variant` → v1/v2, defaults v1); see [ADR-023](docs/adr/). `health.py`'s `compute_overall_health` is a pure weighted average. Post-narrative scoring (`_score_and_snapshot`) is fire-and-log — never fail generation because scoring failed.
 
-**Health dimensions** (`src/db/dimension_configs.py`, `dimension_scores.py`, `health_snapshots.py`): `health_dimension_configs` is a mutable config table; `account_dimension_scores` + `account_health_snapshots` are append-only with a supersede pattern. `accounts.overall_health_score` is a denormalized cache of the latest snapshot.
+**Health dimensions** (`src/db/dimension_configs.py`, `dimension_scores.py`, `health_snapshots.py`): `health_dimension_configs` is a mutable config table; `account_dimension_scores` + `account_health_snapshots` are append-only with a supersede pattern. `accounts.overall_health_score` is a denormalized cache of the latest snapshot. Four dimension types today: `email`, `product_usage`, `sentiment`, `csm_score` — see `config/defaults.json` for current weights.
 
-**Migrations**: baseline `20260423_000001_initial_schema.sql`; changes are new numbered files. New tables: `GRANT ALL ON <table> TO authenticated, service_role;` — never grant to `anon`. RLS uses `current_user_workspace_id()` (SECURITY DEFINER); every workspace-isolation policy carries both `USING` and `WITH CHECK`.
+**Migrations**: baseline `20260423_000001_initial_schema.sql`; changes are new numbered files. Since migration 000027 (ADR-019, "Single Mutation Surface"), `authenticated` is SELECT-only on every table — new tables get `GRANT SELECT ON <table> TO authenticated;` (or a column-restricted `GRANT SELECT (col, col, ...) ON <table> TO authenticated;` when a sensitive column like an encrypted secret must stay service-role-only, per `external_credentials` in migration 000029) plus `GRANT ALL ON <table> TO service_role;`. All mutations route through a SECURITY DEFINER RPC (see the Frontend mutation pattern below) — never grant INSERT/UPDATE/DELETE to `authenticated`, never grant anything to `anon`. RLS uses `current_user_workspace_id()` (SECURITY DEFINER); every workspace-isolation policy carries both `USING` and `WITH CHECK`.
 
 **Timestamp convention**: mutable tables use `created_at` + trigger-maintained `updated_at`. Append-only tables drop `created_at` for a column named after the event (`generated_at`, `scored_at`, `computed_at`, `received_at`, `occurred_at`, `audited_at`) and supersede via `superseded_at` instead of `deleted_at`. `signals` is the edge case: mutable (`created_at`/`updated_at`) plus a separate `occurred_at` for event time.
 
@@ -97,9 +98,9 @@ Copy [.env.example](.env.example) to `.env`. Never commit `.env` (gitignored; se
 
 **Frontend mutation pattern**: all writes go through SECURITY DEFINER RPCs (`supabase.rpc(...)`); direct table mutations are revoked for `authenticated` (migration 000027). Reads use `supabase.from(...).select(...)`. Business logic + workspace checks live in the RPC body. Tests mock `supabase.rpc(...)`.
 
-**Outreach draft greeting sync** (`frontend/src/components/OutreachTab.tsx`): the greeting tracks the selected recipient via a client-side anchored swap (the `^Hi <name>,` line only, regex-escaped), not a server re-render — edit-preserving because a rewritten greeting makes the swap a no-op. `lastAppliedNameContactIdRef` tracks the name actually in the text, decoupled from the dropdown's live value, so the greeting survives a "No recipient" hop. **Two invariants**: (1) derive the "old name" from the ref, never from `contactId` directly; (2) every handler that commits new text — including `handleTemplateSelect` — must also advance the ref, else the greeting desyncs on the No-recipient → template-select path.
+**Outreach draft greeting sync** (`frontend/src/components/OutreachTab.tsx`): the greeting tracks the selected recipient via a client-side anchored swap, not a server re-render — edit-preserving because a rewritten greeting makes the swap a no-op. See the inline comments around `lastAppliedNameContactIdRef` in that file for the two invariants that keep it from desyncing across a "No recipient" hop.
 
-**HTTP server** (`src/server/`): FastAPI app factory in `app.py`, route handlers in `routes/`, lazy imports. `GET /health`. CORS opt-in via `CORS_ORIGINS`. Webhook (`POST /inbound`) authed via `?token=<WEBHOOK_SECRET>` with `hmac.compare_digest`, fail-closed; returns 200 on permanent routing failures so SendGrid doesn't retry forever. Scheduler (`POST /run-narratives`) authed via `Authorization: Bearer <SCHEDULER_SECRET>`. Product telemetry (`POST /event`) authed via API-key Bearer against `api_keys`, with per-instance rate limiting.
+**HTTP server** (`src/server/`): FastAPI app factory in `app.py`, route handlers in `routes/`, lazy imports. `GET /health`. CORS opt-in via `CORS_ORIGINS`. Webhook (`POST /inbound`) authed via `?token=<WEBHOOK_SECRET>` with `hmac.compare_digest`, fail-closed; returns 200 on permanent routing failures so SendGrid doesn't retry forever. Scheduler (`POST /run-narratives`) authed via `Authorization: Bearer <SCHEDULER_SECRET>`. Product telemetry (`POST /event`) authed via API-key Bearer against `api_keys`, with per-instance rate limiting. `POST /run-polls` (Granola poller, same `SCHEDULER_SECRET` auth) and `POST /signal/{kind}` (Plain/Pylon ticket push, HMAC-signed) round out the structured-signal integrations — see [docs/architecture.md](docs/architecture.md) § Structured Signal Integrations.
 
 **Synthetic data generator** (`src/synthetic/`): YAML scenario authoring → per-modality generators → conversion/emission → orchestrator. Generators are pure + seeded (deterministic `uuid5` IDs; workspace ids are `uuid5(NAMESPACE_DNS, slug)`); no `datetime.now()`. Always routes through production normalisation — never bypass it. Synthesise via `uv run python -m src.worker synthesise-fixtures --scenario <path>.yaml`.
 
@@ -136,7 +137,3 @@ When a change produces or modifies LLM output (narrative generation, audit harne
 ## Deployment
 
 Frontend → Vercel. Python worker → GCP Cloud Run (min-instances 0, port 8080). Cloud Scheduler triggers `POST /run-narratives` every 15 minutes. Operational specifics (URLs, project IDs) are kept out of the repo.
-
----
-
-@.claude/internal-guidance.md
