@@ -1,3 +1,13 @@
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+
+// NOTE: scoreBadge's 5-band model is superseded by Phase 1 (4 bands + unknown,
+// token-backed colors per the handoff health ramp). Restored as-is here after
+// `shadcn init` clobbered this file — Phase 0 is foundation-only, not a rewrite.
 const SCORE_BANDS = [
   { minScore: 80, label: 'high',   color: 'bg-green-100 text-green-800' },
   { minScore: 60, label: 'good',   color: 'bg-emerald-100 text-emerald-800' },
