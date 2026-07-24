@@ -143,8 +143,8 @@ export default async function AccountDetailPage({
     : null
 
   const overviewContent = (
-    <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-      <div className="lg:col-span-2 space-y-8">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
+      <div className="min-w-0 space-y-6">
         <NarrativeSection narrative={narrativeWithAudit} accountId={account.id} workspaceId={account.workspace_id} />
         <DimensionBreakdown
           accountId={account.id}
@@ -154,7 +154,7 @@ export default async function AccountDetailPage({
         />
         <SignalsTimeline signals={signals ?? []} />
       </div>
-      <div>
+      <div className="min-w-0 lg:sticky lg:top-6 lg:self-start">
         <ContactsList contacts={contacts ?? []} />
       </div>
     </div>
@@ -170,15 +170,15 @@ export default async function AccountDetailPage({
   )
 
   return (
-    <main className="p-8 max-w-5xl">
+    <main className="max-w-6xl p-8">
       <AccountViewTracker
         accountId={account.id}
         accountSlug={account.slug}
         overallHealthScore={account.overall_health_score ?? null}
       />
       <div className="mb-6">
-        <div className="flex items-center gap-3 mb-1 flex-wrap">
-          <h1 className="text-2xl font-bold">{account.name}</h1>
+        <div className="mb-1 flex flex-wrap items-center gap-3">
+          <h1 className="text-2xl font-bold tracking-tight">{account.name}</h1>
           {account.vertical && <Badge variant="secondary">{account.vertical}</Badge>}
           {account.overall_health_score != null && (
             <Badge className={healthBadge.color}>
@@ -195,9 +195,8 @@ export default async function AccountDetailPage({
           />
         </div>
         {account.crm_record_id && (
-          <p className="text-sm text-gray-500">
-            CRM:{' '}
-            <span className="font-mono text-gray-700">{account.crm_record_id}</span>
+          <p className="text-sm text-muted-foreground">
+            CRM: <span className="font-mono text-foreground/80">{account.crm_record_id}</span>
           </p>
         )}
       </div>

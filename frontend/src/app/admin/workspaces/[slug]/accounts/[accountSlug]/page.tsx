@@ -113,7 +113,7 @@ export default async function AdminAccountDetailPage({
   const workspaceName = workspace?.name ?? slug
 
   return (
-    <main className="p-8 max-w-5xl">
+    <main className="max-w-6xl p-8">
       <nav className="text-sm text-gray-500 mb-4">
         <Link href="/admin" className="hover:underline text-blue-600">
           Admin
@@ -153,8 +153,8 @@ export default async function AdminAccountDetailPage({
         )}
       </div>
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-        <div className="lg:col-span-2 space-y-8">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
+        <div className="min-w-0 space-y-6">
           <NarrativeSection
             narrative={narrativeWithAudit}
             accountId={account.id}
@@ -168,7 +168,7 @@ export default async function AdminAccountDetailPage({
           />
           <SignalsTimeline signals={signals} />
         </div>
-        <div>
+        <div className="min-w-0 lg:sticky lg:top-6 lg:self-start">
           <ContactsList contacts={contacts} />
         </div>
       </div>

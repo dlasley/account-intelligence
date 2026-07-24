@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import ContactsList from '@/components/ContactsList'
 
 const EXTERNAL = [
@@ -36,5 +36,34 @@ describe('ContactsList', () => {
     render(<ContactsList contacts={[...EXTERNAL, ...INTERNAL]} />)
     expect(screen.queryByText('CSM Dave')).toBeNull()
     expect(screen.queryByText('dave@quantaslabs.com')).toBeNull()
+  })
+
+  describe('cap + "See all"', () => {
+    const MANY = Array.from({ length: 9 }, (_, i) => ({
+      id: `c-${i}`,
+      display_name: `Contact ${i}`,
+      email: `contact${i}@example.com`,
+      is_internal: false,
+    }))
+
+    it('does not show the "See all" control under the cap', () => {
+      render(<ContactsList contacts={EXTERNAL} />)
+      expect(screen.queryByText(/See all/)).toBeNull()
+    })
+
+    it('renders only the first 7 contacts and a "See all N" control above the cap', () => {
+      render(<ContactsList contacts={MANY} />)
+      expect(screen.getByText('Contact 0')).toBeTruthy()
+      expect(screen.getByText('Contact 6')).toBeTruthy()
+      expect(screen.queryByText('Contact 7')).toBeNull()
+      expect(screen.getByText('See all 9')).toBeTruthy()
+    })
+
+    it('reveals the remaining contacts on click', () => {
+      render(<ContactsList contacts={MANY} />)
+      fireEvent.click(screen.getByText('See all 9'))
+      expect(screen.getByText('Contact 8')).toBeTruthy()
+      expect(screen.getByText('Show fewer')).toBeTruthy()
+    })
   })
 })

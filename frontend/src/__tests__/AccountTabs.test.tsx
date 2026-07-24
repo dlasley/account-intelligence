@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import AccountTabs from '@/components/AccountTabs'
 import { track } from '@/lib/analytics'
 
@@ -22,11 +23,14 @@ vi.mock('@/components/OutreachTab', () => ({ default: () => <div>OutreachTab</di
 const OVERVIEW = <div>Overview content</div>
 const OUTREACH = <div>Outreach content</div>
 
+// Tab triggers select on pointerdown, not click, so tests drive them with
+// userEvent (which dispatches the full pointer sequence) rather than
+// fireEvent.click.
 describe('AccountTabs', () => {
-  it('renders both tab buttons', () => {
+  it('renders both tab triggers', () => {
     render(<AccountTabs overviewContent={OVERVIEW} outreachContent={OUTREACH} />)
-    expect(screen.getByRole('button', { name: /overview/i })).toBeTruthy()
-    expect(screen.getByRole('button', { name: /outreach/i })).toBeTruthy()
+    expect(screen.getByRole('tab', { name: /overview/i })).toBeTruthy()
+    expect(screen.getByRole('tab', { name: /outreach/i })).toBeTruthy()
   })
 
   it('shows overview content by default', () => {
@@ -35,21 +39,27 @@ describe('AccountTabs', () => {
     expect(screen.queryByText('Outreach content')).toBeNull()
   })
 
-  it('shows outreach content after clicking the Outreach tab', () => {
+  it('shows outreach content after clicking the Outreach tab', async () => {
+    const user = userEvent.setup()
     render(<AccountTabs overviewContent={OVERVIEW} outreachContent={OUTREACH} />)
-    fireEvent.click(screen.getByRole('button', { name: /outreach/i }))
+    await user.click(screen.getByRole('tab', { name: /outreach/i }))
     expect(screen.getByText('Outreach content')).toBeTruthy()
     expect(screen.queryByText('Overview content')).toBeNull()
   })
 
-  it('applies active style to the selected tab', () => {
+  it('marks the selected tab active via aria-selected', async () => {
+    const user = userEvent.setup()
     render(<AccountTabs overviewContent={OVERVIEW} outreachContent={OUTREACH} />)
-    const outreachBtn = screen.getByRole('button', { name: /outreach/i })
-    fireEvent.click(outreachBtn)
-    expect(outreachBtn.className).toContain('border-blue-600')
+    const outreachTab = screen.getByRole('tab', { name: /outreach/i })
+    await user.click(outreachTab)
+    expect(outreachTab.getAttribute('aria-selected')).toBe('true')
+    expect(screen.getByRole('tab', { name: /overview/i }).getAttribute('aria-selected')).toBe(
+      'false',
+    )
   })
 
-  it('fires Outreach Tab Opened event when the Outreach tab is clicked', () => {
+  it('fires Outreach Tab Opened event when the Outreach tab is clicked', async () => {
+    const user = userEvent.setup()
     render(
       <AccountTabs
         overviewContent={OVERVIEW}
@@ -58,7 +68,7 @@ describe('AccountTabs', () => {
         overallHealthScore={67}
       />,
     )
-    fireEvent.click(screen.getByRole('button', { name: /outreach/i }))
+    await user.click(screen.getByRole('tab', { name: /outreach/i }))
     expect(track).toHaveBeenCalledWith('Outreach Tab Opened', {
       account_id: 'acc-123',
       overall_health_score: 67,
