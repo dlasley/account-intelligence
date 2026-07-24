@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import type { VariantProps } from 'class-variance-authority'
 import { relativeTime } from '@/lib/utils'
+import { Badge, badgeVariants } from '@/components/ui/badge'
 
 export type AuditCriterion = {
   criterion: string
@@ -33,47 +35,44 @@ export default function AuditBadge({
 
   if (passed === null || passed === undefined) {
     return (
-      <span
-        title="No audit on record"
-        className="px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-500"
-      >
+      <Badge variant="health-unknown" title="No audit on record">
         audit —
-      </span>
+      </Badge>
     )
   }
 
   const label = passed ? `audit ✓ ${criteriaPassedCount ?? '?'}/${criteriaTotal ?? '?'}` : `audit ✗`
-  const color = passed
-    ? 'bg-green-100 text-green-800'
-    : 'bg-red-100 text-red-800'
+  const auditVariant: VariantProps<typeof badgeVariants>['variant'] = passed
+    ? 'health-strong'
+    : 'health-critical'
   const tooltip = passed
     ? `Audit passed ${criteriaPassedCount ?? '?'}/${criteriaTotal ?? '?'} criteria, last audited ${relativeTime(auditedAt)}`
     : `Audit failed, last audited ${relativeTime(auditedAt)}`
 
   if (variant === 'pill') {
     return (
-      <span
-        title={tooltip}
-        className={`px-2 py-0.5 rounded text-xs font-medium ${color}`}
-      >
+      <Badge variant={auditVariant} title={tooltip}>
         {label}
-      </span>
+      </Badge>
     )
   }
 
   // badge variant: clickable, with expandable panel
   return (
     <div className="relative inline-block">
-      <button
-        title={tooltip}
-        onClick={() => setOpen((v) => !v)}
-        className={`px-2 py-0.5 rounded text-sm font-medium cursor-pointer hover:opacity-80 ${color}`}
-      >
-        {label}
-      </button>
+      <Badge asChild variant={auditVariant}>
+        <button
+          title={tooltip}
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
+          className="cursor-pointer text-sm hover:opacity-80"
+        >
+          {label}
+        </button>
+      </Badge>
 
       {open && criteria && criteria.length > 0 && (
-        <div className="absolute left-0 top-full mt-1 z-10 w-96 bg-white border border-gray-200 rounded shadow-lg p-4">
+        <div className="absolute left-0 top-full mt-1 z-10 w-96 bg-popover text-popover-foreground border border-border rounded shadow-lg p-4">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-semibold text-gray-800">Audit criteria</span>
             <button

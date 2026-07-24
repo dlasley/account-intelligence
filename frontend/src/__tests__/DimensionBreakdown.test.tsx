@@ -22,10 +22,18 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ refresh: mockRefresh }),
 }))
 
-vi.mock('@/lib/utils', () => ({
-  scoreBadge: () => ({ color: 'bg-green-100 text-green-800', label: 'Good' }),
-  relativeTime: () => '2 hours ago',
-}))
+// Partial mock via importOriginal: DimensionBreakdown now renders the shadcn
+// Badge primitive, which imports `cn` from this same module — a full
+// replacement mock would silently drop it and break Badge's className merge.
+vi.mock('@/lib/utils', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/utils')>()
+  return {
+    ...actual,
+    scoreBadge: () => ({ color: 'bg-health-strong-soft text-health-strong-on', label: 'Healthy' }),
+    scoreBarColor: () => 'bg-health-strong',
+    relativeTime: () => '2 hours ago',
+  }
+})
 
 const accountId = 'acct-1'
 

@@ -13,9 +13,25 @@ export type Signal = {
 }
 
 function DirectionIcon({ direction }: { direction: string }) {
-  if (direction === 'inbound') return <span className="text-green-600 font-bold">↓</span>
-  if (direction === 'outbound') return <span className="text-blue-600 font-bold">↑</span>
-  return <span className="text-gray-400">↔</span>
+  if (direction === 'inbound') {
+    return (
+      <span className="text-green-600 font-bold" role="img" aria-label="Inbound">
+        ↓
+      </span>
+    )
+  }
+  if (direction === 'outbound') {
+    return (
+      <span className="text-blue-600 font-bold" role="img" aria-label="Outbound">
+        ↑
+      </span>
+    )
+  }
+  return (
+    <span className="text-gray-400" role="img" aria-label="Internal">
+      ↔
+    </span>
+  )
 }
 
 export default function SignalsTimeline({ signals }: { signals: Signal[] }) {
@@ -38,7 +54,7 @@ export default function SignalsTimeline({ signals }: { signals: Signal[] }) {
     <section>
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-lg font-semibold">Signals</h2>
-        <div className="flex gap-1">
+        <div className="flex gap-1" role="group" aria-label="Filter signals by direction">
           {(['all', 'inbound', 'outbound'] as const).map((f) => (
             <button
               key={f}

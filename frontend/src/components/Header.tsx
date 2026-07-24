@@ -12,6 +12,13 @@ type WorkspaceInfo = {
 
 const HIDDEN_PREFIXES = ['/login', '/auth']
 
+// Matches /admin/workspaces/:slug and its sub-routes, so a super-user browsing
+// another workspace's admin pages sees THAT workspace as secondary context —
+// not their own. Super-user browsing (ADR-018 amendment) never mutates the
+// signed-in user's own workspace_id, so without this the header always showed
+// the super-user's home workspace regardless of which one they were viewing.
+const ADMIN_WORKSPACE_SLUG_RE = /^\/admin\/workspaces\/([^/]+)/
+
 export default function Header() {
   const pathname = usePathname()
   const router = useRouter()
@@ -19,6 +26,7 @@ export default function Header() {
   const [signingOut, setSigningOut] = useState(false)
 
   const isHidden = HIDDEN_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + '/'))
+  const viewedWorkspaceSlug = pathname.match(ADMIN_WORKSPACE_SLUG_RE)?.[1] ?? null
 
   useEffect(() => {
     if (isHidden) return
@@ -29,20 +37,40 @@ export default function Header() {
         data: { user },
       } = await supabase.auth.getUser()
       if (!user) return
-      const { data: workspaceRows } = await supabase
-        .from('workspaces')
-        .select('name')
-        .limit(1)
+
+      let workspaceName: string | null = null
+      if (viewedWorkspaceSlug) {
+        // Super-user admin route: show the workspace being browsed. Only
+        // super-users can reach /admin/* (middleware-gated), so this RPC
+        // (which itself gates on is_super_user) is safe to call here.
+        const { data: workspaces } = await supabase.rpc('list_all_workspaces_with_metadata')
+        workspaceName =
+          (workspaces as { slug: string; name: string }[] | null)?.find(
+            (w) => w.slug === viewedWorkspaceSlug,
+          )?.name ?? null
+      } else {
+        const { data: userRow } = await supabase
+          .from('users')
+          .select('workspace_id')
+          .eq('id', user.id)
+          .maybeSingle()
+        if (userRow?.workspace_id) {
+          const { data: workspace } = await supabase
+            .from('workspaces')
+            .select('name')
+            .eq('id', userRow.workspace_id)
+            .maybeSingle()
+          workspaceName = workspace?.name ?? null
+        }
+      }
+
       if (cancelled) return
-      setInfo({
-        workspaceName: workspaceRows?.[0]?.name ?? null,
-        userEmail: user.email ?? null,
-      })
+      setInfo({ workspaceName, userEmail: user.email ?? null })
     })()
     return () => {
       cancelled = true
     }
-  }, [pathname, isHidden])
+  }, [isHidden, viewedWorkspaceSlug])
 
   if (isHidden) return null
 
@@ -54,18 +82,21 @@ export default function Header() {
   }
 
   return (
-    <header className="border-b border-gray-200 bg-white">
+    <header className="border-b border-border bg-background">
       <div className="max-w-7xl mx-auto px-8 py-3 flex items-center justify-between">
-        <Link href="/accounts" className="text-lg font-semibold text-gray-900 hover:text-gray-700">
-          {info.workspaceName ?? 'Account Intelligence'}
+        <Link href="/accounts" className="flex items-baseline gap-2 hover:opacity-80">
+          <span className="text-lg font-semibold text-foreground">Account Intelligence</span>
+          {info.workspaceName && (
+            <span className="text-sm text-muted-foreground">{info.workspaceName}</span>
+          )}
         </Link>
         <div className="flex items-center gap-4 text-sm">
-          {info.userEmail && <span className="text-gray-600">{info.userEmail}</span>}
+          {info.userEmail && <span className="text-muted-foreground">{info.userEmail}</span>}
           <button
             type="button"
             onClick={handleSignOut}
             disabled={signingOut}
-            className="text-gray-600 hover:text-gray-900 underline disabled:opacity-50"
+            className="text-muted-foreground hover:text-foreground underline disabled:opacity-50"
           >
             {signingOut ? 'Signing out…' : 'Sign out'}
           </button>

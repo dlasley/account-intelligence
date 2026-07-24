@@ -1,3 +1,5 @@
+"use client"
+
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 import { Slot } from "radix-ui"
@@ -19,6 +21,17 @@ const badgeVariants = cva(
         ghost:
           "hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50",
         link: "text-primary underline-offset-4 hover:underline",
+        // Health-token-backed variants — for semantically pass/fail or
+        // warning states that reuse the health ramp rather than inventing
+        // ad hoc green/red/amber classes per call site (audit pass/fail,
+        // the admin "Super-user view" banner). Per-score badges are dynamic
+        // (see lib/utils.ts scoreBadge) and pass their token classes via
+        // `className` instead, since the band isn't known until render.
+        "health-strong": "bg-health-strong-soft text-health-strong-on",
+        "health-moderate": "bg-health-moderate-soft text-health-moderate-on",
+        "health-risk": "bg-health-risk-soft text-health-risk-on",
+        "health-critical": "bg-health-critical-soft text-health-critical-on",
+        "health-unknown": "bg-health-unknown-soft text-health-unknown-on",
       },
     },
     defaultVariants: {

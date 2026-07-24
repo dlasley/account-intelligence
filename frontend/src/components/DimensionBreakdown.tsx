@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { scoreBadge, relativeTime } from '@/lib/utils'
+import { scoreBadge, scoreBarColor, relativeTime } from '@/lib/utils'
 import { track } from '@/lib/analytics'
+import { Badge } from '@/components/ui/badge'
 
 export type DimScore = {
   score: number
@@ -32,7 +33,7 @@ const DIVERGENCE_MIN_WEIGHT = 0.2
 function ScoreBar({ score, color }: { score: number; color: string }) {
   return (
     <div className="flex items-center gap-2 min-w-0">
-      <div className="relative w-24 h-2 rounded bg-gray-100 overflow-hidden shrink-0">
+      <div className="relative w-24 h-2 rounded bg-muted overflow-hidden shrink-0">
         <div
           className={`absolute inset-y-0 left-0 rounded ${color}`}
           style={{ width: `${score}%` }}
@@ -164,27 +165,16 @@ export default function DimensionBreakdown({
                   s.metadata && typeof s.metadata.window_days === 'number'
                     ? (s.metadata.window_days as number)
                     : null
-                // Use a solid fill color derived from the badge color for the bar.
-                // Badge colors are bg-{color}-100 text-{color}-800; bar uses bg-{color}-400.
-                const barColorMap: Record<string, string> = {
-                  'bg-green-100 text-green-800': 'bg-green-400',
-                  'bg-emerald-100 text-emerald-800': 'bg-emerald-400',
-                  'bg-yellow-100 text-yellow-800': 'bg-yellow-400',
-                  'bg-orange-100 text-orange-800': 'bg-orange-400',
-                  'bg-red-100 text-red-800': 'bg-red-400',
-                  'bg-gray-100 text-gray-500': 'bg-gray-400',
-                }
-                const barColor = barColorMap[badge.color] ?? 'bg-blue-400'
                 return (
                   <tr key={s.dimension_id} className="border-b">
                     <td className="py-2 pr-4 font-medium">{name}</td>
                     <td className="py-2 pr-4">
-                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${badge.color}`}>
+                      <Badge className={badge.color}>
                         {s.score} {badge.label}
-                      </span>
+                      </Badge>
                     </td>
                     <td className="py-2 pr-4">
-                      <ScoreBar score={s.score} color={barColor} />
+                      <ScoreBar score={s.score} color={scoreBarColor(s.score)} />
                     </td>
                     <td className="py-2 pr-4 text-gray-600 capitalize">{s.scored_by}</td>
                     <td className="py-2 text-gray-500 text-xs">

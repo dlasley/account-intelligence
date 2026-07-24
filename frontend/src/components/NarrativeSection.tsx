@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { scoreBadge, relativeTime } from '@/lib/utils'
 import { track } from '@/lib/analytics'
+import { Badge } from '@/components/ui/badge'
 
 type NarrativeData = {
   id?: string
@@ -22,9 +23,9 @@ type NarrativeData = {
 function ScorePill({ score }: { score: number }) {
   const b = scoreBadge(score)
   return (
-    <span className={`px-2 py-0.5 rounded font-medium ${b.color}`}>
+    <Badge className={b.color}>
       {score} {b.label}
-    </span>
+    </Badge>
   )
 }
 
@@ -151,18 +152,14 @@ export default function NarrativeSection({
             <div className="flex items-center gap-2 flex-wrap">
               <span>Generated {relativeTime(narrative.generated_at)}</span>
               {narrative.auditPassed !== undefined && narrative.auditPassed !== null && (
-                <span
+                <Badge
+                  variant={narrative.auditPassed ? 'health-strong' : 'health-critical'}
                   title={`Audit passed ${narrative.auditCriteriaPassed ?? '?'}/${narrative.auditCriteriaTotal ?? '?'} criteria, last audited ${relativeTime(narrative.auditAuditedAt ?? null)}`}
-                  className={`px-1.5 py-0.5 rounded text-xs font-medium ${
-                    narrative.auditPassed
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-red-100 text-red-700'
-                  }`}
                 >
                   {narrative.auditPassed
                     ? `audit ✓ ${narrative.auditCriteriaPassed ?? '?'}/${narrative.auditCriteriaTotal ?? '?'} · ${relativeTime(narrative.auditAuditedAt ?? null)}`
                     : `audit ✗ · ${relativeTime(narrative.auditAuditedAt ?? null)}`}
-                </span>
+                </Badge>
               )}
             </div>
           </div>

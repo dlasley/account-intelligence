@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { scoreBadge } from '@/lib/utils'
+import { Badge } from '@/components/ui/badge'
 import AccountViewTracker from '@/components/AccountViewTracker'
 import NarrativeSection from '@/components/NarrativeSection'
 import SignalsTimeline from '@/components/SignalsTimeline'
@@ -178,15 +179,11 @@ export default async function AccountDetailPage({
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-1 flex-wrap">
           <h1 className="text-2xl font-bold">{account.name}</h1>
-          {account.vertical && (
-            <span className="px-2 py-0.5 rounded text-sm bg-blue-50 text-blue-700">
-              {account.vertical}
-            </span>
-          )}
+          {account.vertical && <Badge variant="secondary">{account.vertical}</Badge>}
           {account.overall_health_score != null && (
-            <span className={`px-2 py-0.5 rounded text-sm font-medium ${healthBadge.color}`}>
+            <Badge className={healthBadge.color}>
               Health {account.overall_health_score} {healthBadge.label}
-            </span>
+            </Badge>
           )}
           <AuditBadge
             passed={auditRun?.overall_passed ?? null}
