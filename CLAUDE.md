@@ -71,7 +71,7 @@ Copy [.env.example](.env.example) to `.env`. Never commit `.env` (gitignored; se
 - **Python** `>=3.11`. Ruff handles linting + formatting — 100-character lines, targeting 3.11, enforcing style, import order, and a set of bug-catching and modern-syntax rules (`frontend/` excluded). Pyright runs in basic mode across `src/` + `tests/`; `src/db/` suppresses Supabase JSON-union diagnostics via `executionEnvironments`. Keep new `src/` code at zero pyright errors.
 - **pytest** `asyncio_mode = "auto"` (no `@pytest.mark.asyncio` needed). Hypothesis property tests run 500 examples per `@given`.
 - **OpenAI SDK** pinned `>=2.0,<3`, used only by the audit harness; uses `max_completion_tokens` (GPT-5 rejects `max_tokens`), `reasoning_effort: "low"`, `response_format: json_schema`.
-- **Frontend**: npm only (no pnpm/yarn/bun). Vitest + jsdom.
+- **Frontend**: npm only (no pnpm/yarn/bun). Vitest + jsdom (`frontend/src/test/setup.ts` polyfills `ResizeObserver`, which Radix primitives construct on mount). Tailwind v4 — design tokens live in an `@theme inline` block in `frontend/src/app/globals.css`; there is **no `tailwind.config.js`**. UI primitives are shadcn/ui (`radix-nova` style, unified `radix-ui` package) in `frontend/src/components/ui/` — check a component's actual variant API before assuming one; `radix-nova` differs from classic `new-york`.
 
 ## Common Patterns
 
@@ -92,6 +92,8 @@ Copy [.env.example](.env.example) to `.env`. Never commit `.env` (gitignored; se
 **Soft delete**: every mutable table has `deleted_at timestamptz NULL` (including config tables — FK-integrity + SOC 2 / GDPR two-stage erasure). Append-only tables use `superseded_at` instead.
 
 **Tests**: fixture paths are `Path("fixtures/...")` relative to repo root. Count-based assertions are intentional regression guards. DB-dependent code is tested by patching at the call site, not by mocking the client object.
+
+**Frontend design system** (`frontend/src/app/globals.css`, `lib/utils.ts`, `components/ui/`): semantic shadcn tokens (`bg-background`, `text-muted-foreground`, `border-border`, one accent via `--color-primary`) plus a custom `--color-health-*` ramp. Score→colour resolution is centralized in `scoreBadge` / `scoreBarColor`, both derived from one `HEALTH_BANDS` table (Healthy 70-100 / Moderate 45-69 / At risk 25-44 / Critical 0-24 / Unknown), so badge and bar cannot drift. Use tokens, not raw Tailwind palette classes, for foundational surfaces. Two traps: token class names must be written **literally** (Tailwind v4 statically scans source text, so an interpolated `bg-health-${x}-soft` never compiles), and `shadcn init` **overwrites `lib/utils.ts`** — re-running it will wipe `scoreBadge`/`relativeTime`. `ScrollArea` is constrained to vertical scrolling in the shared primitive; a horizontally scrolling area must opt out of the `[&>div]` overrides there.
 
 **Frontend Supabase clients** (`frontend/src/lib/supabase/`): `client.ts` (browser, `'use client'`), `server.ts` (Server Components / Route Handlers); never cross them. Middleware refreshes sessions inline.
 
