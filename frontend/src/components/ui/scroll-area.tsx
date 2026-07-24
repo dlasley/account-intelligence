@@ -16,9 +16,14 @@ function ScrollArea({
       className={cn("relative", className)}
       {...props}
     >
+      {/* Radix wraps children in a `display: table` div, which sizes to content
+          and lets wide children widen the viewport instead of wrapping inside
+          it. The `[&>div]` overrides constrain that wrapper to the viewport so
+          children lay out against its width — vertical scrolling only. A
+          horizontally scrolling area would need to opt out of these. */}
       <ScrollAreaPrimitive.Viewport
         data-slot="scroll-area-viewport"
-        className="size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1"
+        className="size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 [&>div]:!block [&>div]:!w-full [&>div]:!min-w-0"
       >
         {children}
       </ScrollAreaPrimitive.Viewport>

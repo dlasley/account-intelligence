@@ -82,15 +82,21 @@ export default function Header() {
 
   return (
     <header className="border-b border-border bg-background">
-      <div className="max-w-7xl mx-auto px-8 py-3 flex items-center justify-between">
-        <Link href="/accounts" className="flex items-baseline gap-2 hover:opacity-80">
-          <span className="text-lg font-semibold text-foreground">Account Intelligence</span>
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 py-3 flex items-center justify-between gap-3">
+        <Link href="/accounts" className="flex min-w-0 items-baseline gap-2 hover:opacity-80">
+          <span className="text-lg font-semibold whitespace-nowrap text-foreground">
+            Account Intelligence
+          </span>
           {info.workspaceName && (
-            <span className="text-sm text-muted-foreground">{info.workspaceName}</span>
+            <span className="truncate text-sm text-muted-foreground">{info.workspaceName}</span>
           )}
         </Link>
-        <div className="flex items-center gap-4 text-sm">
-          {info.userEmail && <span className="text-muted-foreground">{info.userEmail}</span>}
+        <div className="flex shrink-0 items-center gap-4 text-sm">
+          {/* The signed-in address is secondary to Sign out; it is dropped
+              below sm rather than competing for the narrow header row. */}
+          {info.userEmail && (
+            <span className="hidden text-muted-foreground sm:inline">{info.userEmail}</span>
+          )}
           <button
             type="button"
             onClick={handleSignOut}

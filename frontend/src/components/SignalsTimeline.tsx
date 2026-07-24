@@ -105,17 +105,22 @@ export default function SignalsTimeline({ signals }: { signals: Signal[] }) {
                   onClick={() => toggleExpand(s.id)}
                   className="cursor-pointer rounded-lg border border-border p-3 hover:bg-muted/50"
                 >
-                  <div className="flex items-center gap-2 text-sm">
+                  {/* min-w-0 lets the flex children shrink below their content
+                      width; without it the subject's `truncate` cannot engage
+                      and long subjects widen the row instead of ellipsing. */}
+                  <div className="flex min-w-0 items-center gap-2 text-sm">
                     <DirectionIcon direction={s.direction} />
-                    <span className="font-mono text-xs text-muted-foreground">
+                    <span className="shrink-0 font-mono text-xs text-muted-foreground">
                       {relativeTime(s.occurred_at)}
                     </span>
-                    <span className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs text-muted-foreground">
+                    <span className="shrink-0 rounded bg-muted px-1.5 py-0.5 font-mono text-xs text-muted-foreground">
                       {s.channel}
                     </span>
-                    <span className="truncate font-medium">{s.subject ?? '(no subject)'}</span>
+                    <span className="min-w-0 truncate font-medium">{s.subject ?? '(no subject)'}</span>
                   </div>
-                  <p className={`mt-1 text-xs text-muted-foreground ${isExpanded ? '' : 'line-clamp-2'}`}>
+                  <p
+                    className={`mt-1 text-xs break-words text-muted-foreground ${isExpanded ? '' : 'line-clamp-2'}`}
+                  >
                     {isExpanded ? s.body : preview}
                   </p>
                 </div>
