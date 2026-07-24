@@ -22,9 +22,9 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ refresh: mockRefresh }),
 }))
 
-// Partial mock via importOriginal: DimensionBreakdown now renders the shadcn
-// Badge primitive, which imports `cn` from this same module — a full
-// replacement mock would silently drop it and break Badge's className merge.
+// Partial mock via importOriginal: the Badge primitive this component renders
+// imports `cn` from this same module — a full replacement mock would silently
+// drop it and break Badge's className merging.
 vi.mock('@/lib/utils', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/utils')>()
   return {

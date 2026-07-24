@@ -5,13 +5,11 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-// Score band → health token classes. 4 bands + unknown, backed by the
-// --color-health-* ramp in globals.css (Healthy 70-100 / Moderate 45-69 /
-// At risk 25-44 / Critical 0-24 / Unknown null). Both scoreBadge and
-// scoreBarColor derive from this single table so the badge and the bar can
-// never drift out of sync the way the old string-keyed barColorMap could.
+// Score band → health token classes, backed by the --color-health-* ramp in
+// globals.css. scoreBadge and scoreBarColor both derive from this table so the
+// badge and the bar cannot drift.
 //
-// Class names are written out literal per band (not template-interpolated,
+// Class names are written out literally per band (not template-interpolated,
 // e.g. NOT `bg-health-${token}-soft`) because Tailwind v4 statically scans
 // source text for complete utility-class strings — an interpolated class
 // name never appears as one, so the utility silently never compiles.

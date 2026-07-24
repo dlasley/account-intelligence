@@ -12,11 +12,10 @@ type WorkspaceInfo = {
 
 const HIDDEN_PREFIXES = ['/login', '/auth']
 
-// Matches /admin/workspaces/:slug and its sub-routes, so a super-user browsing
-// another workspace's admin pages sees THAT workspace as secondary context —
-// not their own. Super-user browsing (ADR-018 amendment) never mutates the
-// signed-in user's own workspace_id, so without this the header always showed
-// the super-user's home workspace regardless of which one they were viewing.
+// Matches /admin/workspaces/:slug and its sub-routes. A super-user browsing
+// another workspace's admin pages sees THAT workspace as secondary context,
+// not their own — super-user browsing never mutates the signed-in user's
+// workspace_id, so the route is the only source for which one is in view.
 const ADMIN_WORKSPACE_SLUG_RE = /^\/admin\/workspaces\/([^/]+)/
 
 export default function Header() {

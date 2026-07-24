@@ -1,11 +1,9 @@
 import { describe, it, expect } from 'vitest'
 import { scoreBadge, scoreBarColor, relativeTime } from '@/lib/utils'
 
-// Bands rewritten for Phase 1 (SP-2 redesign): 5 bands -> 4 + unknown, backed by
-// the --color-health-* token ramp instead of ad hoc Tailwind palette classes.
-// Old: high(80)/good(60)/medium(40)/fair(20)/low(0), green/emerald/yellow/orange/red.
-// New: Healthy(70)/Moderate(45)/At risk(25)/Critical(0)/Unknown(null), thresholds
-// approved by the user alongside the handoff's health ramp.
+// Bands: Healthy 70-100 / Moderate 45-69 / At risk 25-44 / Critical 0-24 /
+// Unknown (null). Each case asserts both ends of its range so a shifted
+// threshold fails here rather than silently reclassifying accounts.
 describe('scoreBadge', () => {
   it('returns Healthy for score >= 70', () => {
     expect(scoreBadge(90).label).toBe('Healthy')
