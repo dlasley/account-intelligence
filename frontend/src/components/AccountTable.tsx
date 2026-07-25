@@ -240,11 +240,14 @@ export default function AccountTable({
         <Table>
           <TableHeader>
             <TableRow>
+              {/* Column priority narrows with the viewport: Name and Health
+                  always render, Vertical and Last signal return at sm, Domain
+                  and Summary at md. */}
               {sortableHead('name', 'Name')}
               <TableHead className="hidden md:table-cell">Domain</TableHead>
-              {sortableHead('vertical', 'Vertical')}
+              {sortableHead('vertical', 'Vertical', 'hidden sm:table-cell')}
               {sortableHead('health', 'Health')}
-              {sortableHead('last_signal', 'Last signal')}
+              {sortableHead('last_signal', 'Last signal', 'hidden sm:table-cell')}
               <TableHead className="hidden md:table-cell">Summary</TableHead>
             </TableRow>
           </TableHeader>
@@ -261,7 +264,7 @@ export default function AccountTable({
                   <TableCell className="hidden text-muted-foreground md:table-cell">
                     {a.primary_domain ?? '—'}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="hidden sm:table-cell">
                     {a.vertical ? (
                       <Badge variant="secondary">{a.vertical}</Badge>
                     ) : (
@@ -282,7 +285,9 @@ export default function AccountTable({
                       />
                     </div>
                   </TableCell>
-                  <TableCell className="text-muted-foreground">{relativeTime(a.last_signal_at)}</TableCell>
+                  <TableCell className="hidden text-muted-foreground sm:table-cell">
+                    {relativeTime(a.last_signal_at)}
+                  </TableCell>
                   <TableCell className="hidden max-w-xs truncate whitespace-nowrap text-muted-foreground md:table-cell">
                     {a.narrative_excerpt ?? <span className="text-muted-foreground/70 italic">No narrative yet</span>}
                   </TableCell>
