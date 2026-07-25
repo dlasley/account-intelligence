@@ -308,7 +308,7 @@ describe('OutreachTab - greeting name sync', () => {
     expect(bodyTextarea().value).not.toContain('Priya Sharma')
   })
 
-  it('null-hop regression: A → No recipient → C shows C name in the greeting (surface 4)', async () => {
+  it('null-hop: A → No recipient → C shows C name in the greeting', async () => {
     render(
       <OutreachTab accountSlug="formation-bio" accountId="acc-1" contacts={CONTACTS} overallHealthScore={75} />
     )
@@ -398,22 +398,6 @@ describe('OutreachTab - greeting name sync', () => {
     await waitFor(() => expect(bodyTextarea().value).toContain('Priya Sharma'))
 
     expect(contactSelect().value).toBe('contact-1')
-  })
-
-  it('compound repro: A → No recipient → C shows C in the body greeting (currently RED pre-fix)', async () => {
-    render(
-      <OutreachTab accountSlug="formation-bio" accountId="acc-1" contacts={CONTACTS} overallHealthScore={75} />
-    )
-    await waitFor(() => expect(bodyTextarea().value).toContain('Priya Sharma'))
-
-    fireEvent.change(contactSelect(), { target: { value: '' } })
-    await waitFor(() => expect(contactSelect().value).toBe(''))
-
-    fireEvent.change(contactSelect(), { target: { value: 'contact-2' } })
-
-    await waitFor(() =>
-      expect(bodyTextarea().value).toBe('Hi bob@formationbio.com,\n\n[Reference something specific.]')
-    )
   })
 
   it('compound: A → No recipient → template-select → C shows C name, not the placeholder', async () => {

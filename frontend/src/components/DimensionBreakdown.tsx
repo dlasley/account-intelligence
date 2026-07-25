@@ -207,7 +207,7 @@ export default function DimensionBreakdown({
                 <TableRow>
                   <TableHead>Dimension</TableHead>
                   <TableHead>Score</TableHead>
-                  <TableHead>Trend</TableHead>
+                  <TableHead>Level</TableHead>
                   <TableHead>Rationale</TableHead>
                 </TableRow>
               </TableHeader>

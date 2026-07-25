@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import CandidateSidebar from '@/components/CandidateSidebar'
+import type { AccountListRow } from '@/lib/types'
 
 const mockRpc = vi.fn().mockResolvedValue({ error: null })
 const mockRefresh = vi.fn()
@@ -13,7 +14,7 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ refresh: mockRefresh }),
 }))
 
-const candidate = {
+const candidate: AccountListRow = {
   id: 'abc-123',
   workspace_id: 'ws-1',
   slug: 'acme',
@@ -22,13 +23,17 @@ const candidate = {
   additional_domains: [],
   vertical: null,
   crm_record_id: null,
-  status: 'candidate' as const,
+  status: 'candidate',
   last_narrative_generated_at: null,
   created_at: '2026-01-01T00:00:00Z',
   updated_at: '2026-01-01T00:00:00Z',
   overall_health_score: null,
   narrative_excerpt: null,
   last_signal_at: null,
+  audit_passed: null,
+  audit_criteria_passed: null,
+  audit_criteria_total: null,
+  audit_audited_at: null,
 }
 
 beforeEach(() => {
