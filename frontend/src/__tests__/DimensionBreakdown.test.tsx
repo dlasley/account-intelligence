@@ -68,7 +68,11 @@ describe('DimensionBreakdown', () => {
     expect(screen.getByText('No dimension scores yet.')).toBeTruthy()
   })
 
-  it('renders dimension score row', () => {
+  // Each dimension renders twice — once in the sm+ table and once in the
+  // narrow-viewport card stack — so these assert on both copies. jsdom applies
+  // no CSS, so the `hidden`/`sm:hidden` classes that leave exactly one visible
+  // in a browser do not remove either from the queried DOM.
+  it('renders dimension score row in both layouts', () => {
     render(
       <DimensionBreakdown
         accountId={accountId}
@@ -77,8 +81,8 @@ describe('DimensionBreakdown', () => {
         hasCsmConfig={false}
       />,
     )
-    expect(screen.getByText('Email Health')).toBeTruthy()
-    expect(screen.getByText(/74/)).toBeTruthy()
+    expect(screen.getAllByText('Email Health')).toHaveLength(2)
+    expect(screen.getAllByText(/74/).length).toBeGreaterThanOrEqual(2)
   })
 
   it('hides CSM form when hasCsmConfig is false', () => {

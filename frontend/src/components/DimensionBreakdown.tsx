@@ -114,6 +114,29 @@ export default function DimensionBreakdown({
     return wb - wa
   })
 
+  const rows = sorted.map((s) => {
+    const windowDays =
+      s.metadata && typeof s.metadata.window_days === 'number'
+        ? (s.metadata.window_days as number)
+        : null
+    const scoredBy = s.scored_by.charAt(0).toUpperCase() + s.scored_by.slice(1)
+    return {
+      key: s.dimension_id,
+      name: configsById.get(s.dimension_id)?.name ?? s.dimension_id,
+      score: s.score,
+      badge: scoreBadge(s.score),
+      barColor: scoreBarColor(s.score),
+      rationale: [
+        scoredBy,
+        windowDays !== null ? `${windowDays}-day window` : null,
+        s.rationale ?? '—',
+        relativeTime(s.scored_at),
+      ]
+        .filter(Boolean)
+        .join(' · '),
+    }
+  })
+
   // Detect divergence: find the two highest-weight dimensions that both meet the
   // minimum weight bar and check if their gap is large enough to call out
   const dominant = sorted.filter(
@@ -158,7 +181,27 @@ export default function DimensionBreakdown({
             </Alert>
           )}
 
-          <div className="mb-4 overflow-hidden rounded-lg border border-border">
+          {/* The four-column table needs more width than a phone offers, so
+              below sm the same rows render as stacked cards. Both layouts read
+              from `rows` so their content cannot diverge. */}
+          <div className="mb-4 space-y-2 sm:hidden">
+            {rows.map((r) => (
+              <div key={r.key} className="rounded-lg border border-border p-3">
+                <div className="flex items-start justify-between gap-2">
+                  <span className="font-medium">{r.name}</span>
+                  <Badge className={r.badge.color}>
+                    {r.score} {r.badge.label}
+                  </Badge>
+                </div>
+                <div className="mt-2">
+                  <ScoreBar score={r.score} color={r.barColor} />
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground">{r.rationale}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mb-4 hidden overflow-hidden rounded-lg border border-border sm:block">
             <Table>
               <TableHeader className="bg-muted/40">
                 <TableRow>
@@ -169,35 +212,22 @@ export default function DimensionBreakdown({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {sorted.map((s) => {
-                  const badge = scoreBadge(s.score)
-                  const name = configsById.get(s.dimension_id)?.name ?? s.dimension_id
-                  const windowDays =
-                    s.metadata && typeof s.metadata.window_days === 'number'
-                      ? (s.metadata.window_days as number)
-                      : null
-                  return (
-                    <TableRow key={s.dimension_id}>
-                      <TableCell className="font-medium">{name}</TableCell>
-                      <TableCell>
-                        <Badge className={badge.color}>
-                          {s.score} {badge.label}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <ScoreBar score={s.score} color={scoreBarColor(s.score)} />
-                      </TableCell>
-                      <TableCell className="whitespace-normal text-xs text-muted-foreground">
-                        <span className="capitalize">{s.scored_by}</span>
-                        {' · '}
-                        {windowDays !== null && <>{windowDays}-day window · </>}
-                        {s.rationale ?? '—'}
-                        {' · '}
-                        {relativeTime(s.scored_at)}
-                      </TableCell>
-                    </TableRow>
-                  )
-                })}
+                {rows.map((r) => (
+                  <TableRow key={r.key}>
+                    <TableCell className="font-medium">{r.name}</TableCell>
+                    <TableCell>
+                      <Badge className={r.badge.color}>
+                        {r.score} {r.badge.label}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <ScoreBar score={r.score} color={r.barColor} />
+                    </TableCell>
+                    <TableCell className="whitespace-normal text-xs text-muted-foreground">
+                      {r.rationale}
+                    </TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </div>
