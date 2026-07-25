@@ -172,6 +172,67 @@ describe('OutreachTab', () => {
   })
 })
 
+describe('OutreachTab - send state machine', () => {
+  it('shows a spinner and disables Send while sending, then the sent success state', async () => {
+    let resolveSend: (value: { ok: boolean; json: () => Promise<unknown> }) => void = () => {}
+    const sendPromise = new Promise<{ ok: boolean; json: () => Promise<unknown> }>((resolve) => {
+      resolveSend = resolve
+    })
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((url: string) => {
+        if (url.includes('/context')) {
+          return Promise.resolve({ ok: true, json: async () => CONTEXT_RESPONSE })
+        }
+        return sendPromise
+      }),
+    )
+
+    render(
+      <OutreachTab accountSlug="formation-bio" accountId="acc-1" contacts={CONTACTS} overallHealthScore={75} />
+    )
+    await waitFor(() => expect(bodyTextarea().value).toContain('Priya Sharma'))
+    // Clear the unfilled [placeholder] slot so Send isn't disabled.
+    fireEvent.change(bodyTextarea(), { target: { value: 'Hi Priya Sharma,\n\nJust checking in.' } })
+
+    const sendButton = screen.getByText('Send').closest('button')!
+    fireEvent.click(sendButton)
+
+    await waitFor(() => expect(screen.getByText('Sending…')).toBeTruthy())
+    expect(screen.getByText('Sending…').closest('button')!.disabled).toBe(true)
+
+    resolveSend({ ok: true, json: async () => ({}) })
+
+    await waitFor(() => expect(screen.getByText('Email sent.')).toBeTruthy())
+    expect(screen.getByText('Sent')).toBeTruthy()
+    expect(screen.getByText('Email sent successfully.')).toBeTruthy()
+  })
+
+  it('shows a destructive alert with a retry affordance when send fails', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((url: string) => {
+        if (url.includes('/context')) {
+          return Promise.resolve({ ok: true, json: async () => CONTEXT_RESPONSE })
+        }
+        return Promise.resolve({ ok: false, status: 502 })
+      }),
+    )
+
+    render(
+      <OutreachTab accountSlug="formation-bio" accountId="acc-1" contacts={CONTACTS} overallHealthScore={75} />
+    )
+    await waitFor(() => expect(bodyTextarea().value).toContain('Priya Sharma'))
+    fireEvent.change(bodyTextarea(), { target: { value: 'Hi Priya Sharma,\n\nJust checking in.' } })
+
+    fireEvent.click(screen.getByText('Send').closest('button')!)
+
+    await waitFor(() => expect(screen.getByRole('alert')).toBeTruthy())
+    expect(screen.getByText('Email delivery failed — please retry.')).toBeTruthy()
+    expect(screen.getByText('Failed · Retry')).toBeTruthy()
+  })
+})
+
 describe('OutreachTab - greeting name sync', () => {
   it('greeting follows the selected recipient and persists the re-filled name via RPC', async () => {
     render(

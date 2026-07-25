@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { scoreBadge } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import NarrativeSection from '@/components/NarrativeSection'
 import SignalsTimeline from '@/components/SignalsTimeline'
 import type { Signal } from '@/components/SignalsTimeline'
@@ -33,8 +34,10 @@ export default async function AdminAccountDetailPage({
   if (error) {
     if (error.message.includes('workspace not found')) notFound()
     return (
-      <main className="p-8">
-        <p className="text-red-600">Failed to load account: {error.message}</p>
+      <main className="mx-auto max-w-5xl p-8">
+        <Alert variant="destructive">
+          <AlertDescription>Failed to load account: {error.message}</AlertDescription>
+        </Alert>
       </main>
     )
   }
@@ -114,16 +117,16 @@ export default async function AdminAccountDetailPage({
 
   return (
     <main className="max-w-6xl p-8">
-      <nav className="text-sm text-gray-500 mb-4">
-        <Link href="/admin" className="hover:underline text-blue-600">
+      <nav className="text-sm text-muted-foreground mb-4">
+        <Link href="/admin" className="hover:underline text-primary">
           Admin
         </Link>
         {' / '}
-        <Link href={`/admin/workspaces/${slug}/accounts`} className="hover:underline text-blue-600">
+        <Link href={`/admin/workspaces/${slug}/accounts`} className="hover:underline text-primary">
           {workspaceName}
         </Link>
         {' / '}
-        <span>{account.name}</span>
+        <span className="text-foreground">{account.name}</span>
       </nav>
 
       <div className="mb-6">
@@ -146,9 +149,9 @@ export default async function AdminAccountDetailPage({
           <Badge variant="health-moderate">Super-user view</Badge>
         </div>
         {account.crm_record_id && (
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted-foreground">
             CRM:{' '}
-            <span className="font-mono text-gray-700">{account.crm_record_id}</span>
+            <span className="font-mono text-foreground">{account.crm_record_id}</span>
           </p>
         )}
       </div>

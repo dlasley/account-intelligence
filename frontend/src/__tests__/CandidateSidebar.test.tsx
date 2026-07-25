@@ -51,12 +51,34 @@ describe('CandidateSidebar', () => {
     })
   })
 
-  it('calls dismiss_candidate_account RPC on reject', async () => {
+  it('reject opens a confirmation dialog rather than calling the RPC immediately', async () => {
     render(<CandidateSidebar candidates={[candidate]} />)
     fireEvent.click(screen.getByText('Reject'))
+
+    expect(await screen.findByRole('alertdialog')).toBeTruthy()
+    expect(mockRpc).not.toHaveBeenCalled()
+  })
+
+  it('calls dismiss_candidate_account RPC after confirming the reject dialog', async () => {
+    render(<CandidateSidebar candidates={[candidate]} />)
+    fireEvent.click(screen.getByText('Reject'))
+    await screen.findByRole('alertdialog')
+    fireEvent.click(screen.getByText('Yes, reject'))
 
     await vi.waitFor(() => {
       expect(mockRpc).toHaveBeenCalledWith('dismiss_candidate_account', { p_account_id: 'abc-123' })
     })
+  })
+
+  it('cancelling the reject dialog does not call the RPC', async () => {
+    render(<CandidateSidebar candidates={[candidate]} />)
+    fireEvent.click(screen.getByText('Reject'))
+    await screen.findByRole('alertdialog')
+    fireEvent.click(screen.getByText('Cancel'))
+
+    await vi.waitFor(() => {
+      expect(screen.queryByRole('alertdialog')).toBeNull()
+    })
+    expect(mockRpc).not.toHaveBeenCalled()
   })
 })

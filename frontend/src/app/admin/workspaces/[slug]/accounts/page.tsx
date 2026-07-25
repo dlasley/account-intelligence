@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { AccountListRow } from '@/lib/types'
 import AccountTable from '@/components/AccountTable'
+import { Badge } from '@/components/ui/badge'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
 export default async function AdminWorkspaceAccountsPage({
   params,
@@ -20,8 +22,10 @@ export default async function AdminWorkspaceAccountsPage({
     // workspace not found surfaces as a Postgres RAISE EXCEPTION
     if (error.message.includes('workspace not found')) notFound()
     return (
-      <main className="p-8">
-        <p className="text-red-600">Failed to load accounts: {error.message}</p>
+      <main className="mx-auto max-w-5xl p-8">
+        <Alert variant="destructive">
+          <AlertDescription>Failed to load accounts: {error.message}</AlertDescription>
+        </Alert>
       </main>
     )
   }
@@ -38,30 +42,27 @@ export default async function AdminWorkspaceAccountsPage({
   const workspaceName = workspace?.name ?? slug
 
   return (
-    <main className="p-8 max-w-5xl">
-      <nav className="text-sm text-gray-500 mb-4">
-        <Link href="/admin" className="hover:underline text-blue-600">
+    <main className="mx-auto max-w-5xl p-8">
+      <nav className="mb-4 text-sm text-muted-foreground">
+        <Link href="/admin" className="text-primary hover:underline">
           Admin
         </Link>
         {' / '}
-        <span>{workspaceName}</span>
+        <span className="text-foreground">{workspaceName}</span>
       </nav>
-      <div className="mb-1 flex items-center gap-2">
-        <h1 className="text-2xl font-bold">{workspaceName}</h1>
-        <span className="px-2 py-0.5 rounded text-xs bg-amber-50 text-amber-700 font-medium border border-amber-200">
-          Super-user view
-        </span>
+      <div className="mb-1 flex flex-wrap items-center gap-2">
+        <h1 className="text-2xl font-bold text-foreground">{workspaceName}</h1>
+        <Badge variant="health-moderate">Super-user view</Badge>
       </div>
-      <p className="text-sm text-gray-500 mb-6">
+      <p className="mb-6 text-sm text-muted-foreground">
         {active.length} active account{active.length !== 1 ? 's' : ''}
-        {candidates.length > 0 ? `, ${candidates.length} candidate${candidates.length !== 1 ? 's' : ''}` : ''}
+        {candidates.length > 0
+          ? `, ${candidates.length} candidate${candidates.length !== 1 ? 's' : ''}`
+          : ''}
       </p>
       <div className="flex gap-8">
-        <div className="flex-1 min-w-0">
-          <AccountTable
-            accounts={active}
-            hrefPrefix={`/admin/workspaces/${slug}/accounts`}
-          />
+        <div className="min-w-0 flex-1">
+          <AccountTable accounts={active} hrefPrefix={`/admin/workspaces/${slug}/accounts`} />
         </div>
       </div>
     </main>

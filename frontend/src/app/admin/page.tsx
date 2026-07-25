@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import WorkspaceTable, { WorkspaceRow } from '@/components/WorkspaceTable'
+import { Badge } from '@/components/ui/badge'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
 export default async function AdminPage() {
   const supabase = await createClient()
@@ -7,8 +9,10 @@ export default async function AdminPage() {
 
   if (error) {
     return (
-      <main className="p-8">
-        <p className="text-red-600">Failed to load workspaces: {error.message}</p>
+      <main className="mx-auto max-w-5xl p-8">
+        <Alert variant="destructive">
+          <AlertDescription>Failed to load workspaces: {error.message}</AlertDescription>
+        </Alert>
       </main>
     )
   }
@@ -16,9 +20,12 @@ export default async function AdminPage() {
   const workspaces = (data ?? []) as WorkspaceRow[]
 
   return (
-    <main className="p-8">
-      <h1 className="text-2xl font-bold mb-2">Admin — All Workspaces</h1>
-      <p className="text-sm text-gray-500 mb-6">
+    <main className="mx-auto max-w-5xl p-8">
+      <div className="mb-1 flex flex-wrap items-center gap-2">
+        <h1 className="text-2xl font-bold text-foreground">All Workspaces</h1>
+        <Badge variant="health-moderate">Super-user view</Badge>
+      </div>
+      <p className="mb-6 text-sm text-muted-foreground">
         {workspaces.length} workspace{workspaces.length !== 1 ? 's' : ''}
       </p>
       <WorkspaceTable workspaces={workspaces} />
