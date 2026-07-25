@@ -72,11 +72,15 @@ describe('SignalsTimeline', () => {
     expect(screen.queryByText('Onboarding update')).toBeNull()
   })
 
+  // The summary row is a button so the disclosure is keyboard-reachable; the
+  // query goes through the accessible control rather than the wrapper element.
   it('expand toggle shows full body on click', () => {
     render(<SignalsTimeline signals={SIGNALS} />)
-    const row = screen.getByText('Onboarding update').closest('div[class*="border"]')!
-    fireEvent.click(row)
+    const toggle = screen.getByText('Onboarding update').closest('button')!
+    expect(toggle.getAttribute('aria-expanded')).toBe('false')
+    fireEvent.click(toggle)
     expect(screen.getByText(/Line three/)).toBeTruthy()
+    expect(toggle.getAttribute('aria-expanded')).toBe('true')
   })
 
   describe('capped render window', () => {

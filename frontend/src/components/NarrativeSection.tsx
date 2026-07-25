@@ -74,7 +74,10 @@ export default function NarrativeSection({
         .eq('account_id', accountId)
         .is('superseded_at', null)
         .maybeSingle()
-      if (data && data.generated_at > clickedAt) {
+      // Compare as instants, not strings: Postgres returns microsecond precision
+      // with a `+00:00` offset while `clickedAt` is millisecond `Z`, so a
+      // lexicographic compare can rank a newer row as older within the same second.
+      if (data && new Date(data.generated_at).getTime() > new Date(clickedAt).getTime()) {
         setNarrative(data as NarrativeData)
         setRegenerating(false)
         setPollingState(null)

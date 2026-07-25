@@ -22,22 +22,37 @@ import {
 export default function CandidateSidebar({ candidates }: { candidates: AccountListRow[] }) {
   const router = useRouter()
   const [rejectTarget, setRejectTarget] = useState<AccountListRow | null>(null)
+  // Holds the id being acted on so its card's controls disable, preventing a
+  // second RPC before the refreshed list arrives.
+  const [pendingId, setPendingId] = useState<string | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
 
-  const handleConfirm = async (id: string) => {
+  const runAction = async (id: string, rpc: 'activate_candidate_account' | 'dismiss_candidate_account') => {
+    if (pendingId) return
+    setPendingId(id)
+    setActionError(null)
     const supabase = createClient()
-    await supabase.rpc('activate_candidate_account', { p_account_id: id })
+    const { error } = await supabase.rpc(rpc, { p_account_id: id })
+    if (error) {
+      setActionError('Could not update the candidate. Please try again.')
+      setPendingId(null)
+      return
+    }
     router.refresh()
+    setPendingId(null)
   }
 
-  const handleReject = async (id: string) => {
-    const supabase = createClient()
-    await supabase.rpc('dismiss_candidate_account', { p_account_id: id })
-    router.refresh()
-  }
+  const handleConfirm = (id: string) => runAction(id, 'activate_candidate_account')
+  const handleReject = (id: string) => runAction(id, 'dismiss_candidate_account')
 
   return (
     <div>
       <h2 className="mb-4 text-lg font-semibold text-foreground">Candidates</h2>
+      {actionError && (
+        <p role="alert" className="mb-3 text-sm text-destructive">
+          {actionError}
+        </p>
+      )}
       <div className="space-y-3">
         {candidates.map((c) => (
           <Card key={c.id}>
@@ -57,13 +72,19 @@ export default function CandidateSidebar({ candidates }: { candidates: AccountLi
                 )}
               </div>
               <div className="flex gap-2">
-                <Button size="sm" className="flex-1" onClick={() => handleConfirm(c.id)}>
-                  Confirm
+                <Button
+                  size="sm"
+                  className="flex-1"
+                  disabled={pendingId !== null}
+                  onClick={() => handleConfirm(c.id)}
+                >
+                  {pendingId === c.id ? 'Working…' : 'Confirm'}
                 </Button>
                 <Button
                   size="sm"
                   variant="destructive"
                   className="flex-1"
+                  disabled={pendingId !== null}
                   onClick={() => setRejectTarget(c)}
                 >
                   Reject

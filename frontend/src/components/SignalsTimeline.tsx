@@ -102,13 +102,18 @@ export default function SignalsTimeline({ signals }: { signals: Signal[] }) {
               return (
                 <div
                   key={s.id}
-                  onClick={() => toggleExpand(s.id)}
-                  className="cursor-pointer rounded-lg border border-border p-3 hover:bg-muted/50"
+                  className="rounded-lg border border-border p-3 hover:bg-muted/50"
                 >
                   {/* min-w-0 lets the flex children shrink below their content
                       width; without it the subject's `truncate` cannot engage
                       and long subjects widen the row instead of ellipsing. */}
-                  <div className="flex min-w-0 items-center gap-2 text-sm">
+                  <button
+                    type="button"
+                    onClick={() => toggleExpand(s.id)}
+                    aria-expanded={isExpanded}
+                    aria-controls={`signal-body-${s.id}`}
+                    className="flex w-full min-w-0 cursor-pointer items-center gap-2 text-left text-sm"
+                  >
                     <DirectionIcon direction={s.direction} />
                     <span className="shrink-0 font-mono text-xs text-muted-foreground">
                       {relativeTime(s.occurred_at)}
@@ -117,8 +122,9 @@ export default function SignalsTimeline({ signals }: { signals: Signal[] }) {
                       {s.channel}
                     </span>
                     <span className="min-w-0 truncate font-medium">{s.subject ?? '(no subject)'}</span>
-                  </div>
+                  </button>
                   <p
+                    id={`signal-body-${s.id}`}
                     className={`mt-1 text-xs break-words text-muted-foreground ${isExpanded ? '' : 'line-clamp-2'}`}
                   >
                     {isExpanded ? s.body : preview}

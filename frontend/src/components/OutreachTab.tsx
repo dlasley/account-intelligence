@@ -46,7 +46,9 @@ type Props = {
   overallHealthScore: number | null
 }
 
-type Status = 'idle' | 'loading' | 'saving' | 'sending' | 'sent' | 'error'
+// Send lifecycle only. Autosave is tracked separately (`isSaving`) so a blur-save
+// resolving mid-send cannot reset this back to `idle`.
+type Status = 'idle' | 'loading' | 'sending' | 'sent' | 'error'
 
 const CONTACT_NAME_SLOT = '[Contact Name]'
 
@@ -78,6 +80,8 @@ export default function OutreachTab({ accountSlug, accountId, contacts, overallH
   const [body, setBody] = useState('')
   const [contactId, setContactId] = useState<string | null>(contacts[0]?.id ?? null)
   const [status, setStatus] = useState<Status>('idle')
+  const [isSaving, setIsSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   // Tracks the contact whose name is actually baked into subject/body text right now,
@@ -178,11 +182,22 @@ export default function OutreachTab({ accountSlug, accountId, contacts, overallH
     }
   }, [intentTemplates, selectedTemplateId, handleTemplateSelect])
 
+  // Autosave tracks its own flag rather than `status`. A blur fires on mousedown
+  // and the Send click on mouseup, so a save that resolved into `status` would
+  // overwrite `sending` and re-enable the Send button mid-flight.
   async function handleSubjectBlur() {
     if (!draftId) return
-    setStatus('saving')
-    await supabase.rpc('update_outreach_draft', { p_draft_id: draftId, p_subject: subject })
-    setStatus('idle')
+    setIsSaving(true)
+    const { error } = await supabase.rpc('update_outreach_draft', {
+      p_draft_id: draftId,
+      p_subject: subject,
+    })
+    setIsSaving(false)
+    if (error) {
+      setSaveError('Could not save the subject. Your last edit may be lost.')
+      return
+    }
+    setSaveError(null)
     track('Outreach Template Edited', {
       account_id: accountId,
       intent,
@@ -194,9 +209,17 @@ export default function OutreachTab({ accountSlug, accountId, contacts, overallH
 
   async function handleBodyBlur() {
     if (!draftId) return
-    setStatus('saving')
-    await supabase.rpc('update_outreach_draft', { p_draft_id: draftId, p_body: body })
-    setStatus('idle')
+    setIsSaving(true)
+    const { error } = await supabase.rpc('update_outreach_draft', {
+      p_draft_id: draftId,
+      p_body: body,
+    })
+    setIsSaving(false)
+    if (error) {
+      setSaveError('Could not save the body. Your last edit may be lost.')
+      return
+    }
+    setSaveError(null)
     track('Outreach Template Edited', {
       account_id: accountId,
       intent,
@@ -431,13 +454,18 @@ export default function OutreachTab({ accountSlug, accountId, contacts, overallH
                     : 'Send'}
             </Button>
             {status === 'sent' && (
-              <span className="text-sm font-medium text-health-strong-on">
+              <span role="status" className="text-sm font-medium text-health-strong-on">
                 Email sent successfully.
               </span>
             )}
-            {status === 'saving' && (
+            {isSaving && (
               <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <Loader2 className="size-3 animate-spin" /> Saving…
+              </span>
+            )}
+            {saveError && (
+              <span role="alert" className="text-xs text-destructive">
+                {saveError}
               </span>
             )}
             {status !== 'sent' && hasUnfilledSlots && (

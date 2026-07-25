@@ -12,7 +12,7 @@ export default function RetryButton({
 }: React.ComponentProps<'button'> & VariantProps<typeof buttonVariants>) {
   const router = useRouter()
   return (
-    <Button onClick={() => router.refresh()} {...props}>
+    <Button {...props} onClick={() => router.refresh()}>
       {children}
     </Button>
   )
