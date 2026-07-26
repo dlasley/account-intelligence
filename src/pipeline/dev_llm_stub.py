@@ -5,8 +5,8 @@ Implements the `.messages.create()` surface that `generate_narrative()`
 pipeline — routing, health scoring, narrative persistence — against a local
 Supabase instance with no `ANTHROPIC_API_KEY` and no outbound network call.
 
-Selected only at the CLI layer in `src/worker.py` (`FAKE_LLM=true` env var or
-`--fake-llm` flag on `generate-narratives`); `generate_narrative()` itself is
+Selected only at the CLI layer in `src/worker.py` (`STUB_LLM=true` env var or
+`--stub-llm` flag on `generate-narratives`); `generate_narrative()` itself is
 unmodified and has no knowledge this client isn't real.
 
 Never wire `scripts/audit_narratives.py` at this client's output. The audit
@@ -20,8 +20,8 @@ import json
 import anthropic
 
 CANNED_NARRATIVE = (
-    "[FAKE-LLM STUB] This narrative was produced by the local development stub, not a "
-    "real model call. Set ANTHROPIC_API_KEY and drop --fake-llm / FAKE_LLM to see real output."
+    "[STUB-LLM] This narrative was produced by the local development stub, not a "
+    "real model call. Set ANTHROPIC_API_KEY and drop --stub-llm / STUB_LLM to see real output."
 )
 
 # Deliberately the minimum of the valid 1-100 range — implausible for a real narrative,
@@ -29,13 +29,13 @@ CANNED_NARRATIVE = (
 CANNED_SENTIMENT = 1
 
 
-class FakeAnthropicClient:
+class StubAnthropicClient:
     """Drop-in replacement for `anthropic.Anthropic()` that never leaves the machine."""
 
     def __init__(self) -> None:
         self.messages = self
 
-    def create(self, *, model: str = "fake-llm", **_kwargs: object) -> anthropic.types.Message:
+    def create(self, *, model: str = "stub-llm", **_kwargs: object) -> anthropic.types.Message:
         payload = {
             "narrative": CANNED_NARRATIVE,
             "sentiment": CANNED_SENTIMENT,
@@ -45,7 +45,7 @@ class FakeAnthropicClient:
             "suggested_next_action": None,
         }
         return anthropic.types.Message(
-            id="msg_fake_llm",
+            id="msg_stub_llm",
             type="message",
             role="assistant",
             model=model,

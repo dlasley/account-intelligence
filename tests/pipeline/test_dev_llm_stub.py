@@ -2,13 +2,13 @@ import json
 
 import anthropic
 
-from src.pipeline.dev_fake_llm import CANNED_NARRATIVE, CANNED_SENTIMENT, FakeAnthropicClient
+from src.pipeline.dev_llm_stub import CANNED_NARRATIVE, CANNED_SENTIMENT, StubAnthropicClient
 
 
 def test_create_returns_shape_generate_narrative_expects():
     """generate_narrative() indexes response.content[0] and requires a TextBlock instance."""
-    client = FakeAnthropicClient()
-    response = client.messages.create(model="claude-fake", max_tokens=4096, messages=[])
+    client = StubAnthropicClient()
+    response = client.messages.create(model="claude-stub", max_tokens=4096, messages=[])
 
     assert isinstance(response.content[0], anthropic.types.TextBlock)
     payload = json.loads(response.content[0].text)
@@ -21,4 +21,4 @@ def test_create_returns_shape_generate_narrative_expects():
 
 
 def test_canned_narrative_is_visibly_marked():
-    assert "FAKE-LLM" in CANNED_NARRATIVE
+    assert "STUB-LLM" in CANNED_NARRATIVE

@@ -254,10 +254,10 @@ SUPABASE_URL=<API_URL> SUPABASE_SERVICE_ROLE_KEY=<SERVICE_ROLE_KEY> \
   uv run python -m src.worker process-fixtures --scenario synthetic/seed-stage-saas
 
 SUPABASE_URL=<API_URL> SUPABASE_SERVICE_ROLE_KEY=<SERVICE_ROLE_KEY> \
-  uv run python -m src.worker generate-narratives --workspace-slug lattice-build --all --fake-llm
+  uv run python -m src.worker generate-narratives --workspace-slug lattice-build --all --stub-llm
 ```
 
-`--fake-llm` (equivalently, `FAKE_LLM=true` in the environment) swaps in a canned local stub for the Anthropic client — no `ANTHROPIC_API_KEY`, no outbound call. Every narrative it writes is prefixed `[FAKE-LLM STUB]` with a fixed low sentiment, so it can't be mistaken for real model output; drop the flag and set `ANTHROPIC_API_KEY` once you want to see the actual product. Never point `scripts/audit_narratives.py` at this output — grading canned text produces a meaningless pass rate.
+`--stub-llm` (equivalently, `STUB_LLM=true` in the environment) swaps in a canned local stub for the Anthropic client — no `ANTHROPIC_API_KEY`, no outbound call. Every narrative it writes is prefixed `[STUB-LLM]` with a fixed low sentiment, so it can't be mistaken for real model output; drop the flag and set `ANTHROPIC_API_KEY` once you want to see the actual product. Never point `scripts/audit_narratives.py` at this output — grading canned text produces a meaningless pass rate.
 
 `supabase/seed.sql` runs automatically on `supabase start` and `supabase db reset`. It pre-creates the `lattice-build` organization and workspace with the same deterministic ID `process-fixtures` computes from the scenario's slug, so the two commands above always land on the same rows regardless of run order.
 
