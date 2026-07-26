@@ -3,6 +3,6 @@
   "name": "Acme Corp",
   "primary_domain": "acme.com",
   "additional_domains": [],
-  "vertical": "tech",
+  "vertical": "software",
   "status": "active"
 }
