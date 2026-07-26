@@ -637,7 +637,7 @@ def _serve(port: int, host: str = "0.0.0.0") -> None:
 
 
 def main(args: list[str] | None = None) -> None:
-    parser = argparse.ArgumentParser(description="Customer Success Platform worker")
+    parser = argparse.ArgumentParser(description="Account Intelligence worker")
     subparsers = parser.add_subparsers(dest="command")
 
     ingest_parser = subparsers.add_parser(
