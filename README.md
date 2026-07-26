@@ -230,8 +230,8 @@ Everything in this section runs against nothing but this checkout — no Supabas
 ```bash
 uv sync
 cd frontend && npm install && cd ..
-uv run pytest                     # 811 passed, 5 skipped
-cd frontend && npm test && cd ..  # 79 passed
+uv run pytest
+cd frontend && npm test && cd ..
 ```
 
 ### See the pipeline reason about real data (no database)
@@ -343,7 +343,7 @@ mapping.
 ### Test
 
 ```bash
-uv run pytest                          # Python tests (815 collected)
+uv run pytest                          # Python tests
 cd frontend && npm test                # Vitest
 ```
 
