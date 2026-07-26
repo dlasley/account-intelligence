@@ -16,6 +16,9 @@ export type Signal = {
 
 // Rows rendered per page of the capped render window below.
 const PAGE_SIZE = 15
+// Roughly two rendered lines at the body's type size — the point past which
+// `line-clamp-2` actually hides something.
+const BODY_PREVIEW_CHARS = 150
 
 // The design system has one brand accent, neutrals, and a health ramp — no
 // dedicated "direction" palette — so inbound borrows the health-strong tone,
@@ -98,36 +101,49 @@ export default function SignalsTimeline({ signals }: { signals: Signal[] }) {
           <div className="flex flex-col gap-2 p-3">
             {visible.map((s) => {
               const isExpanded = expanded.has(s.id)
-              const preview = s.body.split('\n').slice(0, 2).join(' ')
+              // Bodies short enough to render whole get no disclosure control —
+              // a toggle that swaps identical text reads as broken.
+              const isTruncatable = s.body.length > BODY_PREVIEW_CHARS || s.body.includes('\n')
+              // min-w-0 lets the flex children shrink below their content width;
+              // without it the subject's `truncate` cannot engage and long
+              // subjects widen the row instead of ellipsing.
+              const summary = (
+                <>
+                  <DirectionIcon direction={s.direction} />
+                  <span className="shrink-0 font-mono text-xs text-muted-foreground">
+                    {relativeTime(s.occurred_at)}
+                  </span>
+                  <span className="shrink-0 rounded bg-muted px-1.5 py-0.5 font-mono text-xs text-muted-foreground">
+                    {s.channel}
+                  </span>
+                  <span className="min-w-0 truncate font-medium">{s.subject ?? '(no subject)'}</span>
+                </>
+              )
               return (
                 <div
                   key={s.id}
-                  className="rounded-lg border border-border p-3 hover:bg-muted/50"
+                  className={`rounded-lg border border-border p-3 ${isTruncatable ? 'hover:bg-muted/50' : ''}`}
                 >
-                  {/* min-w-0 lets the flex children shrink below their content
-                      width; without it the subject's `truncate` cannot engage
-                      and long subjects widen the row instead of ellipsing. */}
-                  <button
-                    type="button"
-                    onClick={() => toggleExpand(s.id)}
-                    aria-expanded={isExpanded}
-                    aria-controls={`signal-body-${s.id}`}
-                    className="flex w-full min-w-0 cursor-pointer items-center gap-2 text-left text-sm"
-                  >
-                    <DirectionIcon direction={s.direction} />
-                    <span className="shrink-0 font-mono text-xs text-muted-foreground">
-                      {relativeTime(s.occurred_at)}
-                    </span>
-                    <span className="shrink-0 rounded bg-muted px-1.5 py-0.5 font-mono text-xs text-muted-foreground">
-                      {s.channel}
-                    </span>
-                    <span className="min-w-0 truncate font-medium">{s.subject ?? '(no subject)'}</span>
-                  </button>
+                  {isTruncatable ? (
+                    <button
+                      type="button"
+                      onClick={() => toggleExpand(s.id)}
+                      aria-expanded={isExpanded}
+                      aria-controls={`signal-body-${s.id}`}
+                      className="flex w-full min-w-0 cursor-pointer items-center gap-2 text-left text-sm"
+                    >
+                      {summary}
+                    </button>
+                  ) : (
+                    <div className="flex min-w-0 items-center gap-2 text-sm">{summary}</div>
+                  )}
                   <p
                     id={`signal-body-${s.id}`}
-                    className={`mt-1 text-xs break-words text-muted-foreground ${isExpanded ? '' : 'line-clamp-2'}`}
+                    className={`mt-1 text-xs break-words text-muted-foreground ${
+                      isTruncatable && !isExpanded ? 'line-clamp-2' : ''
+                    }`}
                   >
-                    {isExpanded ? s.body : preview}
+                    {s.body}
                   </p>
                 </div>
               )

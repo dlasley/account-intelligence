@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { scoreBadge } from '@/lib/utils'
+import { scoreBadge, verticalLabel } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import NarrativeSection from '@/components/NarrativeSection'
@@ -132,7 +132,7 @@ export default async function AdminAccountDetailPage({
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-1 flex-wrap">
           <h1 className="text-2xl font-bold">{account.name}</h1>
-          {account.vertical && <Badge variant="secondary">{account.vertical}</Badge>}
+          {account.vertical && <Badge variant="secondary">{verticalLabel(account.vertical)}</Badge>}
           {account.overall_health_score != null && (
             <Badge className={healthBadge.color}>
               Health {account.overall_health_score} {healthBadge.label}

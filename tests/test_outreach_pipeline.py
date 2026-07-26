@@ -3,7 +3,8 @@
 from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
-from src.pipeline.outreach import recommend_template
+from src.domain.contact import Contact
+from src.pipeline.outreach import _salutation_name, recommend_template
 
 
 def _make_account(*, overall_health_score: int | None = None):
@@ -125,3 +126,34 @@ def test_recommend_none_health_skips_score_rules():
     account = _make_account(overall_health_score=None)
     template_id, _ = recommend_template(account, None, [])
     assert template_id in ("check_in.casual", "check_in.reengagement")
+
+
+def _make_contact(display_name: str | None, email: str = "priya@formationbio.com"):
+    return Contact(
+        id=uuid4(),
+        workspace_id=uuid4(),
+        account_id=uuid4(),
+        email=email,
+        display_name=display_name,
+        is_internal=False,
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC),
+        deleted_at=None,
+    )
+
+
+def test_salutation_uses_given_name_only():
+    """Templates greet with the given name; the frontend derives the same form
+    when swapping a greeting to a new recipient, so the two must agree."""
+    assert _salutation_name(_make_contact("Priya Sharma")) == "Priya"
+
+
+def test_salutation_handles_single_word_and_extra_whitespace():
+    assert _salutation_name(_make_contact("Cher")) == "Cher"
+    assert _salutation_name(_make_contact("  Priya   Sharma  ")) == "Priya"
+
+
+def test_salutation_falls_back_to_email_without_display_name():
+    """An email carries no given name to extract."""
+    contact = _make_contact(None, email="bob@formationbio.com")
+    assert _salutation_name(contact) == "bob@formationbio.com"

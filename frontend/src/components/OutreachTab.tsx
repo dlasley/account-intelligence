@@ -52,10 +52,16 @@ type Status = 'idle' | 'loading' | 'sending' | 'sent' | 'error'
 
 const CONTACT_NAME_SLOT = '[Contact Name]'
 
+// Salutations use the given name only — "Hi Avery," not "Hi Avery Davis,".
+// Contacts with no display name fall back to the email, which has no given name
+// to extract. Both the old and new name in a greeting swap resolve through here,
+// so the swap continues to match whatever form is in the text.
 function nameForContact(
   c: { display_name: string | null; email: string } | undefined | null,
 ): string {
-  return c ? c.display_name || c.email : CONTACT_NAME_SLOT
+  if (!c) return CONTACT_NAME_SLOT
+  if (!c.display_name) return c.email
+  return c.display_name.trim().split(/\s+/)[0]
 }
 
 function nameForContactId(contacts: Props['contacts'], id: string | null): string {

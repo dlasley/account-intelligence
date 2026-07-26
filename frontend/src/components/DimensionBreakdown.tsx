@@ -67,14 +67,16 @@ export default function DimensionBreakdown({
     dimensionConfigs.map((c) => [c.id, c])
   )
 
-  // previous_score sourced from current top score for the csm_score dimension
-  const currentCsmScore =
-    dimensionScores.find(
-      (s) => configsById.get(s.dimension_id)?.dimension_type === 'csm_score'
-    )?.score ?? null
+  const currentCsm = dimensionScores.find(
+    (s) => configsById.get(s.dimension_id)?.dimension_type === 'csm_score'
+  )
+  // Sent as previous_score so the RPC can supersede the standing row.
+  const currentCsmScore = currentCsm?.score ?? null
   const router = useRouter()
-  const [csmScore, setCsmScore] = useState('')
-  const [csmRationale, setCsmRationale] = useState('')
+  // Seeded from the standing score so an update is an edit of what's there
+  // rather than re-entry from blank.
+  const [csmScore, setCsmScore] = useState(currentCsmScore === null ? '' : String(currentCsmScore))
+  const [csmRationale, setCsmRationale] = useState(currentCsm?.rationale ?? '')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -238,23 +240,32 @@ export default function DimensionBreakdown({
         <div className="rounded-lg border border-border bg-muted/30 p-4">
           <h3 className="mb-2 text-sm font-semibold">Update CSM Score</h3>
           <div className="flex flex-wrap items-start gap-2">
+            {/* `inputMode` gets the numeric keypad on mobile without the
+                desktop stepper arrows a 1–100 range makes unusable. */}
             <Input
-              type="number"
-              min={1}
-              max={100}
+              id="csm-score"
+              type="text"
+              inputMode="numeric"
+              aria-label="CSM score, 1 to 100"
               placeholder="Score (1–100)"
               value={csmScore}
               onChange={(e) => setCsmScore(e.target.value)}
               className="w-28"
             />
             <Input
+              id="csm-rationale"
               type="text"
-              placeholder="Rationale (optional)"
+              aria-label="Rationale for the CSM score"
+              placeholder="Rationale"
               value={csmRationale}
               onChange={(e) => setCsmRationale(e.target.value)}
               className="min-w-40 flex-1"
             />
-            <Button onClick={handleSaveCsmScore} disabled={saving || !csmScore} size="sm">
+            <Button
+              onClick={handleSaveCsmScore}
+              disabled={saving || !csmScore || !csmRationale.trim()}
+              size="sm"
+            >
               {saving ? 'Saving…' : 'Save'}
             </Button>
           </div>

@@ -106,6 +106,7 @@ describe('DimensionBreakdown', () => {
     fireEvent.change(screen.getByPlaceholderText('Score (1–100)'), {
       target: { value: '50.5' },
     })
+    fireEvent.change(screen.getByPlaceholderText('Rationale'), { target: { value: 'Context.' } })
     fireEvent.click(screen.getByText('Save'))
     expect(screen.getByText('Score must be an integer between 1 and 100.')).toBeTruthy()
     expect(mockRpc).not.toHaveBeenCalled()
@@ -118,6 +119,7 @@ describe('DimensionBreakdown', () => {
     fireEvent.change(screen.getByPlaceholderText('Score (1–100)'), {
       target: { value: '0' },
     })
+    fireEvent.change(screen.getByPlaceholderText('Rationale'), { target: { value: 'Context.' } })
     fireEvent.click(screen.getByText('Save'))
     expect(screen.getByText('Score must be an integer between 1 and 100.')).toBeTruthy()
   })
@@ -130,12 +132,13 @@ describe('DimensionBreakdown', () => {
     fireEvent.change(screen.getByPlaceholderText('Score (1–100)'), {
       target: { value: '85' },
     })
+    fireEvent.change(screen.getByPlaceholderText('Rationale'), { target: { value: 'Context.' } })
     fireEvent.click(screen.getByText('Save'))
     await vi.waitFor(() => {
       expect(mockRpc).toHaveBeenCalledWith('set_csm_score', {
         p_account_id: accountId,
         p_score: 85,
-        p_rationale: null,
+        p_rationale: 'Context.',
       })
       expect(mockRefresh).toHaveBeenCalled()
     })
@@ -151,6 +154,7 @@ describe('DimensionBreakdown', () => {
     fireEvent.change(screen.getByPlaceholderText('Score (1–100)'), {
       target: { value: '85' },
     })
+    fireEvent.change(screen.getByPlaceholderText('Rationale'), { target: { value: 'Context.' } })
     fireEvent.click(screen.getByText('Save'))
     await vi.waitFor(() => {
       expect(track).toHaveBeenCalledWith(
@@ -171,6 +175,7 @@ describe('DimensionBreakdown', () => {
     fireEvent.change(screen.getByPlaceholderText('Score (1–100)'), {
       target: { value: '70' },
     })
+    fireEvent.change(screen.getByPlaceholderText('Rationale'), { target: { value: 'Context.' } })
     fireEvent.click(screen.getByText('Save'))
     await vi.waitFor(() => {
       expect(screen.getByText('Permission denied')).toBeTruthy()

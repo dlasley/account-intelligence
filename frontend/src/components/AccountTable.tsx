@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { ArrowDown, ArrowUp, ArrowUpDown, ChevronDown, Search } from 'lucide-react'
 import { AccountListRow } from '@/lib/types'
-import { scoreBadge, relativeTime, HEALTH_BAND_LABELS } from '@/lib/utils'
+import { scoreBadge, relativeTime, verticalLabel, HEALTH_BAND_LABELS } from '@/lib/utils'
 import AuditBadge from '@/components/AuditBadge'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -13,13 +13,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 
 type SortKey = 'name' | 'vertical' | 'health' | 'last_signal'
 type SortDir = 'asc' | 'desc'
-
-const SORT_OPTIONS: { value: SortKey; label: string }[] = [
-  { value: 'health', label: 'Health' },
-  { value: 'name', label: 'Name' },
-  { value: 'vertical', label: 'Vertical' },
-  { value: 'last_signal', label: 'Last signal' },
-]
 
 // Ascending reads naturally for text (A→Z); descending reads naturally for
 // health and recency (best/newest first) — this is the direction a header
@@ -153,13 +146,6 @@ export default function AccountTable({
     }
   }
 
-  const handleSortKeyChange = (value: string) => {
-    const key = value as SortKey
-    if (key === sortKey) return
-    setSortKey(key)
-    setSortDir(DEFAULT_DIR[key])
-  }
-
   const handleClearFilters = () => {
     setSearch('')
     setVerticalFilter('all')
@@ -200,7 +186,7 @@ export default function AccountTable({
           label="Filter by vertical"
           value={verticalFilter}
           onChange={setVerticalFilter}
-          options={[{ value: 'all', label: 'All verticals' }, ...verticalOptions.map((v) => ({ value: v, label: v }))]}
+          options={[{ value: 'all', label: 'All verticals' }, ...verticalOptions.map((v) => ({ value: v, label: verticalLabel(v) }))]}
         />
         <FilterSelect
           label="Filter by health"
@@ -211,19 +197,6 @@ export default function AccountTable({
             ...HEALTH_BAND_LABELS.map((label) => ({ value: label, label })),
           ]}
         />
-        <div className="flex items-center gap-1.5">
-          <span className="text-sm text-muted-foreground">Sort:</span>
-          <FilterSelect label="Sort by" value={sortKey} onChange={handleSortKeyChange} options={SORT_OPTIONS} />
-          <Button
-            type="button"
-            variant="outline"
-            size="icon-sm"
-            aria-label={`Sort direction ${sortDir === 'asc' ? 'ascending' : 'descending'}, click to reverse`}
-            onClick={() => setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))}
-          >
-            {sortDir === 'asc' ? <ArrowUp className="size-3.5" /> : <ArrowDown className="size-3.5" />}
-          </Button>
-        </div>
       </div>
 
       {sorted.length === 0 ? (
@@ -266,7 +239,7 @@ export default function AccountTable({
                   </TableCell>
                   <TableCell className="hidden sm:table-cell">
                     {a.vertical ? (
-                      <Badge variant="secondary">{a.vertical}</Badge>
+                      <Badge variant="secondary">{verticalLabel(a.vertical)}</Badge>
                     ) : (
                       <span className="text-muted-foreground">—</span>
                     )}

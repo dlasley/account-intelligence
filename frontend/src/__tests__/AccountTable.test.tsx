@@ -122,12 +122,6 @@ describe('AccountTable', () => {
     expect(rowNames()).toEqual(['Thornfield AI', 'Novagen Bio', 'Formation Bio', 'Crucible'])
   })
 
-  it('the sort Select and the column headers share one sort state', () => {
-    render(<AccountTable accounts={accounts} />)
-    fireEvent.change(screen.getByLabelText('Sort by'), { target: { value: 'name' } })
-    expect(rowNames()).toEqual(['Crucible', 'Formation Bio', 'Novagen Bio', 'Thornfield AI'])
-  })
-
   it('shows the no-results state when filters exclude every row, with a working clear action', () => {
     render(<AccountTable accounts={accounts} />)
     fireEvent.change(screen.getByLabelText('Search accounts'), { target: { value: 'nonexistent-co' } })

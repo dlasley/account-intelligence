@@ -48,6 +48,15 @@ export function scoreBarColor(score: number | null): string {
  * filter UIs without duplicating the band list. */
 export const HEALTH_BAND_LABELS = [...HEALTH_BANDS.map((b) => b.label), UNKNOWN_BAND.label] as const
 
+/** Renders a snake_case vertical as title case — `public_sector` → `Public Sector`. */
+export function verticalLabel(vertical: string | null): string {
+  if (!vertical) return '—'
+  return vertical
+    .split('_')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+}
+
 export function relativeTime(isoString: string | null): string {
   if (!isoString) return '—'
   const diff = Date.now() - new Date(isoString).getTime()

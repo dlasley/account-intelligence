@@ -31,7 +31,7 @@ const CONTEXT_RESPONSE = {
   draft_id: 'draft-1',
   contact_id: 'contact-1',
   subject: 'Checking in — Formation Bio',
-  body: 'Hi Priya Sharma,\n\n[Reference something specific.]',
+  body: 'Hi Priya,\n\n[Reference something specific.]',
   recommended_template_id: 'check_in.casual',
   recommendation_rationale: 'No specific signal detected — default check-in suggested.',
   templates: [
@@ -40,14 +40,14 @@ const CONTEXT_RESPONSE = {
       intent: 'check_in',
       name: 'Casual Check-in',
       subject: 'Checking in — Formation Bio',
-      body: 'Hi Priya Sharma,\n\n[Reference something specific.]',
+      body: 'Hi Priya,\n\n[Reference something specific.]',
     },
     {
       id: 'check_in.reengagement',
       intent: 'check_in',
       name: 'Re-engagement',
       subject: 'Following up — Formation Bio',
-      body: 'Hi Priya Sharma,\n\n[Add context.]',
+      body: 'Hi Priya,\n\n[Add context.]',
     },
   ],
   signals: [
@@ -191,9 +191,9 @@ describe('OutreachTab - send state machine', () => {
     render(
       <OutreachTab accountSlug="formation-bio" accountId="acc-1" contacts={CONTACTS} overallHealthScore={75} />
     )
-    await waitFor(() => expect(bodyTextarea().value).toContain('Priya Sharma'))
+    await waitFor(() => expect(bodyTextarea().value).toContain('Priya'))
     // Clear the unfilled [placeholder] slot so Send isn't disabled.
-    fireEvent.change(bodyTextarea(), { target: { value: 'Hi Priya Sharma,\n\nJust checking in.' } })
+    fireEvent.change(bodyTextarea(), { target: { value: 'Hi Priya,\n\nJust checking in.' } })
 
     const sendButton = screen.getByText('Send').closest('button')!
     fireEvent.click(sendButton)
@@ -222,8 +222,8 @@ describe('OutreachTab - send state machine', () => {
     render(
       <OutreachTab accountSlug="formation-bio" accountId="acc-1" contacts={CONTACTS} overallHealthScore={75} />
     )
-    await waitFor(() => expect(bodyTextarea().value).toContain('Priya Sharma'))
-    fireEvent.change(bodyTextarea(), { target: { value: 'Hi Priya Sharma,\n\nJust checking in.' } })
+    await waitFor(() => expect(bodyTextarea().value).toContain('Priya'))
+    fireEvent.change(bodyTextarea(), { target: { value: 'Hi Priya,\n\nJust checking in.' } })
 
     fireEvent.click(screen.getByText('Send').closest('button')!)
 
@@ -238,7 +238,7 @@ describe('OutreachTab - greeting name sync', () => {
     render(
       <OutreachTab accountSlug="formation-bio" accountId="acc-1" contacts={CONTACTS} overallHealthScore={75} />
     )
-    await waitFor(() => expect(bodyTextarea().value).toContain('Priya Sharma'))
+    await waitFor(() => expect(bodyTextarea().value).toContain('Priya'))
 
     fireEvent.change(contactSelect(), { target: { value: 'contact-2' } })
 
@@ -258,7 +258,7 @@ describe('OutreachTab - greeting name sync', () => {
     render(
       <OutreachTab accountSlug="formation-bio" accountId="acc-1" contacts={CONTACTS} overallHealthScore={75} />
     )
-    await waitFor(() => expect(bodyTextarea().value).toContain('Priya Sharma'))
+    await waitFor(() => expect(bodyTextarea().value).toContain('Priya'))
 
     fireEvent.change(bodyTextarea(), { target: { value: 'Hey there,\n\nJust checking in.' } })
     fireEvent.change(contactSelect(), { target: { value: 'contact-2' } })
@@ -276,11 +276,11 @@ describe('OutreachTab - greeting name sync', () => {
     render(
       <OutreachTab accountSlug="formation-bio" accountId="acc-1" contacts={CONTACTS} overallHealthScore={75} />
     )
-    await waitFor(() => expect(bodyTextarea().value).toContain('Priya Sharma'))
+    await waitFor(() => expect(bodyTextarea().value).toContain('Priya'))
 
     fireEvent.change(bodyTextarea(), {
       target: {
-        value: 'Hi Priya Sharma,\n\nI wanted to follow up on your custom onboarding needs.',
+        value: 'Hi Priya,\n\nI wanted to follow up on your custom onboarding needs.',
       },
     })
     fireEvent.change(contactSelect(), { target: { value: 'contact-2' } })
@@ -296,7 +296,7 @@ describe('OutreachTab - greeting name sync', () => {
     render(
       <OutreachTab accountSlug="formation-bio" accountId="acc-1" contacts={CONTACTS} overallHealthScore={75} />
     )
-    await waitFor(() => expect(bodyTextarea().value).toContain('Priya Sharma'))
+    await waitFor(() => expect(bodyTextarea().value).toContain('Priya'))
 
     fireEvent.change(contactSelect(), { target: { value: 'contact-2' } })
     await waitFor(() => expect(bodyTextarea().value).toContain('bob@formationbio.com'))
@@ -305,14 +305,14 @@ describe('OutreachTab - greeting name sync', () => {
     fireEvent.click(reengageRadio)
 
     await waitFor(() => expect(bodyTextarea().value).toBe('Hi bob@formationbio.com,\n\n[Add context.]'))
-    expect(bodyTextarea().value).not.toContain('Priya Sharma')
+    expect(bodyTextarea().value).not.toContain('Priya')
   })
 
   it('null-hop: A → No recipient → C shows C name in the greeting', async () => {
     render(
       <OutreachTab accountSlug="formation-bio" accountId="acc-1" contacts={CONTACTS} overallHealthScore={75} />
     )
-    await waitFor(() => expect(bodyTextarea().value).toContain('Priya Sharma'))
+    await waitFor(() => expect(bodyTextarea().value).toContain('Priya'))
 
     fireEvent.change(contactSelect(), { target: { value: '' } })
     await waitFor(() => expect(contactSelect().value).toBe(''))
@@ -341,14 +341,14 @@ describe('OutreachTab - greeting name sync', () => {
         ok: true,
         json: async () => ({
           ...CONTEXT_RESPONSE,
-          body: 'Hi Priya Sharma,\n\nAs Priya Sharma mentioned last week, we should follow up.',
+          body: 'Hi Priya,\n\nAs Priya Sharma mentioned last week, we should follow up.',
         }),
       })
     )
     render(
       <OutreachTab accountSlug="formation-bio" accountId="acc-1" contacts={CONTACTS} overallHealthScore={75} />
     )
-    await waitFor(() => expect(bodyTextarea().value).toContain('Priya Sharma'))
+    await waitFor(() => expect(bodyTextarea().value).toContain('Priya'))
 
     fireEvent.change(contactSelect(), { target: { value: 'contact-2' } })
 
@@ -363,7 +363,7 @@ describe('OutreachTab - greeting name sync', () => {
     render(
       <OutreachTab accountSlug="formation-bio" accountId="acc-1" contacts={CONTACTS} overallHealthScore={75} />
     )
-    await waitFor(() => expect(bodyTextarea().value).toContain('Priya Sharma'))
+    await waitFor(() => expect(bodyTextarea().value).toContain('Priya'))
 
     // First hop bakes the '+'-bearing email into the greeting as the "current" name.
     fireEvent.change(contactSelect(), { target: { value: 'contact-3' } })
@@ -395,7 +395,7 @@ describe('OutreachTab - greeting name sync', () => {
     render(
       <OutreachTab accountSlug="formation-bio" accountId="acc-1" contacts={CONTACTS} overallHealthScore={75} />
     )
-    await waitFor(() => expect(bodyTextarea().value).toContain('Priya Sharma'))
+    await waitFor(() => expect(bodyTextarea().value).toContain('Priya'))
 
     expect(contactSelect().value).toBe('contact-1')
   })
@@ -404,7 +404,7 @@ describe('OutreachTab - greeting name sync', () => {
     render(
       <OutreachTab accountSlug="formation-bio" accountId="acc-1" contacts={CONTACTS} overallHealthScore={75} />
     )
-    await waitFor(() => expect(bodyTextarea().value).toContain('Priya Sharma'))
+    await waitFor(() => expect(bodyTextarea().value).toContain('Priya'))
 
     fireEvent.change(contactSelect(), { target: { value: '' } })
     await waitFor(() => expect(contactSelect().value).toBe(''))
