@@ -551,6 +551,22 @@ Three sign-in modes on `/login`: Google OAuth (`supabase.auth.signInWithOAuth({ 
 
 For RLS to return data, a user must have a row in the `users` table with the correct `workspace_id`. New users are not provisioned automatically — a workspace admin inserts them manually or via a future provisioning flow.
 
+### Super-User Browsing
+
+A flagged super-user (`users.is_super_user`) can browse any workspace's data through a dedicated `/admin` surface, for support and debugging without needing direct database access. Three routes, three RPCs:
+
+| Route | RPC | Returns |
+|---|---|---|
+| `/admin` | `list_all_workspaces_with_metadata()` | every workspace, with account/narrative/signal freshness counts |
+| `/admin/workspaces/[slug]/accounts` | `list_accounts_for_workspace(p_workspace_slug)` | that workspace's account list — the same return shape as `get_account_list()` |
+| `/admin/workspaces/[slug]/accounts/[accountSlug]` | `get_account_detail_for_workspace(p_workspace_slug, p_account_slug)` | one JSON blob: account + narrative + audit run + signals + contacts + dimension scores/configs |
+
+All three RPCs are `SECURITY DEFINER`, so they bypass RLS on purpose — that's the only way to read across workspaces at all. Each re-checks `is_super_user` in its own function body (the `COALESCE(..., false)`-wrapped subquery pattern from the SECURITY DEFINER discipline in CLAUDE.md, guarding against the NULL-`auth.uid()` fall-through for an anonymous caller), and `EXECUTE` is granted to `authenticated` and revoked from `anon`. Next.js middleware (`frontend/src/middleware.ts`) adds a second, earlier gate: any request under `/admin` triggers an `is_super_user` lookup before the page — and therefore the RPC — ever runs, redirecting non-super-users to `/accounts`.
+
+The admin surface is read-only. None of the three RPCs writes anything; a super-user cannot mutate another workspace's data through `/admin`. Every other write in the system still goes through the single-mutation-surface RPC pattern (migration 000027), and `authenticated` remains SELECT-only on every table regardless of `is_super_user`.
+
+This replaced an earlier design (migration 000025) where a super-user "impersonated" a workspace by temporarily overwriting their own `workspace_id`, so ordinary workspace-scoped queries resolved against the target workspace. Migration 000026 dropped that in favor of the direct RLS-bypass RPCs above — a super-user's own `workspace_id` never changes; the RPCs read a target workspace's data through explicit cross-workspace functions instead.
+
 ### Worker-Side Outreach Auth
 
 `POST /outreach/{account_slug}/context` and `POST /outreach/send/{draft_id}` require a Supabase JWT (`Authorization: Bearer <jwt>`). The worker decodes the JWT to extract `user_id`, looks up the user's `workspace_id` from the `users` table, and uses that to scope all DB reads and writes. The frontend passes its Supabase session token directly.
