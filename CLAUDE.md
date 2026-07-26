@@ -132,6 +132,7 @@ When a change produces or modifies LLM output (narrative generation, audit harne
 3. **Signal density is part of the prompt's input** — a prompt that passes at one corpus density is untested at another; audit at the new density before shipping.
 4. **Cheapest-validation-first** — the cheapest invalidation test for an LLM-output assumption (usually a single audit run at the assumed density) runs before downstream work.
 5. **Validate the validator** — an audit run producing a mass-failure signal gets a sanity check against a known-good baseline before it drives a decision.
+6. **A single audit verdict is not stable for a borderline narrative.** Back-to-back runs over identical data have returned different verdicts for the same narrative. Re-audit a failure (`--narrative-id <id> --dry-run`, ~$0.006) before it drives a decision or blocks a merge. Thin-corpus narratives flap most — they sit closest to the coverage threshold, whose hard gate turns on whether sparse evidence was acknowledged. Read the gate outcome from the run output, never from the shell exit code, which a pipe will mask.
 
 ## Design docs
 
