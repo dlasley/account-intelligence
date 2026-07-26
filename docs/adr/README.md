@@ -4,6 +4,8 @@ A curated, public subset of the design decisions behind this platform. Each ADR 
 
 Full internal design history (all ADRs, phase handoffs, postmortems) is maintained privately; the records surfaced here are the ones with the clearest standalone value for a reader trying to understand the engineering approach.
 
+Other docs in this repo (architecture.md, CLAUDE.md, migration comments) cite ADR numbers that don't appear below — those are the unpublished internal ones. An ADR number without a link here has no public write-up; treat the surrounding prose as the full account.
+
 ## Records
 
 - **[ADR-023](adr-023-prompt-variant-flag-gating.md) — Prompt-variant gating via a sticky feature flag.** Why prompt *content* is made runtime-selectable per account behind a feature flag, and the governance rule that a variant must clear the existing quality bar before it ever reaches live traffic.
