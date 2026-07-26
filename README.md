@@ -213,6 +213,9 @@ account-intelligence/
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Same value as `SUPABASE_URL` |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase anon key (safe in client bundle; RLS controls access) |
 | `NEXT_PUBLIC_WORKER_URL` | Yes | Cloud Run service URL. Use `http://localhost:8080` locally. |
+| `NEXT_PUBLIC_POSTHOG_ENABLED` | No | Defaults to `false`; analytics no-op without it |
+| `NEXT_PUBLIC_POSTHOG_KEY` | No | Required only when analytics are enabled |
+| `NEXT_PUBLIC_POSTHOG_HOST` | No | PostHog ingestion host |
 
 Never add `SUPABASE_SERVICE_ROLE_KEY` or `ANTHROPIC_API_KEY` to Vercel — those belong on Cloud Run only.
 
