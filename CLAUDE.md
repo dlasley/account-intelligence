@@ -59,12 +59,13 @@ Full data-flow (inbound email → routing → narrative generation → audit) in
 Copy [.env.example](.env.example) to `.env`. Never commit `.env` (gitignored; settings deny-list blocks edits).
 
 - **LLM providers**: `ANTHROPIC_API_KEY` (narrative generation; outreach uses templates, no LLM); `OPENAI_API_KEY` (audit harness — GPT-5-mini as cross-vendor auditor).
-- **Supabase (worker)**: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ACCESS_TOKEN` (MCP).
-- **Supabase (frontend)**: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+- **Supabase (worker)**: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ACCESS_TOKEN` (MCP), `SUPABASE_PROJECT_REF` (MCP, substituted into `.mcp.json` URLs).
+- **Supabase (frontend)**: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_WORKER_URL` (Cloud Run URL the frontend calls for outreach context).
 - **Inbound email**: `INBOUND_DOMAIN` (public-repo files use `signal.example.com` as the RFC-2606 placeholder).
-- **Outreach + API**: `SENDGRID_API_KEY`, `CORS_ORIGINS`, `WEBHOOK_SECRET`, `SCHEDULER_SECRET`.
-- **Integrations**: `INTEGRATION_ENCRYPTION_KEY` (required — encrypts Plain/Pylon/Granola credentials, ADR-020).
-- **Analytics**: `POSTHOG_API_KEY`, `POSTHOG_HOST`, `POSTHOG_ENABLED`.
+- **Outreach + API**: `SENDGRID_API_KEY`, `CORS_ORIGINS`, `WEBHOOK_SECRET`, `SCHEDULER_SECRET`, `FASTAPI_DEBUG` (enables the `/docs` UI locally), `LOG_LEVEL` (defaults `WARNING`).
+- **Integrations**: `INTEGRATION_ENCRYPTION_KEY` (encrypts Plain/Pylon/Granola credentials, ADR-020; read lazily per-request/per-poll, so the worker boots without it if no structured integrations are configured).
+- **Analytics (worker)**: `POSTHOG_API_KEY`, `POSTHOG_HOST`, `POSTHOG_ENABLED`, `POSTHOG_LLM_OBSERVABILITY_ENABLED`, `DEPLOY_ENV`, `APP_ENV`.
+- **Analytics (frontend)**: `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST`, `NEXT_PUBLIC_POSTHOG_ENABLED`.
 
 ## Tooling Notes
 
