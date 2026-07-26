@@ -71,7 +71,7 @@ See [docs/architecture.md](docs/architecture.md) for pipeline internals, health 
 
 **No configuration required before value.** Accounts and contacts are auto-discovered from inbound email domains. The first email to the inbound address creates the account and contact; the first narrative generates without any setup step.
 
-**Deterministic health scoring, not LLM-decided.** Email engagement health is a pure function of signal count, recency window, and contact diversity — scaled by a per-account `frequency_multiplier`. A product-usage dimension, scored the same deterministic way from telemetry events, carries equal weight alongside email engagement. The LLM narrates; it does not score. Sentiment is extracted from the narrative as an integer (1-100) and wired as a separate health dimension.
+**Deterministic health scoring, not LLM-decided.** Email engagement health is a pure function of signal count, recency window, and contact diversity — scaled by a per-account `frequency_multiplier`. A product-usage dimension, scored the same deterministic way from telemetry events, carries equal weight alongside email engagement. The LLM narrates; it does not score. Sentiment is extracted from the narrative as an integer (1-100) and wired as a separate health dimension. A fourth dimension, CSM score, is set directly by a human via the `set_csm_score` RPC rather than computed from any signal. Overall health is a weighted average across whichever dimensions currently have an active score — a dimension with none simply drops out of the average, and the remaining weights renormalize rather than treating the missing dimension as zero.
 
 **Vendor-neutral analytics wrapper.** Both the worker and frontend emit product-analytics and LLM-observability events through a single internal interface rather than importing the PostHog SDK directly at each call site; swapping analytics providers means rewriting the wrapper body, not touching call sites.
 
@@ -83,11 +83,15 @@ See [docs/architecture.md](docs/architecture.md) for pipeline internals, health 
 
 **Webhook security tradeoff.** SendGrid Inbound Parse does not support custom request headers. The webhook secret is passed as a `?token=` query parameter, which appears in Cloud Run request logs (IAM-access-controlled). This is a documented accepted tradeoff. See [docs/architecture.md](docs/architecture.md) for the full decision.
 
+**Structured signals extend beyond email and telemetry, unvalidated against live vendor traffic.** Plain and Pylon ticket webhooks (push) and Granola meeting notes (poll) route through the same three-way contact-linkage logic as product telemetry, sharing one normalizer. The adapters are built to each vendor's documented webhook/API shape; none has been exercised against real vendor traffic yet, so treat the parsing logic as unverified until a live account confirms it.
+
+**Super-user browsing bypasses RLS by explicit design, not oversight.** A small `/admin` surface (three routes: workspace list, per-workspace account list, per-account detail) lets a flagged super-user (`users.is_super_user`) browse any workspace's data for support and debugging. Access is checked twice: Next.js middleware blocks `/admin/*` for non-super-users before any query runs, and each of the three SECURITY DEFINER RPCs it calls re-checks `is_super_user` inside the function body before bypassing RLS. `authenticated` stays SELECT-only everywhere else, and the admin surface itself is read-only — none of its RPCs write anything. See [docs/architecture.md](docs/architecture.md) for the route/RPC detail.
+
 ---
 
 ## Data Model
 
-Six entities, all workspace-scoped:
+Seven entities, all workspace-scoped:
 
 ```text
 organization
@@ -114,26 +118,36 @@ account-intelligence/
 │   ├── pipeline/                 # Signal processing and narrative generation
 │   │   ├── router.py             # Pure function: 6-stage routing cascade
 │   │   ├── normalizer.py         # Contact upsert + signal insert
+│   │   ├── _contact_factory.py   # Shared contact-creation helper used by normalizer + product_event
 │   │   ├── confidence.py         # Engagement health score (deterministic)
 │   │   ├── generator.py          # Claude API call + prompt caching + health scoring
 │   │   ├── health.py             # Weighted dimension average (pure function)
 │   │   ├── outreach.py           # Template loading, recommendation, signal panel
 │   │   ├── product_event.py      # Product telemetry normalisation (3-way contact routing)
+│   │   ├── product_usage_render.py # Product-usage dimension rationale text
+│   │   ├── structured_signal.py  # Plain/Pylon/Granola normalisation (shared 3-way contact routing)
+│   │   ├── run.py                # process_event(): production entry point for email + synthetic signals
 │   │   └── scheduler.py          # Enqueue/drain narrative regen jobs
 │   ├── synthetic/                # Synthetic data generator (ADR-015)
 │   │   ├── orchestrator.py       # YAML scenario → seeded RNG → per-modality dispatch
 │   │   ├── scenario.py           # Pydantic schema (extra="forbid")
-│   │   ├── generators/           # Pure functions: email.py (5 registers × 7 topical families), product.py
+│   │   ├── generators/           # Pure functions: email.py (5 registers × 7 topical families), product.py, meeting_note.py, ticket_plain.py, ticket_pylon.py
 │   │   └── materialise.py        # Write deterministic scenario output to fixtures/synthetic/<scenario>/
+│   ├── simulator/                # Trajectory backfill: replays synthesised signals through the production pipeline per historical week
 │   ├── server/                   # FastAPI app (serve subcommand)
-│   │   └── routes/               # /inbound, /run-narratives, /run-polls, /outreach/{slug}/context, /outreach/send/{draft_id}, /event, /event.js, /signal/{kind}
+│   │   └── routes/               # /health, /inbound, /run-narratives, /run-polls, /outreach/{slug}/context, /outreach/send/{draft_id}, /event, /event.js, /signal/{kind}
 │   ├── signals/                  # SignalSource ABC + JsonFixtureSource
+│   ├── integrations/             # Plain/Pylon/Granola adapters + credential encryption (ADR-020)
+│   ├── observability/            # LLM OTel instrumentation for PostHog LLM analytics
 │   └── config/                   # Config loader (deep-merge workspace overrides on defaults)
 ├── scripts/
-│   ├── audit_narratives.py            # Cross-vendor narrative audit harness (ADR-016, OpenAI GPT-5-mini)
+│   ├── audit_narratives.py            # Cross-vendor narrative audit harness (ADR-016, OpenAI GPT-5-mini; prompt at scripts/prompts/audit-narratives.md)
 │   ├── capture_narrative_baselines.py # Phase 4c: snapshot active narratives + scores; refuses non-audit-clean
 │   ├── check_narrative_baselines.py   # Phase 4c: DB-coupled drift detector vs committed baselines
-│   └── derive_quantas_labs_baseline.py # One-shot fixture-equivalence baseline derivation
+│   ├── derive_quantas_labs_baseline.py # One-shot fixture-equivalence baseline derivation
+│   ├── reanchor_demo_data.py          # Shifts a demo workspace's signal timestamps forward so a synthetic corpus reads as current
+│   ├── simulate_history.py            # Trajectory simulator CLI (src/simulator/): backfills per-week historical narratives from a YAML spec
+│   └── validate_per_week.py           # Fast targeted per-week regression check for a handful of accounts after a prompt edit
 ├── tests/                        # pytest tests (asyncio_mode = "auto")
 │   ├── synthetic/                # Orchestrator, equivalence, audit integration, dimension distribution
 │   ├── test_invariants.py        # Hypothesis property tests
@@ -150,8 +164,8 @@ account-intelligence/
 │   └── migrations/               # 30 numbered SQL migrations (baseline + incremental, 000001–000030)
 ├── frontend/                     # Next.js 15 App Router frontend
 │   └── src/
-│       ├── app/                  # Pages: /login, /accounts, /accounts/[slug]
-│       ├── components/           # AccountTabs, NarrativeSection, OutreachTab, etc.
+│       ├── app/                  # Pages: / (redirects to /accounts), /login, /accounts, /accounts/[slug], /admin, /admin/workspaces/[slug]/accounts, /admin/workspaces/[slug]/accounts/[accountSlug]
+│       ├── components/           # AccountTabs, NarrativeSection, OutreachTab, WorkspaceTable, AccountTable, etc.
 │       └── lib/                  # Supabase browser/server clients, utils
 ├── docs/
 │   └── architecture.md           # Pipeline internals, routing cascade, health design, audit harness
@@ -173,13 +187,24 @@ account-intelligence/
 | `OPENAI_API_KEY` | No | Audit harness only (`scripts/audit_narratives.py`). Required to run the cross-model narrative audit; not used by the worker proper. |
 | `SUPABASE_URL` | Yes | Supabase project URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | Yes | Service-role key for worker writes |
+| `SUPABASE_ANON_KEY` | No | Not read by the worker itself; canonical value the frontend's `NEXT_PUBLIC_SUPABASE_ANON_KEY` mirrors |
+| `SUPABASE_ACCESS_TOKEN` | No | Supabase MCP server only; not read by the worker at runtime |
+| `SUPABASE_PROJECT_REF` | No | Supabase MCP server only, substituted into `.mcp.json` URLs; not read by the worker at runtime |
 | `WEBHOOK_SECRET` | Yes | HMAC token for SendGrid inbound validation |
-| `SCHEDULER_SECRET` | Yes | Bearer token for Cloud Scheduler auth on `/run-narratives` |
+| `SCHEDULER_SECRET` | Yes | Bearer token for Cloud Scheduler auth on `/run-narratives` and `/run-polls` |
 | `SENDGRID_API_KEY` | Yes | SendGrid Transactional API key for outreach send |
+| `INTEGRATION_ENCRYPTION_KEY` | No | Encrypts Plain/Pylon/Granola credentials (ADR-020). Read lazily per-request/per-poll, not at startup — the worker boots fine without it if no structured integrations are configured; required only once one is. |
 | `INBOUND_DOMAIN` | No | Inbound email domain (e.g. `signal.yourdomain.com`). Falls back to `defaults.json`. |
 | `CORS_ORIGINS` | No | Comma-separated allowed origins (e.g. Vercel URL + `http://localhost:3000`). Unset = no CORS headers. |
+| `FASTAPI_DEBUG` | No | Set to `true` to enable the `/docs` UI locally. |
 | `AUDIT_MAX_COST_USD` | No | Cost ceiling for one audit run (default `0.50`). |
 | `LOG_LEVEL` | No | Defaults to `WARNING`. Set `INFO` for pipeline visibility. |
+| `POSTHOG_API_KEY` | No | PostHog project API key, shared by product analytics and LLM observability. |
+| `POSTHOG_HOST` | No | Defaults to `https://us.i.posthog.com`. |
+| `POSTHOG_ENABLED` | No | Product analytics on/off. Defaults `false`. |
+| `POSTHOG_LLM_OBSERVABILITY_ENABLED` | No | LLM OTel instrumentation on/off. Defaults `true` when `POSTHOG_API_KEY` is set. |
+| `DEPLOY_ENV` | No | Injected into OTel resource attributes. Defaults `development`; set `production` in prod. |
+| `APP_ENV` | No | Product-analytics `distinct_id` prefix. Set `production` in prod. |
 
 ### Next.js Frontend (Vercel)
 
