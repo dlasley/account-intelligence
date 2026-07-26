@@ -221,6 +221,80 @@ Never add `SUPABASE_SERVICE_ROLE_KEY` or `ANTHROPIC_API_KEY` to Vercel — those
 
 ---
 
+## Run It Locally, No Accounts
+
+Everything in this section runs against nothing but this checkout — no Supabase project, no Anthropic key, no `.env` file. Skip to [Getting Started](#getting-started) below if you already have a Supabase project and an Anthropic key and want real narrative output.
+
+### Prove the code works
+
+```bash
+uv sync
+cd frontend && npm install && cd ..
+uv run pytest                     # 811 passed, 5 skipped
+cd frontend && npm test && cd ..  # 79 passed
+```
+
+### See the pipeline reason about real data (no database)
+
+```bash
+uv run python -m src.worker ingest-fixtures --scenario synthetic/seed-stage-saas
+```
+
+Loads one of the four committed synthetic scenarios (`fixtures/synthetic/`) and prints the routing preview for its inbound events. This never imports `src.db` — no database, no LLM call, no network.
+
+### Run the full worker pipeline against a local database
+
+Needs Docker and the [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started) — both free, neither needs a supabase.com account. `supabase start` runs a self-contained local stack (Postgres, Auth, PostgREST, Studio) in Docker; the 30 tracked migrations apply to it exactly as they would to a hosted project.
+
+```bash
+supabase start
+supabase status -o env   # prints API_URL, ANON_KEY, SERVICE_ROLE_KEY for the commands below
+
+SUPABASE_URL=<API_URL> SUPABASE_SERVICE_ROLE_KEY=<SERVICE_ROLE_KEY> \
+  uv run python -m src.worker process-fixtures --scenario synthetic/seed-stage-saas
+
+SUPABASE_URL=<API_URL> SUPABASE_SERVICE_ROLE_KEY=<SERVICE_ROLE_KEY> \
+  uv run python -m src.worker generate-narratives --workspace-slug lattice-build --all --fake-llm
+```
+
+`--fake-llm` (equivalently, `FAKE_LLM=true` in the environment) swaps in a canned local stub for the Anthropic client — no `ANTHROPIC_API_KEY`, no outbound call. Every narrative it writes is prefixed `[FAKE-LLM STUB]` with a fixed low sentiment, so it can't be mistaken for real model output; drop the flag and set `ANTHROPIC_API_KEY` once you want to see the actual product. Never point `scripts/audit_narratives.py` at this output — grading canned text produces a meaningless pass rate.
+
+`supabase/seed.sql` runs automatically on `supabase start` and `supabase db reset`. It pre-creates the `lattice-build` organization and workspace with the same deterministic ID `process-fixtures` computes from the scenario's slug, so the two commands above always land on the same rows regardless of run order.
+
+Inspect the result via Studio (URL printed by `supabase start`, default `http://127.0.0.1:54323`) or `psql`/`docker exec` against the printed `DB_URL`. Run `supabase stop` when done.
+
+### See it in the actual frontend
+
+The frontend reads Supabase directly, so pointing it at the local stack from the previous section shows the same data in the real UI. One manual step is required — there's no self-serve signup-to-workspace flow yet.
+
+1. Point the frontend at the local stack (`frontend/.env.local`, or exported in your shell):
+
+   ```bash
+   NEXT_PUBLIC_SUPABASE_URL=<API_URL>          # same API_URL as above
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=<ANON_KEY>    # same ANON_KEY as above — safe to expose, RLS gates data
+   ```
+
+   These are printed by `supabase status`. They're the well-known Supabase CLI local-dev defaults, identical across every default local install — not a leaked project secret.
+
+2. Create an auth user via Studio → **Authentication → Users → Add user** (email + password), then copy its UUID.
+
+3. Link it to the seeded workspace by running this in Studio's SQL editor (or `psql`), substituting the UUID from step 2:
+
+   ```sql
+   insert into public.users (id, workspace_id, email, display_name, role)
+   values (
+     '<auth-user-uuid-from-step-2>',
+     'e20008c3-2f9f-5717-a076-eb101fd99bd8',  -- lattice-build, seeded by supabase/seed.sql
+     'you@example.com',
+     'Your Name',
+     'admin'
+   );
+   ```
+
+4. `cd frontend && npm run dev`, then log in at `http://localhost:3000/login` with the email/password from step 2.
+
+---
+
 ## Getting Started
 
 ### Prerequisites
@@ -255,7 +329,7 @@ uv run python -m src.worker serve    # Python worker → http://localhost:8080
 ```bash
 # Process the seed-stage-saas scenario (12 fictional accounts for a CI/CD observability
 # startup; populates the `lattice-build` workspace per the YAML's workspace_slug).
-uv run python -m src.worker process-fixtures --scenario seed-stage-saas
+uv run python -m src.worker process-fixtures --scenario synthetic/seed-stage-saas
 
 # Generate narratives for every account in the resulting workspace.
 uv run python -m src.worker generate-narratives --workspace-slug lattice-build --all
