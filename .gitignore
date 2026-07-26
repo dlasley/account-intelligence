@@ -84,3 +84,6 @@ htmlcov/
 
 # Playwright MCP session artifacts (screenshots, snapshots, console logs)
 .playwright-mcp/
+
+# Reversal snapshots written by scripts/reanchor_demo_data.py
+reanchor_backup_*.json
