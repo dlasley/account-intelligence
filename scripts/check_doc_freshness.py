@@ -66,7 +66,8 @@ def check_migration_filenames() -> Result:
             "not in the CLI's YYYYMMDDHHMMSS_name.sql form (breaks `supabase start`): "
             + ", ".join(bad),
         )
-    return Result("migration filenames", True, f"{len(list(MIGRATIONS.glob('*.sql')))} files, all well-formed")
+    count = len(list(MIGRATIONS.glob("*.sql")))
+    return Result("migration filenames", True, f"{count} files, all well-formed")
 
 
 def check_migration_count() -> Result:
