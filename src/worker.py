@@ -465,6 +465,7 @@ def _generate_narratives(
     all_accounts: bool,
     account_slug: str | None,
     max_jobs: int,
+    fake_llm: bool = False,
 ) -> None:
     from src.observability.llm import setup_llm_observability
 
@@ -472,8 +473,6 @@ def _generate_narratives(
     # instrumentor wraps the client constructor.  No-ops when POSTHOG_API_KEY is unset
     # or POSTHOG_LLM_OBSERVABILITY_ENABLED=false — safe to call unconditionally.
     setup_llm_observability()
-
-    import anthropic as anthropic_sdk
 
     from src.config.loader import load_config
     from src.db.accounts import get_account_by_slug, get_accounts_for_workspace
@@ -489,7 +488,26 @@ def _generate_narratives(
     from src.pipeline.run import UNMATCHED_ACCOUNT_SLUG
 
     client = get_client()
-    client_ai = anthropic_sdk.Anthropic()
+
+    # FAKE_LLM lets `generate-narratives` run with no ANTHROPIC_API_KEY and no
+    # outbound API call, for standing up the pipeline against a local Supabase
+    # instance. --fake-llm on the command line overrides the env var either way.
+    use_fake_llm = fake_llm or os.environ.get("FAKE_LLM", "").lower() == "true"
+    if use_fake_llm:
+        from typing import cast
+
+        import anthropic as anthropic_sdk
+
+        from src.pipeline.dev_fake_llm import FakeAnthropicClient
+
+        print("FAKE_LLM active — narratives will be canned, not model-generated.\n")
+        # generate_narrative() types this parameter as anthropic.Anthropic; the fake
+        # client only needs to satisfy the .messages.create() surface it actually calls.
+        client_ai = cast(anthropic_sdk.Anthropic, FakeAnthropicClient())
+    else:
+        import anthropic as anthropic_sdk
+
+        client_ai = anthropic_sdk.Anthropic()
 
     workspace = get_workspace_by_slug(client, workspace_slug)
     if not workspace:
@@ -681,6 +699,14 @@ def main(args: list[str] | None = None) -> None:
     gen_parser.add_argument(
         "--max-jobs", type=int, default=20, help="Max job queue items to process"
     )
+    gen_parser.add_argument(
+        "--fake-llm",
+        action="store_true",
+        help=(
+            "Use a canned local stub instead of the Anthropic API — no ANTHROPIC_API_KEY, "
+            "no outbound call. Overrides FAKE_LLM if both are set. Never audit this output."
+        ),
+    )
 
     synth_parser = subparsers.add_parser(
         "synthesise-fixtures",
@@ -727,6 +753,7 @@ def main(args: list[str] | None = None) -> None:
                 all_accounts=parsed.all_accounts,
                 account_slug=parsed.account_slug,
                 max_jobs=parsed.max_jobs,
+                fake_llm=parsed.fake_llm,
             )
         elif parsed.command == "serve":
             _serve(port=parsed.port, host=parsed.host)
