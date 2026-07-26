@@ -343,7 +343,7 @@ mapping.
 ### Test
 
 ```bash
-uv run pytest                          # Python tests (815 passing)
+uv run pytest                          # Python tests (815 collected)
 cd frontend && npm test                # Vitest
 ```
 

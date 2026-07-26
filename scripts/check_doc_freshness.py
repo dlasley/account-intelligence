@@ -103,8 +103,15 @@ def check_adr_index() -> Result:
 
 
 def check_test_count() -> Result:
+    """Compare the README's test count against `pytest --collect-only`.
+
+    The claim is worded "collected", not "passing", because those differ here:
+    modules skipped at collection time never appear in the collected total but
+    do appear in the run summary. Verifying a *passing* count would also require
+    running the suite rather than collecting it.
+    """
     text = README.read_text()
-    claims = re.findall(r"\((\d+) passing\)", text)
+    claims = re.findall(r"\((\d+) collected\)", text)
     if not claims:
         return Result("test count in README", True, "no count claimed")
     proc = subprocess.run(
