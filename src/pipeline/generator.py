@@ -160,10 +160,6 @@ def _render_valid_contact_list(contacts: dict[UUID, Contact]) -> str:
     return "\n".join(lines)
 
 
-def _load_template(config: Config) -> str:
-    return (config_root() / config.narrative_generation.prompt_template_path).read_text()
-
-
 def _resolve_prompt_variant(account_id: UUID) -> str:
     """Evaluate the `narrative-prompt-variant` PostHog flag for this account.
 

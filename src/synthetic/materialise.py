@@ -44,10 +44,6 @@ def _scenario_hash(scenario_path: Path) -> str:
     return hashlib.sha256(scenario_path.read_bytes()).hexdigest()
 
 
-def _default_out_dir(scenario: ScenarioSpec, fixtures_root: Path) -> Path:
-    return fixtures_root / "synthetic" / scenario.name
-
-
 def write_scenario_to_disk(
     scenario: ScenarioSpec,
     scenario_path: Path,

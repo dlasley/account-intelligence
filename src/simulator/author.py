@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import sys
 from collections.abc import Mapping
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import date, timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -92,22 +92,6 @@ class AccountOverride:
     seed: int
     start_date: date
     end_date: date
-
-
-@dataclass
-class AuthorSession:
-    """Accumulated state across a single TUI authoring session."""
-
-    workspace_slug: str
-    spec: TrajectorySpec | None
-    accounts: list[WorkspaceAccountInfo]
-    selected_slugs: list[str]
-    start_date: date
-    end_date: date
-    global_primitive: str
-    global_params: dict
-    global_seed: int
-    overrides: dict[str, AccountOverride] = field(default_factory=dict)
 
 
 # ---------------------------------------------------------------------------
