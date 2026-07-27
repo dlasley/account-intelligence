@@ -84,9 +84,21 @@ def _parse_template_file(path: Path) -> dict:
     }
 
 
+def _salutation_name(contact: Contact) -> str:
+    """Given name only — every template uses [Contact Name] as a salutation.
+
+    Contacts without a display name fall back to the email, which carries no
+    given name to extract. The frontend derives the same form when it swaps a
+    greeting to a new recipient, so both sides must stay in agreement.
+    """
+    if not contact.display_name:
+        return contact.email
+    return contact.display_name.split()[0]
+
+
 def _render(raw: dict, account: Account, contact: Contact | None) -> OutreachTemplate:
     """Fill [Account Name] and [Contact Name] slots; leave other [placeholders] for user."""
-    contact_name = (contact.display_name or contact.email) if contact else "[Contact Name]"
+    contact_name = _salutation_name(contact) if contact else "[Contact Name]"
     slots = {"[Account Name]": account.name, "[Contact Name]": contact_name}
 
     def _fill(text: str) -> str:

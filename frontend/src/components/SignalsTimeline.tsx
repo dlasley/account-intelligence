@@ -1,7 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { relativeTime } from '@/lib/utils'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 export type Signal = {
   id: string
@@ -12,18 +14,53 @@ export type Signal = {
   body: string
 }
 
+// Rows rendered per page of the capped render window below.
+const PAGE_SIZE = 15
+// Roughly two rendered lines at the body's type size — the point past which
+// `line-clamp-2` actually hides something.
+const BODY_PREVIEW_CHARS = 150
+
+// The design system has one brand accent, neutrals, and a health ramp — no
+// dedicated "direction" palette — so inbound borrows the health-strong tone,
+// outbound uses the accent, and internal uses standard muted text.
 function DirectionIcon({ direction }: { direction: string }) {
-  if (direction === 'inbound') return <span className="text-green-600 font-bold">↓</span>
-  if (direction === 'outbound') return <span className="text-blue-600 font-bold">↑</span>
-  return <span className="text-gray-400">↔</span>
+  if (direction === 'inbound') {
+    return (
+      <span className="font-bold text-health-strong-on" role="img" aria-label="Inbound">
+        ↓
+      </span>
+    )
+  }
+  if (direction === 'outbound') {
+    return (
+      <span className="font-bold text-primary" role="img" aria-label="Outbound">
+        ↑
+      </span>
+    )
+  }
+  return (
+    <span className="text-muted-foreground" role="img" aria-label="Internal">
+      ↔
+    </span>
+  )
 }
 
 export default function SignalsTimeline({ signals }: { signals: Signal[] }) {
   const [filter, setFilter] = useState<'all' | 'inbound' | 'outbound'>('all')
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
 
-  const filtered =
-    filter === 'all' ? signals : signals.filter((s) => s.direction === filter)
+  const filtered = useMemo(
+    () => (filter === 'all' ? signals : signals.filter((s) => s.direction === filter)),
+    [signals, filter],
+  )
+  const visible = filtered.slice(0, visibleCount)
+  const remaining = filtered.length - visible.length
+
+  const handleFilterChange = (next: string) => {
+    setFilter(next as 'all' | 'inbound' | 'outbound')
+    setVisibleCount(PAGE_SIZE) // reset the capped window on filter change
+  }
 
   const toggleExpand = (id: string) => {
     setExpanded((prev) => {
@@ -36,53 +73,91 @@ export default function SignalsTimeline({ signals }: { signals: Signal[] }) {
 
   return (
     <section>
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-lg font-semibold">Signals</h2>
-        <div className="flex gap-1">
-          {(['all', 'inbound', 'outbound'] as const).map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-2 py-1 text-xs rounded ${
-                filter === f
-                  ? 'bg-gray-800 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              {f}
-            </button>
-          ))}
-        </div>
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <h2 className="text-base font-semibold">
+          Signals{' '}
+          <span className="font-mono text-xs font-normal text-muted-foreground">
+            · {signals.length}
+          </span>
+        </h2>
+        <Tabs value={filter} onValueChange={handleFilterChange}>
+          <TabsList aria-label="Filter signals by direction">
+            {(['all', 'inbound', 'outbound'] as const).map((f) => (
+              <TabsTrigger key={f} value={f} className="text-xs">
+                {f}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
       </div>
 
       {filtered.length === 0 ? (
-        <p className="text-gray-400 text-sm">No signals.</p>
+        <p className="text-sm text-muted-foreground">No signals.</p>
       ) : (
-        <div className="space-y-1">
-          {filtered.map((s) => {
-            const isExpanded = expanded.has(s.id)
-            const preview = s.body.split('\n').slice(0, 2).join(' ')
-            return (
-              <div
-                key={s.id}
-                onClick={() => toggleExpand(s.id)}
-                className="p-3 border rounded hover:bg-gray-50 cursor-pointer"
-              >
-                <div className="flex items-center gap-2 text-sm">
+        // The timeline scrolls independently of the page inside a fixed-height
+        // viewport. Only `visibleCount` rows mount at a time; "Show N more"
+        // grows that window rather than every row mounting up front.
+        <ScrollArea className="h-[480px] rounded-lg border border-border">
+          <div className="flex flex-col gap-2 p-3">
+            {visible.map((s) => {
+              const isExpanded = expanded.has(s.id)
+              // Bodies short enough to render whole get no disclosure control —
+              // a toggle that swaps identical text reads as broken.
+              const isTruncatable = s.body.length > BODY_PREVIEW_CHARS || s.body.includes('\n')
+              // min-w-0 lets the flex children shrink below their content width;
+              // without it the subject's `truncate` cannot engage and long
+              // subjects widen the row instead of ellipsing.
+              const summary = (
+                <>
                   <DirectionIcon direction={s.direction} />
-                  <span className="text-gray-400 text-xs">{relativeTime(s.occurred_at)}</span>
-                  <span className="text-xs bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">
+                  <span className="shrink-0 font-mono text-xs text-muted-foreground">
+                    {relativeTime(s.occurred_at)}
+                  </span>
+                  <span className="shrink-0 rounded bg-muted px-1.5 py-0.5 font-mono text-xs text-muted-foreground">
                     {s.channel}
                   </span>
-                  <span className="font-medium truncate">{s.subject ?? '(no subject)'}</span>
+                  <span className="min-w-0 truncate font-medium">{s.subject ?? '(no subject)'}</span>
+                </>
+              )
+              return (
+                <div
+                  key={s.id}
+                  className={`rounded-lg border border-border p-3 ${isTruncatable ? 'hover:bg-muted/50' : ''}`}
+                >
+                  {isTruncatable ? (
+                    <button
+                      type="button"
+                      onClick={() => toggleExpand(s.id)}
+                      aria-expanded={isExpanded}
+                      aria-controls={`signal-body-${s.id}`}
+                      className="flex w-full min-w-0 cursor-pointer items-center gap-2 text-left text-sm"
+                    >
+                      {summary}
+                    </button>
+                  ) : (
+                    <div className="flex min-w-0 items-center gap-2 text-sm">{summary}</div>
+                  )}
+                  <p
+                    id={`signal-body-${s.id}`}
+                    className={`mt-1 text-xs break-words text-muted-foreground ${
+                      isTruncatable && !isExpanded ? 'line-clamp-2' : ''
+                    }`}
+                  >
+                    {s.body}
+                  </p>
                 </div>
-                <p className={`mt-1 text-xs text-gray-600 ${isExpanded ? '' : 'line-clamp-2'}`}>
-                  {isExpanded ? s.body : preview}
-                </p>
-              </div>
-            )
-          })}
-        </div>
+              )
+            })}
+            {remaining > 0 && (
+              <button
+                onClick={() => setVisibleCount((n) => n + PAGE_SIZE)}
+                className="py-1 text-center text-sm font-medium text-primary hover:underline"
+              >
+                Show {remaining} more signal{remaining !== 1 ? 's' : ''}
+              </button>
+            )}
+          </div>
+        </ScrollArea>
       )}
     </section>
   )

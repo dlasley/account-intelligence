@@ -22,10 +22,18 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ refresh: mockRefresh }),
 }))
 
-vi.mock('@/lib/utils', () => ({
-  scoreBadge: () => ({ color: 'bg-green-100 text-green-800', label: 'Good' }),
-  relativeTime: () => '2 hours ago',
-}))
+// Partial mock via importOriginal: the Badge primitive this component renders
+// imports `cn` from this same module — a full replacement mock would silently
+// drop it and break Badge's className merging.
+vi.mock('@/lib/utils', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/utils')>()
+  return {
+    ...actual,
+    scoreBadge: () => ({ color: 'bg-health-strong-soft text-health-strong-on', label: 'Healthy' }),
+    scoreBarColor: () => 'bg-health-strong',
+    relativeTime: () => '2 hours ago',
+  }
+})
 
 const accountId = 'acct-1'
 
@@ -60,7 +68,11 @@ describe('DimensionBreakdown', () => {
     expect(screen.getByText('No dimension scores yet.')).toBeTruthy()
   })
 
-  it('renders dimension score row', () => {
+  // Each dimension renders twice — once in the sm+ table and once in the
+  // narrow-viewport card stack — so these assert on both copies. jsdom applies
+  // no CSS, so the `hidden`/`sm:hidden` classes that leave exactly one visible
+  // in a browser do not remove either from the queried DOM.
+  it('renders dimension score row in both layouts', () => {
     render(
       <DimensionBreakdown
         accountId={accountId}
@@ -69,8 +81,8 @@ describe('DimensionBreakdown', () => {
         hasCsmConfig={false}
       />,
     )
-    expect(screen.getByText('Email Health')).toBeTruthy()
-    expect(screen.getByText(/74/)).toBeTruthy()
+    expect(screen.getAllByText('Email Health')).toHaveLength(2)
+    expect(screen.getAllByText(/74/).length).toBeGreaterThanOrEqual(2)
   })
 
   it('hides CSM form when hasCsmConfig is false', () => {
@@ -94,6 +106,7 @@ describe('DimensionBreakdown', () => {
     fireEvent.change(screen.getByPlaceholderText('Score (1–100)'), {
       target: { value: '50.5' },
     })
+    fireEvent.change(screen.getByPlaceholderText('Rationale'), { target: { value: 'Context.' } })
     fireEvent.click(screen.getByText('Save'))
     expect(screen.getByText('Score must be an integer between 1 and 100.')).toBeTruthy()
     expect(mockRpc).not.toHaveBeenCalled()
@@ -106,6 +119,7 @@ describe('DimensionBreakdown', () => {
     fireEvent.change(screen.getByPlaceholderText('Score (1–100)'), {
       target: { value: '0' },
     })
+    fireEvent.change(screen.getByPlaceholderText('Rationale'), { target: { value: 'Context.' } })
     fireEvent.click(screen.getByText('Save'))
     expect(screen.getByText('Score must be an integer between 1 and 100.')).toBeTruthy()
   })
@@ -118,12 +132,13 @@ describe('DimensionBreakdown', () => {
     fireEvent.change(screen.getByPlaceholderText('Score (1–100)'), {
       target: { value: '85' },
     })
+    fireEvent.change(screen.getByPlaceholderText('Rationale'), { target: { value: 'Context.' } })
     fireEvent.click(screen.getByText('Save'))
     await vi.waitFor(() => {
       expect(mockRpc).toHaveBeenCalledWith('set_csm_score', {
         p_account_id: accountId,
         p_score: 85,
-        p_rationale: null,
+        p_rationale: 'Context.',
       })
       expect(mockRefresh).toHaveBeenCalled()
     })
@@ -139,6 +154,7 @@ describe('DimensionBreakdown', () => {
     fireEvent.change(screen.getByPlaceholderText('Score (1–100)'), {
       target: { value: '85' },
     })
+    fireEvent.change(screen.getByPlaceholderText('Rationale'), { target: { value: 'Context.' } })
     fireEvent.click(screen.getByText('Save'))
     await vi.waitFor(() => {
       expect(track).toHaveBeenCalledWith(
@@ -159,6 +175,7 @@ describe('DimensionBreakdown', () => {
     fireEvent.change(screen.getByPlaceholderText('Score (1–100)'), {
       target: { value: '70' },
     })
+    fireEvent.change(screen.getByPlaceholderText('Rationale'), { target: { value: 'Context.' } })
     fireEvent.click(screen.getByText('Save'))
     await vi.waitFor(() => {
       expect(screen.getByText('Permission denied')).toBeTruthy()

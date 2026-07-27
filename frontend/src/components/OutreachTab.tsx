@@ -1,8 +1,16 @@
 'use client'
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { Check, ChevronDown, Loader2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { track } from '@/lib/analytics'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Skeleton } from '@/components/ui/skeleton'
 
 type Signal = {
   occurred_at: string
@@ -38,14 +46,22 @@ type Props = {
   overallHealthScore: number | null
 }
 
-type Status = 'idle' | 'loading' | 'saving' | 'sending' | 'sent' | 'error'
+// Send lifecycle only. Autosave is tracked separately (`isSaving`) so a blur-save
+// resolving mid-send cannot reset this back to `idle`.
+type Status = 'idle' | 'loading' | 'sending' | 'sent' | 'error'
 
 const CONTACT_NAME_SLOT = '[Contact Name]'
 
+// Salutations use the given name only — "Hi Avery," not "Hi Avery Davis,".
+// Contacts with no display name fall back to the email, which has no given name
+// to extract. Both the old and new name in a greeting swap resolve through here,
+// so the swap continues to match whatever form is in the text.
 function nameForContact(
   c: { display_name: string | null; email: string } | undefined | null,
 ): string {
-  return c ? c.display_name || c.email : CONTACT_NAME_SLOT
+  if (!c) return CONTACT_NAME_SLOT
+  if (!c.display_name) return c.email
+  return c.display_name.trim().split(/\s+/)[0]
 }
 
 function nameForContactId(contacts: Props['contacts'], id: string | null): string {
@@ -70,6 +86,8 @@ export default function OutreachTab({ accountSlug, accountId, contacts, overallH
   const [body, setBody] = useState('')
   const [contactId, setContactId] = useState<string | null>(contacts[0]?.id ?? null)
   const [status, setStatus] = useState<Status>('idle')
+  const [isSaving, setIsSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   // Tracks the contact whose name is actually baked into subject/body text right now,
@@ -170,11 +188,22 @@ export default function OutreachTab({ accountSlug, accountId, contacts, overallH
     }
   }, [intentTemplates, selectedTemplateId, handleTemplateSelect])
 
+  // Autosave tracks its own flag rather than `status`. A blur fires on mousedown
+  // and the Send click on mouseup, so a save that resolved into `status` would
+  // overwrite `sending` and re-enable the Send button mid-flight.
   async function handleSubjectBlur() {
     if (!draftId) return
-    setStatus('saving')
-    await supabase.rpc('update_outreach_draft', { p_draft_id: draftId, p_subject: subject })
-    setStatus('idle')
+    setIsSaving(true)
+    const { error } = await supabase.rpc('update_outreach_draft', {
+      p_draft_id: draftId,
+      p_subject: subject,
+    })
+    setIsSaving(false)
+    if (error) {
+      setSaveError('Could not save the subject. Your last edit may be lost.')
+      return
+    }
+    setSaveError(null)
     track('Outreach Template Edited', {
       account_id: accountId,
       intent,
@@ -186,9 +215,17 @@ export default function OutreachTab({ accountSlug, accountId, contacts, overallH
 
   async function handleBodyBlur() {
     if (!draftId) return
-    setStatus('saving')
-    await supabase.rpc('update_outreach_draft', { p_draft_id: draftId, p_body: body })
-    setStatus('idle')
+    setIsSaving(true)
+    const { error } = await supabase.rpc('update_outreach_draft', {
+      p_draft_id: draftId,
+      p_body: body,
+    })
+    setIsSaving(false)
+    if (error) {
+      setSaveError('Could not save the body. Your last edit may be lost.')
+      return
+    }
+    setSaveError(null)
     track('Outreach Template Edited', {
       account_id: accountId,
       intent,
@@ -261,99 +298,112 @@ export default function OutreachTab({ accountSlug, accountId, contacts, overallH
 
   const hasUnfilledSlots = subject.includes('[') || body.includes('[')
   const isLowHealth = overallHealthScore !== null && overallHealthScore < 40
+  const sendDisabled =
+    hasUnfilledSlots || !contactId || !draftId || status === 'sending' || status === 'sent'
 
   if (status === 'loading') {
-    return <div className="text-sm text-gray-500 py-4">Loading outreach context…</div>
+    return (
+      <section className="space-y-4" aria-busy="true">
+        <span className="sr-only">Loading outreach context…</span>
+        <Skeleton className="h-8 w-full" />
+        <Skeleton className="h-8 w-2/3" />
+        <Skeleton className="h-16 w-full" />
+        <Skeleton className="h-40 w-full" />
+      </section>
+    )
   }
 
   return (
     <section className="space-y-6">
       {isLowHealth && status !== 'sent' && (
-        <div className="px-4 py-3 bg-amber-50 border border-amber-200 rounded text-sm text-amber-800">
+        <div className="rounded-md border border-health-risk/40 bg-health-risk-soft px-3 py-2 text-sm text-health-risk-on">
           This account has a low health score ({overallHealthScore}). Consider a check-in to
           re-engage.
         </div>
       )}
 
       {status === 'sent' && (
-        <div className="px-4 py-3 bg-green-50 border border-green-200 rounded text-sm text-green-800">
+        <div className="flex items-center gap-3 rounded-md border border-health-strong/40 bg-health-strong-soft px-3 py-2.5 text-sm text-health-strong-on">
+          <Check className="size-4 shrink-0" />
           Email sent.
         </div>
       )}
 
       {status === 'error' && errorMessage && (
-        <div className="px-4 py-3 bg-red-50 border border-red-200 rounded text-sm text-red-800">
-          {errorMessage}
-        </div>
+        <Alert variant="destructive">
+          <AlertDescription>{errorMessage}</AlertDescription>
+        </Alert>
       )}
 
       {context && (
-        <div className="px-3 py-2 bg-blue-50 border border-blue-100 rounded text-xs text-blue-700">
+        <div className="rounded-md border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
           {context.recommendation_rationale}
         </div>
       )}
 
       <div className="space-y-4">
         {contacts.length > 0 && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Recipient</label>
-            <select
-              value={contactId ?? ''}
-              onChange={(e) => handleContactChange(e.target.value || null)}
-              disabled={status === 'sent'}
-              className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm disabled:bg-gray-50 disabled:text-gray-600"
-            >
-              <option value="">No recipient</option>
-              {contacts.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.display_name ? `${c.display_name} <${c.email}>` : c.email}
-                </option>
-              ))}
-            </select>
+          <div className="space-y-1.5">
+            <Label htmlFor="outreach-recipient">Recipient</Label>
+            <div className="relative">
+              <select
+                id="outreach-recipient"
+                value={contactId ?? ''}
+                onChange={(e) => handleContactChange(e.target.value || null)}
+                disabled={status === 'sent'}
+                className="h-8 w-full appearance-none rounded-lg border border-input bg-transparent px-2.5 py-1 pr-7 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:bg-input/50 disabled:text-muted-foreground"
+              >
+                <option value="">No recipient</option>
+                {contacts.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.display_name ? `${c.display_name} <${c.email}>` : c.email}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="pointer-events-none absolute top-1/2 right-2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+            </div>
           </div>
         )}
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Intent</label>
-          <div className="flex gap-2">
+        <div className="space-y-1.5">
+          <Label>Intent</Label>
+          <div className="flex flex-wrap gap-2">
             {(['check_in', 'expansion', 'renewal', 'custom'] as const).map((i) => (
-              <button
+              <Button
                 key={i}
-                onClick={() => setIntent(i)}
+                type="button"
+                size="sm"
+                variant={intent === i ? 'default' : 'outline'}
                 disabled={status === 'sent'}
-                className={`px-3 py-1.5 text-sm rounded border disabled:opacity-50 disabled:cursor-not-allowed ${
-                  intent === i
-                    ? 'bg-blue-600 text-white border-blue-600'
-                    : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
-                }`}
+                onClick={() => setIntent(i)}
               >
                 {i === 'check_in'
                   ? 'Check-in'
                   : i === 'expansion'
-                  ? 'Expansion'
-                  : i === 'renewal'
-                  ? 'Renewal'
-                  : 'Custom'}
-              </button>
+                    ? 'Expansion'
+                    : i === 'renewal'
+                      ? 'Renewal'
+                      : 'Custom'}
+              </Button>
             ))}
           </div>
         </div>
 
         {intentTemplates.length > 1 && (
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             {intentTemplates.map((t) => (
-              <label key={t.id} className="flex items-center gap-2 cursor-pointer">
+              <label key={t.id} className="flex cursor-pointer items-center gap-2 text-sm">
                 <input
                   type="radio"
                   name="template"
                   value={t.id}
                   checked={selectedTemplateId === t.id}
                   onChange={() => handleTemplateSelect(t)}
-                  className="accent-blue-600"
+                  className="accent-primary"
                 />
-                <span className="text-sm text-gray-700">{t.name}</span>
+                <span className="text-foreground">{t.name}</span>
                 {t.id === context?.recommended_template_id && (
-                  <span className="text-xs text-blue-600 ml-1">Recommended</span>
+                  <span className="text-xs text-primary">Recommended</span>
                 )}
               </label>
             ))}
@@ -362,80 +412,95 @@ export default function OutreachTab({ accountSlug, accountId, contacts, overallH
       </div>
 
       {context && (
-        <div className="space-y-4 pt-2 border-t border-gray-100">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
-            <input
+        <div className="space-y-4 border-t border-border pt-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="outreach-subject">Subject</Label>
+            <Input
+              id="outreach-subject"
               type="text"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               onBlur={handleSubjectBlur}
               readOnly={status === 'sent'}
-              className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm read-only:bg-gray-50 read-only:text-gray-600"
+              className="read-only:bg-muted/50 read-only:text-muted-foreground"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Body</label>
-            <textarea
+          <div className="space-y-1.5">
+            <Label htmlFor="outreach-body">Body</Label>
+            <Textarea
+              id="outreach-body"
               value={body}
               onChange={(e) => setBody(e.target.value)}
               onBlur={handleBodyBlur}
               readOnly={status === 'sent'}
               rows={10}
-              className="w-full border border-gray-300 rounded px-3 py-2 text-sm resize-y read-only:bg-gray-50 read-only:text-gray-600"
+              className="min-h-48 resize-y read-only:bg-muted/50 read-only:text-muted-foreground"
             />
           </div>
 
-          <div className="flex items-center gap-3">
-            <button
+          <div className="flex flex-wrap items-center gap-3">
+            <Button
               onClick={handleSend}
-              disabled={
-                hasUnfilledSlots ||
-                !contactId ||
-                !draftId ||
-                status === 'sending' ||
-                status === 'sent'
-              }
-              className={`px-4 py-2 text-sm text-white rounded disabled:opacity-50 ${
-                status === 'sent'
-                  ? 'bg-gray-500'
-                  : 'bg-green-600 hover:bg-green-700'
-              }`}
+              disabled={sendDisabled}
+              variant={status === 'error' ? 'destructive' : 'default'}
+              className={cn(
+                status === 'sent' &&
+                  'bg-health-strong text-health-strong-on hover:bg-health-strong',
+              )}
             >
-              {status === 'sending' ? 'Sending…' : status === 'sent' ? '✓ Sent' : 'Send'}
-            </button>
+              {status === 'sending' && <Loader2 className="animate-spin" />}
+              {status === 'sent' && <Check />}
+              {status === 'sending'
+                ? 'Sending…'
+                : status === 'sent'
+                  ? 'Sent'
+                  : status === 'error'
+                    ? 'Failed · Retry'
+                    : 'Send'}
+            </Button>
             {status === 'sent' && (
-              <span className="text-sm text-green-700 font-medium">
+              <span role="status" className="text-sm font-medium text-health-strong-on">
                 Email sent successfully.
               </span>
             )}
-            {status === 'saving' && <span className="text-xs text-gray-400">Saving…</span>}
+            {isSaving && (
+              <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Loader2 className="size-3 animate-spin" /> Saving…
+              </span>
+            )}
+            {saveError && (
+              <span role="alert" className="text-xs text-destructive">
+                {saveError}
+              </span>
+            )}
             {status !== 'sent' && hasUnfilledSlots && (
-              <span className="text-xs text-amber-600">
+              <span className="text-xs text-health-moderate-on">
                 Fill in all [placeholder] fields before sending.
               </span>
             )}
             {status !== 'sent' && !hasUnfilledSlots && !contactId && (
-              <span className="text-xs text-amber-600">Select a recipient to send.</span>
+              <span className="text-xs text-health-moderate-on">Select a recipient to send.</span>
             )}
           </div>
         </div>
       )}
 
       {context && context.signals.length > 0 && (
-        <div className="space-y-2 pt-2 border-t border-gray-100">
-          <h3 className="text-sm font-medium text-gray-700">Recent signals</h3>
+        <div className="space-y-2 border-t border-border pt-4">
+          <h3 className="text-sm font-medium text-foreground">Recent signals</h3>
           {context.signals.map((s, i) => (
-            <div key={i} className="text-xs border border-gray-100 rounded p-2 space-y-1">
-              <div className="flex gap-2 text-gray-500">
+            <div key={i} className="space-y-1 rounded-md border border-border p-2 text-xs">
+              <div className="flex gap-2 text-muted-foreground">
                 <span>{new Date(s.occurred_at).toLocaleDateString()}</span>
                 <span className="capitalize">{s.direction}</span>
                 {s.subject && (
-                  <span className="text-gray-700 font-medium truncate">{s.subject}</span>
+                  <span className="truncate font-medium text-foreground">{s.subject}</span>
                 )}
               </div>
-              {s.body_excerpt && <p className="text-gray-600 line-clamp-2">{s.body_excerpt}</p>}
+              {s.body_excerpt && (
+                <p className="line-clamp-2 text-muted-foreground">{s.body_excerpt}</p>
+              )}
             </div>
           ))}
         </div>

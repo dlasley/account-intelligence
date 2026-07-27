@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { relativeTime } from '@/lib/utils'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 export type WorkspaceRow = {
   id: string
@@ -14,39 +15,47 @@ export type WorkspaceRow = {
 
 export default function WorkspaceTable({ workspaces }: { workspaces: WorkspaceRow[] }) {
   if (workspaces.length === 0) {
-    return <p className="text-gray-500">No workspaces found.</p>
+    return (
+      <div className="rounded-lg border border-dashed border-border bg-muted/30 px-6 py-10 text-center">
+        <p className="text-sm font-semibold">No workspaces found</p>
+      </div>
+    )
   }
 
   return (
-    <table className="w-full text-sm border-collapse">
-      <thead>
-        <tr className="border-b text-left text-gray-500">
-          <th className="pb-2 pr-4 font-medium">Workspace</th>
-          <th className="pb-2 pr-4 font-medium">Accounts</th>
-          <th className="pb-2 pr-4 font-medium">Active</th>
-          <th className="pb-2 pr-4 font-medium">Last narrative</th>
-          <th className="pb-2 font-medium">Last signal</th>
-        </tr>
-      </thead>
-      <tbody>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          {/* Name and Last signal always render; the rest return at sm/md, matching
+              AccountTable's column-priority convention for narrow viewports. */}
+          <TableHead>Workspace</TableHead>
+          <TableHead className="hidden sm:table-cell">Accounts</TableHead>
+          <TableHead className="hidden sm:table-cell">Active</TableHead>
+          <TableHead className="hidden md:table-cell">Last narrative</TableHead>
+          <TableHead>Last signal</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
         {workspaces.map((w) => (
-          <tr key={w.id} className="border-b hover:bg-gray-50">
-            <td className="py-2 pr-4">
+          <TableRow key={w.id}>
+            <TableCell>
               <Link
                 href={`/admin/workspaces/${w.slug}/accounts`}
-                className="text-blue-600 hover:underline font-medium"
+                className="font-medium text-primary hover:underline"
               >
                 {w.name}
               </Link>
-              <div className="text-xs text-gray-400">{w.slug}</div>
-            </td>
-            <td className="py-2 pr-4">{w.account_count}</td>
-            <td className="py-2 pr-4">{w.active_account_count}</td>
-            <td className="py-2 pr-4">{relativeTime(w.last_narrative_at)}</td>
-            <td className="py-2">{relativeTime(w.last_signal_at)}</td>
-          </tr>
+              <div className="font-mono text-xs text-muted-foreground">{w.slug}</div>
+            </TableCell>
+            <TableCell className="hidden sm:table-cell">{w.account_count}</TableCell>
+            <TableCell className="hidden sm:table-cell">{w.active_account_count}</TableCell>
+            <TableCell className="hidden text-muted-foreground md:table-cell">
+              {relativeTime(w.last_narrative_at)}
+            </TableCell>
+            <TableCell className="text-muted-foreground">{relativeTime(w.last_signal_at)}</TableCell>
+          </TableRow>
         ))}
-      </tbody>
-    </table>
+      </TableBody>
+    </Table>
   )
 }

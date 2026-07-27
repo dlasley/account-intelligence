@@ -1,7 +1,9 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { scoreBadge } from '@/lib/utils'
+import { scoreBadge, verticalLabel } from '@/lib/utils'
+import { Badge } from '@/components/ui/badge'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import NarrativeSection from '@/components/NarrativeSection'
 import SignalsTimeline from '@/components/SignalsTimeline'
 import type { Signal } from '@/components/SignalsTimeline'
@@ -32,8 +34,10 @@ export default async function AdminAccountDetailPage({
   if (error) {
     if (error.message.includes('workspace not found')) notFound()
     return (
-      <main className="p-8">
-        <p className="text-red-600">Failed to load account: {error.message}</p>
+      <main className="mx-auto max-w-5xl p-8">
+        <Alert variant="destructive">
+          <AlertDescription>Failed to load account: {error.message}</AlertDescription>
+        </Alert>
       </main>
     )
   }
@@ -112,31 +116,27 @@ export default async function AdminAccountDetailPage({
   const workspaceName = workspace?.name ?? slug
 
   return (
-    <main className="p-8 max-w-5xl">
-      <nav className="text-sm text-gray-500 mb-4">
-        <Link href="/admin" className="hover:underline text-blue-600">
+    <main className="max-w-6xl p-8">
+      <nav className="text-sm text-muted-foreground mb-4">
+        <Link href="/admin" className="hover:underline text-primary">
           Admin
         </Link>
         {' / '}
-        <Link href={`/admin/workspaces/${slug}/accounts`} className="hover:underline text-blue-600">
+        <Link href={`/admin/workspaces/${slug}/accounts`} className="hover:underline text-primary">
           {workspaceName}
         </Link>
         {' / '}
-        <span>{account.name}</span>
+        <span className="text-foreground">{account.name}</span>
       </nav>
 
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-1 flex-wrap">
           <h1 className="text-2xl font-bold">{account.name}</h1>
-          {account.vertical && (
-            <span className="px-2 py-0.5 rounded text-sm bg-blue-50 text-blue-700">
-              {account.vertical}
-            </span>
-          )}
+          {account.vertical && <Badge variant="secondary">{verticalLabel(account.vertical)}</Badge>}
           {account.overall_health_score != null && (
-            <span className={`px-2 py-0.5 rounded text-sm font-medium ${healthBadge.color}`}>
+            <Badge className={healthBadge.color}>
               Health {account.overall_health_score} {healthBadge.label}
-            </span>
+            </Badge>
           )}
           <AuditBadge
             passed={auditRun?.overall_passed ?? null}
@@ -146,20 +146,18 @@ export default async function AdminAccountDetailPage({
             criteria={auditCriteria}
             variant="badge"
           />
-          <span className="px-2 py-0.5 rounded text-xs bg-amber-50 text-amber-700 font-medium border border-amber-200">
-            Super-user view
-          </span>
+          <Badge variant="health-moderate">Super-user view</Badge>
         </div>
         {account.crm_record_id && (
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted-foreground">
             CRM:{' '}
-            <span className="font-mono text-gray-700">{account.crm_record_id}</span>
+            <span className="font-mono text-foreground">{account.crm_record_id}</span>
           </p>
         )}
       </div>
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-        <div className="lg:col-span-2 space-y-8">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
+        <div className="min-w-0 space-y-6">
           <NarrativeSection
             narrative={narrativeWithAudit}
             accountId={account.id}
@@ -173,7 +171,7 @@ export default async function AdminAccountDetailPage({
           />
           <SignalsTimeline signals={signals} />
         </div>
-        <div>
+        <div className="min-w-0 lg:sticky lg:top-6 lg:self-start">
           <ContactsList contacts={contacts} />
         </div>
       </div>

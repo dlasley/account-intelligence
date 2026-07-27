@@ -3,8 +3,20 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { scoreBadge, relativeTime } from '@/lib/utils'
+import { scoreBadge, scoreBarColor, relativeTime } from '@/lib/utils'
 import { track } from '@/lib/analytics'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table'
 
 export type DimScore = {
   score: number
@@ -31,13 +43,8 @@ const DIVERGENCE_MIN_WEIGHT = 0.2
 
 function ScoreBar({ score, color }: { score: number; color: string }) {
   return (
-    <div className="flex items-center gap-2 min-w-0">
-      <div className="relative w-24 h-2 rounded bg-gray-100 overflow-hidden shrink-0">
-        <div
-          className={`absolute inset-y-0 left-0 rounded ${color}`}
-          style={{ width: `${score}%` }}
-        />
-      </div>
+    <div className="relative h-1.5 w-24 shrink-0 overflow-hidden rounded-full bg-muted">
+      <div className={`absolute inset-y-0 left-0 rounded-full ${color}`} style={{ width: `${score}%` }} />
     </div>
   )
 }
@@ -60,14 +67,16 @@ export default function DimensionBreakdown({
     dimensionConfigs.map((c) => [c.id, c])
   )
 
-  // previous_score sourced from current top score for the csm_score dimension
-  const currentCsmScore =
-    dimensionScores.find(
-      (s) => configsById.get(s.dimension_id)?.dimension_type === 'csm_score'
-    )?.score ?? null
+  const currentCsm = dimensionScores.find(
+    (s) => configsById.get(s.dimension_id)?.dimension_type === 'csm_score'
+  )
+  // Sent as previous_score so the RPC can supersede the standing row.
+  const currentCsmScore = currentCsm?.score ?? null
   const router = useRouter()
-  const [csmScore, setCsmScore] = useState('')
-  const [csmRationale, setCsmRationale] = useState('')
+  // Seeded from the standing score so an update is an edit of what's there
+  // rather than re-entry from blank.
+  const [csmScore, setCsmScore] = useState(currentCsmScore === null ? '' : String(currentCsmScore))
+  const [csmRationale, setCsmRationale] = useState(currentCsm?.rationale ?? '')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -107,6 +116,29 @@ export default function DimensionBreakdown({
     return wb - wa
   })
 
+  const rows = sorted.map((s) => {
+    const windowDays =
+      s.metadata && typeof s.metadata.window_days === 'number'
+        ? (s.metadata.window_days as number)
+        : null
+    const scoredBy = s.scored_by.charAt(0).toUpperCase() + s.scored_by.slice(1)
+    return {
+      key: s.dimension_id,
+      name: configsById.get(s.dimension_id)?.name ?? s.dimension_id,
+      score: s.score,
+      badge: scoreBadge(s.score),
+      barColor: scoreBarColor(s.score),
+      rationale: [
+        scoredBy,
+        windowDays !== null ? `${windowDays}-day window` : null,
+        s.rationale ?? '—',
+        relativeTime(s.scored_at),
+      ]
+        .filter(Boolean)
+        .join(' · '),
+    }
+  })
+
   // Detect divergence: find the two highest-weight dimensions that both meet the
   // minimum weight bar and check if their gap is large enough to call out
   const dominant = sorted.filter(
@@ -125,116 +157,119 @@ export default function DimensionBreakdown({
 
   return (
     <section>
-      <h2 className="text-lg font-semibold mb-3">Health Dimensions</h2>
+      <h2 className="mb-3 text-base font-semibold">Health Dimensions</h2>
 
       {dimensionScores.length === 0 ? (
-        <p className="text-gray-400 italic text-sm">No dimension scores yet.</p>
+        <p className="text-sm text-muted-foreground">No dimension scores yet.</p>
       ) : (
         <>
           {divergencePair && (
-            <div className="mb-3 px-3 py-2 bg-amber-50 border border-amber-200 rounded text-sm text-amber-800">
-              <span className="font-semibold">Divergence detected</span>
-              {' — '}
-              {configsById.get(divergencePair[0].dimension_id)?.name ?? divergencePair[0].dimension_id}
-              {' '}({divergencePair[0].score})
-              {' vs '}
-              {configsById.get(divergencePair[1].dimension_id)?.name ?? divergencePair[1].dimension_id}
-              {' '}({divergencePair[1].score})
-              {': a '}
-              {Math.abs(divergencePair[0].score - divergencePair[1].score)}
-              {'-point gap between dominant dimensions.'}
-            </div>
+            <Alert className="mb-3 border-health-moderate/40 border-l-[3px] border-l-health-moderate bg-health-moderate-soft">
+              <AlertTitle className="text-health-moderate-on">Divergence detected</AlertTitle>
+              <AlertDescription className="text-health-moderate-on/90">
+                <span className="font-semibold">
+                  {configsById.get(divergencePair[0].dimension_id)?.name ?? divergencePair[0].dimension_id}
+                </span>{' '}
+                {divergencePair[0].score}
+                {' vs '}
+                <span className="font-semibold">
+                  {configsById.get(divergencePair[1].dimension_id)?.name ?? divergencePair[1].dimension_id}
+                </span>{' '}
+                {divergencePair[1].score}
+                {' — a '}
+                {Math.abs(divergencePair[0].score - divergencePair[1].score)}
+                {'-point gap between dominant dimensions.'}
+              </AlertDescription>
+            </Alert>
           )}
 
-          <table className="w-full text-sm border-collapse mb-4">
-            <thead>
-              <tr className="border-b text-left text-gray-500">
-                <th className="pb-2 pr-4 font-medium">Dimension</th>
-                <th className="pb-2 pr-4 font-medium">Score</th>
-                <th className="pb-2 pr-4 font-medium w-32">Bar</th>
-                <th className="pb-2 pr-4 font-medium">Scored by</th>
-                <th className="pb-2 font-medium">Rationale / notes</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sorted.map((s) => {
-                const badge = scoreBadge(s.score)
-                const name = configsById.get(s.dimension_id)?.name ?? s.dimension_id
-                const windowDays =
-                  s.metadata && typeof s.metadata.window_days === 'number'
-                    ? (s.metadata.window_days as number)
-                    : null
-                // Use a solid fill color derived from the badge color for the bar.
-                // Badge colors are bg-{color}-100 text-{color}-800; bar uses bg-{color}-400.
-                const barColorMap: Record<string, string> = {
-                  'bg-green-100 text-green-800': 'bg-green-400',
-                  'bg-emerald-100 text-emerald-800': 'bg-emerald-400',
-                  'bg-yellow-100 text-yellow-800': 'bg-yellow-400',
-                  'bg-orange-100 text-orange-800': 'bg-orange-400',
-                  'bg-red-100 text-red-800': 'bg-red-400',
-                  'bg-gray-100 text-gray-500': 'bg-gray-400',
-                }
-                const barColor = barColorMap[badge.color] ?? 'bg-blue-400'
-                return (
-                  <tr key={s.dimension_id} className="border-b">
-                    <td className="py-2 pr-4 font-medium">{name}</td>
-                    <td className="py-2 pr-4">
-                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${badge.color}`}>
-                        {s.score} {badge.label}
-                      </span>
-                    </td>
-                    <td className="py-2 pr-4">
-                      <ScoreBar score={s.score} color={barColor} />
-                    </td>
-                    <td className="py-2 pr-4 text-gray-600 capitalize">{s.scored_by}</td>
-                    <td className="py-2 text-gray-500 text-xs">
-                      {windowDays !== null && (
-                        <span className="mr-1 text-gray-400 italic">
-                          scored from {windowDays}-day window ·{' '}
-                        </span>
-                      )}
-                      {s.rationale ?? <span className="text-gray-400">—</span>}
-                      {!windowDays && !s.rationale && null}
-                      {' '}
-                      <span className="text-gray-400">{relativeTime(s.scored_at)}</span>
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
+          {/* The four-column table needs more width than a phone offers, so
+              below sm the same rows render as stacked cards. Both layouts read
+              from `rows` so their content cannot diverge. */}
+          <div className="mb-4 space-y-2 sm:hidden">
+            {rows.map((r) => (
+              <div key={r.key} className="rounded-lg border border-border p-3">
+                <div className="flex items-start justify-between gap-2">
+                  <span className="font-medium">{r.name}</span>
+                  <Badge className={r.badge.color}>
+                    {r.score} {r.badge.label}
+                  </Badge>
+                </div>
+                <div className="mt-2">
+                  <ScoreBar score={r.score} color={r.barColor} />
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground">{r.rationale}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mb-4 hidden overflow-hidden rounded-lg border border-border sm:block">
+            <Table>
+              <TableHeader className="bg-muted/40">
+                <TableRow>
+                  <TableHead>Dimension</TableHead>
+                  <TableHead>Score</TableHead>
+                  <TableHead>Level</TableHead>
+                  <TableHead>Rationale</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {rows.map((r) => (
+                  <TableRow key={r.key}>
+                    <TableCell className="font-medium">{r.name}</TableCell>
+                    <TableCell>
+                      <Badge className={r.badge.color}>
+                        {r.score} {r.badge.label}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <ScoreBar score={r.score} color={r.barColor} />
+                    </TableCell>
+                    <TableCell className="whitespace-normal text-xs text-muted-foreground">
+                      {r.rationale}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </>
       )}
 
       {hasCsmConfig && (
-        <div className="border rounded p-4 bg-gray-50">
-          <h3 className="text-sm font-semibold mb-2">Update CSM Score</h3>
-          <div className="flex gap-2 items-start flex-wrap">
-            <input
-              type="number"
-              min={1}
-              max={100}
+        <div className="rounded-lg border border-border bg-muted/30 p-4">
+          <h3 className="mb-2 text-sm font-semibold">Update CSM Score</h3>
+          <div className="flex flex-wrap items-start gap-2">
+            {/* `inputMode` gets the numeric keypad on mobile without the
+                desktop stepper arrows a 1–100 range makes unusable. */}
+            <Input
+              id="csm-score"
+              type="text"
+              inputMode="numeric"
+              aria-label="CSM score, 1 to 100"
               placeholder="Score (1–100)"
               value={csmScore}
               onChange={(e) => setCsmScore(e.target.value)}
-              className="border rounded px-2 py-1 text-sm w-28"
+              className="w-28"
             />
-            <input
+            <Input
+              id="csm-rationale"
               type="text"
-              placeholder="Rationale (optional)"
+              aria-label="Rationale for the CSM score"
+              placeholder="Rationale"
               value={csmRationale}
               onChange={(e) => setCsmRationale(e.target.value)}
-              className="border rounded px-2 py-1 text-sm flex-1 min-w-40"
+              className="min-w-40 flex-1"
             />
-            <button
+            <Button
               onClick={handleSaveCsmScore}
-              disabled={saving || !csmScore}
-              className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+              disabled={saving || !csmScore || !csmRationale.trim()}
+              size="sm"
             >
               {saving ? 'Saving…' : 'Save'}
-            </button>
+            </Button>
           </div>
-          {error && <p className="text-red-600 text-xs mt-2">{error}</p>}
+          {error && <p className="mt-2 text-xs text-destructive">{error}</p>}
         </div>
       )}
     </section>
