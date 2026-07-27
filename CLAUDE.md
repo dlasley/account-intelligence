@@ -14,6 +14,9 @@ cd frontend && npm run dev            # Next.js dev server (frontend/)
 uv run python -m src.worker serve     # Worker HTTP server (webhooks/API), port 8080
 # other subcommands: ingest-fixtures, process-fixtures, generate-narratives, synthesise-fixtures
 # (bare `python -m src.worker` only prints help)
+uv run python -m src.worker generate-narratives --workspace-slug <slug> --all --stub-llm
+# --stub-llm (or STUB_LLM=true) swaps in a canned local stub — no ANTHROPIC_API_KEY,
+# no outbound call. Never audit that output; grading canned text is meaningless.
 
 # Test
 cd frontend && npm test               # Vitest (frontend)
@@ -48,7 +51,7 @@ Full data-flow (inbound email → routing → narrative generation → audit) in
 
 - [src/](src/) — Python worker package (`src.*`): `domain/` models, `db/` layer, `config/`, `pipeline/`, `server/` (HTTP), `signals/` (inbound source adapters), `integrations/` (Plain/Pylon/Granola + credential crypto), `synthetic/` (fixture generator), `simulator/` (trajectory backfill), `observability/`.
 - [tests/](tests/) — pytest (`testpaths = ["tests"]`); Hypothesis property tests in `test_invariants.py`.
-- [scripts/](scripts/) — standalone CLIs: `audit_narratives.py` (cross-vendor audit harness), `simulate_history.py` (trajectory simulator), `validate_per_week.py` (fast per-week regression check), baseline capture/check, `reanchor_demo_data.py` (demo-data freshening).
+- [scripts/](scripts/) — standalone CLIs: `audit_narratives.py` (cross-vendor audit harness), `simulate_history.py` (trajectory simulator), `validate_per_week.py` (fast per-week regression check), `check_doc_freshness.py` (recomputable doc claims, CI-wired), baseline capture/check, `reanchor_demo_data.py` (demo-data freshening).
 - [fixtures/synthetic-scenarios/](fixtures/synthetic-scenarios/) — YAML scenarios driving the synthetic generator.
 - [frontend/src/app/](frontend/src/app/) — Next.js App Router pages/layouts.
 - [supabase/](supabase/) — SQL migrations.
@@ -108,9 +111,9 @@ Copy [.env.example](.env.example) to `.env`. Never commit `.env` (gitignored; se
 
 **Synthetic data generator** (`src/synthetic/`): YAML scenario authoring → per-modality generators → conversion/emission → orchestrator. Generators are pure + seeded (deterministic `uuid5` IDs; workspace ids are `uuid5(NAMESPACE_DNS, slug)`); no `datetime.now()`. Always routes through production normalisation — never bypass it. Synthesise via `uv run python -m src.worker synthesise-fixtures --scenario <path>.yaml`.
 
-**Trajectory simulator** (`src/simulator/`, CLI `scripts/simulate_history.py`): backfills per-week historical narratives from YAML specs at `fixtures/synthetic-scenarios/trajectory.<workspace-slug>.yaml`, replaying synthesised signals through the **production** pipeline with `now_anchor=week_start`. Two invariants the module docstrings state: it must never import `src.db.*` directly, and per-week generation is its only mode — current-snapshot narratives belong to the production scheduler. `scripts/validate_per_week.py` is the cheap targeted alternative for re-auditing a few accounts after a prompt edit.
+**Trajectory simulator** (`src/simulator/`, CLI `scripts/simulate_history.py`): backfills per-week historical narratives from YAML specs at `fixtures/synthetic-scenarios/trajectory.<workspace-slug>.yaml`, replaying synthesised signals through the **production** pipeline with `now_anchor=week_start`. Two invariants the module docstrings state: it must never import `src.db.*` directly, and per-week generation is its only mode — current-snapshot narratives belong to the production scheduler. `executor.run()` is the single entry point; a parallel top-level execution path previously drifted out of sync and rotted unnoticed, so add capability to `run()` rather than beside it. `scripts/validate_per_week.py` is the cheap targeted alternative for re-auditing a few accounts after a prompt edit.
 
-**Doc freshness** (`scripts/check_doc_freshness.py`, CI: `.github/workflows/doc-freshness.yml`): recomputes the claims in tracked docs that can be derived from the repo — migration count and filename form, the ADR index against the files on disk, the README test count, and committed fixtures against freshly generated output. Runs on every push and PR; needs no secrets. **When a doc gains a new claim that could be recomputed, add a check rather than relying on someone noticing.** The script cannot see prose claims or stale rationale — those still need a reader.
+**Doc freshness** (`scripts/check_doc_freshness.py`, CI: `.github/workflows/doc-freshness.yml`): recomputes the claims in tracked docs that can be derived from the repo — migration count and filename form, the ADR index against the files on disk, and committed fixtures against freshly generated output. Runs on every push and PR; needs no secrets. A test-count check exists but passes trivially: the README deliberately claims no count, because a reader gains nothing from the size of the suite and the figure is wrong the moment anyone adds a test. **Prefer deleting a decaying claim to guarding it** — a guarded number looks legitimate, so nobody questions it again, and now there is a check to maintain too. When a claim genuinely earns its place and is recomputable, add a check rather than relying on someone noticing. The script cannot see prose claims or stale rationale — those still need a reader.
 
 **Audit harness** (`scripts/audit_narratives.py`): a cross-vendor evaluator that grades generated narratives on 5 criteria (faithfulness, coverage, calibration, hallucination, tone-fit) using OpenAI GPT-5-mini (cross-vendor for training-priors independence). Two append-only tables (`narrative_audits`, `narrative_audit_runs`), committed atomically. Any single hard-gate failure blocks a PR. Design rationale is in ADR-016 (internal, not in the curated public set).
 
