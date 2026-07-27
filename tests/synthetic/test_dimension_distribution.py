@@ -11,16 +11,16 @@ Design note: This test computes engagement scores WITHOUT the LLM or DB. It:
   4. Calls compute_overall_health() using only the email/engagement dimension.
 
 This is the only dimension computable offline (sentiment and CSM score require
-LLM output or manual entry). The engagement dimension has weight=0.5 per
-config/defaults.json. With a single dimension, overall_health == engagement score
-(weighted average of one value = that value), so we assert directly on
-engagement scores throughout.
+LLM output or manual entry). Health is a weighted average that renormalises over
+the dimensions actually present, so with engagement alone overall_health equals
+the engagement score whatever the configured weight is. Assertions therefore run
+directly against engagement scores throughout.
 
 The quantas-labs-baseline.yaml is excluded: it contains 5 Quantas Labs account
 sub-scenarios with 63 total signals; computing per-account engagement from the
 merged stream is non-trivial and not the intent of the distribution test (it
-has its own equivalence test in test_quantas_labs_equivalence.py). The 7 named
-scenarios are the corpus the distribution test exists for.
+has its own equivalence test in test_quantas_labs_equivalence.py). The named
+scenarios in _CORPUS_SCENARIOS are the corpus the distribution test exists for.
 """
 
 import json

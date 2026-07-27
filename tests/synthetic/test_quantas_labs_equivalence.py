@@ -1,14 +1,13 @@
-"""TDD: failing tests for Phase 2c quantas-labs-baseline equivalence.
+"""Equivalence tests for the quantas-labs-baseline synthetic scenario.
 
 Asserts that the synthetic scenario `quantas-labs-baseline.yaml` reproduces the
-routing decisions produced by the 63 hand-authored Quantas Labs account fixtures.
+routing decisions produced by the hand-authored Quantas Labs account fixtures.
 Equivalence criterion (ADR-015 §Req 8):
   - signal count per account (exact)
   - routing-method distribution per account (exact)
   - sender-domain set per account (order-insensitive equality)
 
-ImportError on `ExpectedSignalSpec` is the expected red state until the coder
-adds the class to `src.synthetic.scenario`.
+The fixtures are private-only, so these tests skip when they are absent.
 """
 
 import json
@@ -28,7 +27,8 @@ from src.domain.workspace import Workspace
 from src.pipeline.run import UNMATCHED_ACCOUNT_SLUG
 from src.synthetic.orchestrator import load_scenario, run_scenario
 
-# This import is intentionally the red line: ExpectedSignalSpec does not exist yet.
+# Imported for its own sake: the tests below never reference the symbol, so this
+# line is what fails if the scenario schema stops exposing it.
 from src.synthetic.scenario import ExpectedSignalSpec  # noqa: F401
 
 _ACCOUNTS_DIR = Path("fixtures/quantas-labs-shaped/accounts")

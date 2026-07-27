@@ -11,9 +11,6 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-# This import is the intentional red line.  scripts/audit_narratives.py does not
-# exist yet.  Every test in this file will fail at collection time with:
-#   ModuleNotFoundError: No module named 'scripts.audit_narratives'
 from scripts.audit_narratives import (
     AuditContext,
     AuditResult,

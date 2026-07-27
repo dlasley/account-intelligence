@@ -1,9 +1,7 @@
-"""TDD: failing tests for generate_product_event_payload (src/synthetic/generators/product.py).
+"""Tests for generate_product_event_payload (src/synthetic/generators/product.py).
 
-These tests verify ADR-015 Req 7 — product-event payloads must survive the
+Verifies ADR-015 Req 7 — product-event payloads must survive the
 normalize_product_event chain unchanged, hitting all three routing branches.
-
-ImportError is the expected failing state until the coder ships product.py.
 """
 
 import uuid
@@ -14,8 +12,6 @@ from uuid import NAMESPACE_DNS, uuid5
 from src.domain.contact import Contact
 from src.domain.signal import RoutingMethod, SourceType
 from src.pipeline.product_event import normalize_product_event
-
-# This import is intentionally the red line: the module does not exist yet.
 from src.synthetic.generators.product import (
     _EXPANSION_EVENT_NAMES,
     build_product_contact_pool,

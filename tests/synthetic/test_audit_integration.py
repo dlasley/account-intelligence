@@ -19,7 +19,6 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-# This import is the intentional red line.
 from scripts.audit_narratives import AuditContext, audit_one_narrative
 from src.domain.narrative import Narrative
 from src.domain.signal import Channel, Direction, RoutingMethod, Signal, SourceType
