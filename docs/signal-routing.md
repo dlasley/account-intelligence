@@ -49,7 +49,7 @@ Parsing logic at [src/signals/shared_inbox.py:75-91](../src/signals/shared_inbox
 
 | # | Stage | Matches when | Confidence | RoutingMethod |
 |---|---|---|---|---|
-| 0 | `outbound_bcc` | `from_email` is in `workspace.internal_domains` (this email was sent BY workspace staff) | 0.9 | `OUTBOUND_BCC` |
+| 0 | `outbound_bcc` | `from_email` is in `workspace.internal_domains` (this email was sent BY workspace staff) | 0.9 / 0.3 | `OUTBOUND_BCC` |
 | 1 | `plus_addressing` | recipient had `+<account-slug>` AND a matching account exists | **1.0** | `PLUS_ADDRESSING` |
 | 2 | `header_domain` | sender's email domain matches some active account's `primary_domain` | 0.9 | `HEADER_DOMAIN` |
 | 3 | `forward_parse` | email looks like a forward (e.g., body contains `From:` / `Forwarded message` markers); extracted original sender's domain matches an active account | 0.7 | `FORWARD_PARSE` |
@@ -58,6 +58,20 @@ Parsing logic at [src/signals/shared_inbox.py:75-91](../src/signals/shared_inbox
 | — | (fallback) | none of the above | 0.0 | `UNMATCHED` |
 
 Stage 5 is implemented at [src/pipeline/router.py:262-296](../src/pipeline/router.py#L262-L296).
+
+### Two confidences at stage 0
+
+Stage 0 returns `0.9` when an external recipient matches an existing account. When no
+account matches, it does not fall through to stage 1 — it derives a company from the
+first recipient's domain and returns a **new `CANDIDATE` account at `0.3`**, the same
+confidence and the same candidate mechanism stage 5 uses ([router.py:130-136](../src/pipeline/router.py#L130-L136)).
+
+It declines to guess in one case: if the recipient domain is a personal provider
+(gmail.com and similar), no company can be derived, so stage 0 returns no match and
+the cascade continues.
+
+So an outbound BCC can create an account, not merely match one. Stage 5 is not the
+only candidate-creating path.
 
 ### Auto-discovery rules (stage 5)
 
@@ -132,6 +146,8 @@ The embeddable browser bundle (`src/server/static/event.js`, built via `npm run 
 ---
 
 ## Structured signal path (Plain / Pylon / Granola)
+
+> **Unvalidated against live vendor traffic.** The Plain, Pylon, and Granola adapters are built to each vendor's documented event shape and have never been exercised against a real payload. See [architecture.md § Structured Signal Integrations](architecture.md#structured-signal-integrations).
 
 A third and fourth signal category — ticket and meeting-note records pushed or pulled from Plain, Pylon, and Granola — routes on a different identity model than either path above: workspace identity comes from the `external_credentials` row the request authenticates against (a per-workspace webhook secret or API key), not from an envelope address or an `Authorization: Bearer` API key against the `api_keys` table. Within that workspace, contact/account resolution mirrors the product-event path's 3-way logic exactly (known contact → matched; new contact whose email domain matches an active account → auto-linked; no domain match → orphaned; no participant email → unmatched) — no candidate-account creation, same as product events. See [architecture.md § Structured Signal Integrations](architecture.md#structured-signal-integrations) for the full push (`POST /signal/{kind}`) and poll (`POST /run-polls`) treatment; it isn't duplicated here since this document's scope is the email and product-event cascades specifically.
 

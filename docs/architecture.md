@@ -179,6 +179,8 @@ The auto_discovery path (ADR-013) uses `upsert_contact_safe` — a conflict-safe
 
 ADR-020 (multi-source structured signals, phased) added a third category of inbound signal alongside email and product telemetry: structured records pushed or pulled from third-party support and meeting-notes tools. Two ingestion shapes — push and poll — share one normalizer.
 
+> **These adapters have never run against live vendor traffic.** They are written to each vendor's *documented* webhook and API shape, and the synthetic generators encode that same documented shape — so fixture and adapter agree with each other by construction, and neither has been checked against a real payload. "Tested" here means unit-tested against a self-consistent fixture, not validated in production. Treat the parsing logic in this section as unverified until a live account confirms it. Known unknowns: vendors add and rename envelope fields over time, and the Pylon event-type catalog is incomplete by design (the adapter logs and skips unrecognized types).
+
 ### Credential Model
 
 `external_credentials` stores both directions of integration secret:
