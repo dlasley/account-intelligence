@@ -1,0 +1,39 @@
+name: Doc Freshness
+
+# Recomputable claims in tracked docs drift silently: a migration count, a test
+# count, an ADR index, committed fixtures that no longer match the generator.
+# Each has already gone stale at least once and was only caught by someone
+# thinking to look. This runs the checks instead.
+#
+# Needs no secrets and touches no external service, so it runs on every push and
+# PR rather than behind the `production` environment gate the audit workflow uses.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  freshness:
+    name: Recomputable doc claims
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install uv
+        run: pip install uv
+
+      - name: Install dependencies
+        run: uv sync
+
+      # --all includes the two slow checks: collecting the test suite to verify
+      # the count README claims, and regenerating every materialized scenario
+      # into a temp directory to diff against what is committed.
+      - name: Check documentation freshness
+        run: uv run python scripts/check_doc_freshness.py --all

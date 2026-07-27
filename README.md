@@ -69,9 +69,9 @@ See [docs/architecture.md](docs/architecture.md) for pipeline internals, health 
 
 ## Key Design Decisions
 
-**No configuration before value.** Accounts and contacts are auto-discovered from inbound email domains. The first email to the inbound address creates the account and contact; the first narrative generates without any setup step.
+**No configuration required before value.** Accounts and contacts are auto-discovered from inbound email domains. The first email to the inbound address creates the account and contact; the first narrative generates without any setup step.
 
-**Deterministic health scoring, not LLM-decided.** Email engagement health is a pure function of signal count, recency window, and contact diversity — scaled by a per-account `frequency_multiplier`. A product-usage dimension, scored the same deterministic way from telemetry events, carries equal weight alongside email engagement. The LLM narrates; it does not score. Sentiment is extracted from the narrative as an integer (1-100) and wired as a separate health dimension.
+**Deterministic health scoring, not LLM-decided.** Email engagement health is a pure function of signal count, recency window, and contact diversity — scaled by a per-account `frequency_multiplier`. A product-usage dimension, scored the same deterministic way from telemetry events, carries equal weight alongside email engagement. The LLM narrates; it does not score. Sentiment is extracted from the narrative as an integer (1-100) and wired as a separate health dimension. A fourth dimension, CSM score, is set directly by a human via the `set_csm_score` RPC rather than computed from any signal. Overall health is a weighted average across whichever dimensions currently have an active score — a dimension with none simply drops out of the average, and the remaining weights renormalize rather than treating the missing dimension as zero.
 
 **Vendor-neutral analytics wrapper.** Both the worker and frontend emit product-analytics and LLM-observability events through a single internal interface rather than importing the PostHog SDK directly at each call site; swapping analytics providers means rewriting the wrapper body, not touching call sites.
 
@@ -83,11 +83,15 @@ See [docs/architecture.md](docs/architecture.md) for pipeline internals, health 
 
 **Webhook security tradeoff.** SendGrid Inbound Parse does not support custom request headers. The webhook secret is passed as a `?token=` query parameter, which appears in Cloud Run request logs (IAM-access-controlled). This is a documented accepted tradeoff. See [docs/architecture.md](docs/architecture.md) for the full decision.
 
+**Structured signals extend beyond email and telemetry, unvalidated against live vendor traffic.** Plain and Pylon ticket webhooks (push) and Granola meeting notes (poll) route through the same three-way contact-linkage logic as product telemetry, sharing one normalizer. The adapters are built to each vendor's documented webhook/API shape; none has been exercised against real vendor traffic yet, so treat the parsing logic as unverified until a live account confirms it.
+
+**Super-user browsing bypasses RLS by explicit design, not oversight.** A small `/admin` surface (three routes: workspace list, per-workspace account list, per-account detail) lets a flagged super-user (`users.is_super_user`) browse any workspace's data for support and debugging. Access is checked twice: Next.js middleware blocks `/admin/*` for non-super-users before any query runs, and each of the three SECURITY DEFINER RPCs it calls re-checks `is_super_user` inside the function body before bypassing RLS. `authenticated` stays SELECT-only everywhere else, and the admin surface itself is read-only — none of its RPCs write anything. See [docs/architecture.md](docs/architecture.md) for the route/RPC detail.
+
 ---
 
 ## Data Model
 
-Six entities, all workspace-scoped:
+Seven entities, all workspace-scoped:
 
 ```text
 organization
@@ -114,26 +118,36 @@ account-intelligence/
 │   ├── pipeline/                 # Signal processing and narrative generation
 │   │   ├── router.py             # Pure function: 6-stage routing cascade
 │   │   ├── normalizer.py         # Contact upsert + signal insert
+│   │   ├── _contact_factory.py   # Shared contact-creation helper used by normalizer + product_event
 │   │   ├── confidence.py         # Engagement health score (deterministic)
 │   │   ├── generator.py          # Claude API call + prompt caching + health scoring
 │   │   ├── health.py             # Weighted dimension average (pure function)
 │   │   ├── outreach.py           # Template loading, recommendation, signal panel
 │   │   ├── product_event.py      # Product telemetry normalisation (3-way contact routing)
+│   │   ├── product_usage_render.py # Product-usage dimension rationale text
+│   │   ├── structured_signal.py  # Plain/Pylon/Granola normalisation (shared 3-way contact routing)
+│   │   ├── run.py                # process_event(): production entry point for email + synthetic signals
 │   │   └── scheduler.py          # Enqueue/drain narrative regen jobs
 │   ├── synthetic/                # Synthetic data generator (ADR-015)
 │   │   ├── orchestrator.py       # YAML scenario → seeded RNG → per-modality dispatch
 │   │   ├── scenario.py           # Pydantic schema (extra="forbid")
-│   │   ├── generators/           # Pure functions: email.py (5 registers × 7 topical families), product.py
+│   │   ├── generators/           # Pure functions: email.py (5 registers × 7 topical families), product.py, meeting_note.py, ticket_plain.py, ticket_pylon.py
 │   │   └── materialise.py        # Write deterministic scenario output to fixtures/synthetic/<scenario>/
+│   ├── simulator/                # Trajectory backfill: replays synthesised signals through the production pipeline per historical week
 │   ├── server/                   # FastAPI app (serve subcommand)
-│   │   └── routes/               # /inbound, /run-narratives, /run-polls, /outreach/{slug}/context, /outreach/send/{draft_id}, /event, /event.js, /signal/{kind}
+│   │   └── routes/               # /health, /inbound, /run-narratives, /run-polls, /outreach/{slug}/context, /outreach/send/{draft_id}, /event, /event.js, /signal/{kind}
 │   ├── signals/                  # SignalSource ABC + JsonFixtureSource
+│   ├── integrations/             # Plain/Pylon/Granola adapters + credential encryption (ADR-020)
+│   ├── observability/            # LLM OTel instrumentation for PostHog LLM analytics
 │   └── config/                   # Config loader (deep-merge workspace overrides on defaults)
 ├── scripts/
-│   ├── audit_narratives.py            # Cross-vendor narrative audit harness (ADR-016, OpenAI GPT-5-mini)
+│   ├── audit_narratives.py            # Cross-vendor narrative audit harness (ADR-016, OpenAI GPT-5-mini; prompt at scripts/prompts/audit-narratives.md)
 │   ├── capture_narrative_baselines.py # Phase 4c: snapshot active narratives + scores; refuses non-audit-clean
 │   ├── check_narrative_baselines.py   # Phase 4c: DB-coupled drift detector vs committed baselines
-│   └── derive_quantas_labs_baseline.py # One-shot fixture-equivalence baseline derivation
+│   ├── derive_quantas_labs_baseline.py # One-shot fixture-equivalence baseline derivation
+│   ├── reanchor_demo_data.py          # Shifts a demo workspace's signal timestamps forward so a synthetic corpus reads as current
+│   ├── simulate_history.py            # Trajectory simulator CLI (src/simulator/): backfills per-week historical narratives from a YAML spec
+│   └── validate_per_week.py           # Fast targeted per-week regression check for a handful of accounts after a prompt edit
 ├── tests/                        # pytest tests (asyncio_mode = "auto")
 │   ├── synthetic/                # Orchestrator, equivalence, audit integration, dimension distribution
 │   ├── test_invariants.py        # Hypothesis property tests
@@ -150,8 +164,8 @@ account-intelligence/
 │   └── migrations/               # 30 numbered SQL migrations (baseline + incremental, 000001–000030)
 ├── frontend/                     # Next.js 15 App Router frontend
 │   └── src/
-│       ├── app/                  # Pages: /login, /accounts, /accounts/[slug]
-│       ├── components/           # AccountTabs, NarrativeSection, OutreachTab, etc.
+│       ├── app/                  # Pages: / (redirects to /accounts), /login, /accounts, /accounts/[slug], /admin, /admin/workspaces/[slug]/accounts, /admin/workspaces/[slug]/accounts/[accountSlug]
+│       ├── components/           # AccountTabs, NarrativeSection, OutreachTab, WorkspaceTable, AccountTable, etc.
 │       └── lib/                  # Supabase browser/server clients, utils
 ├── docs/
 │   └── architecture.md           # Pipeline internals, routing cascade, health design, audit harness
@@ -173,13 +187,24 @@ account-intelligence/
 | `OPENAI_API_KEY` | No | Audit harness only (`scripts/audit_narratives.py`). Required to run the cross-model narrative audit; not used by the worker proper. |
 | `SUPABASE_URL` | Yes | Supabase project URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | Yes | Service-role key for worker writes |
+| `SUPABASE_ANON_KEY` | No | Not read by the worker itself; canonical value the frontend's `NEXT_PUBLIC_SUPABASE_ANON_KEY` mirrors |
+| `SUPABASE_ACCESS_TOKEN` | No | Supabase MCP server only; not read by the worker at runtime |
+| `SUPABASE_PROJECT_REF` | No | Supabase MCP server only, substituted into `.mcp.json` URLs; not read by the worker at runtime |
 | `WEBHOOK_SECRET` | Yes | HMAC token for SendGrid inbound validation |
-| `SCHEDULER_SECRET` | Yes | Bearer token for Cloud Scheduler auth on `/run-narratives` |
+| `SCHEDULER_SECRET` | Yes | Bearer token for Cloud Scheduler auth on `/run-narratives` and `/run-polls` |
 | `SENDGRID_API_KEY` | Yes | SendGrid Transactional API key for outreach send |
+| `INTEGRATION_ENCRYPTION_KEY` | No | Encrypts Plain/Pylon/Granola credentials (ADR-020). Read lazily per-request/per-poll, not at startup — the worker boots fine without it if no structured integrations are configured; required only once one is. |
 | `INBOUND_DOMAIN` | No | Inbound email domain (e.g. `signal.yourdomain.com`). Falls back to `defaults.json`. |
 | `CORS_ORIGINS` | No | Comma-separated allowed origins (e.g. Vercel URL + `http://localhost:3000`). Unset = no CORS headers. |
+| `FASTAPI_DEBUG` | No | Set to `true` to enable the `/docs` UI locally. |
 | `AUDIT_MAX_COST_USD` | No | Cost ceiling for one audit run (default `0.50`). |
 | `LOG_LEVEL` | No | Defaults to `WARNING`. Set `INFO` for pipeline visibility. |
+| `POSTHOG_API_KEY` | No | PostHog project API key, shared by product analytics and LLM observability. |
+| `POSTHOG_HOST` | No | Defaults to `https://us.i.posthog.com`. |
+| `POSTHOG_ENABLED` | No | Product analytics on/off. Defaults `false`. |
+| `POSTHOG_LLM_OBSERVABILITY_ENABLED` | No | LLM OTel instrumentation on/off. Defaults `true` when `POSTHOG_API_KEY` is set. |
+| `DEPLOY_ENV` | No | Injected into OTel resource attributes. Defaults `development`; set `production` in prod. |
+| `APP_ENV` | No | Product-analytics `distinct_id` prefix. Set `production` in prod. |
 
 ### Next.js Frontend (Vercel)
 
@@ -188,8 +213,85 @@ account-intelligence/
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Same value as `SUPABASE_URL` |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase anon key (safe in client bundle; RLS controls access) |
 | `NEXT_PUBLIC_WORKER_URL` | Yes | Cloud Run service URL. Use `http://localhost:8080` locally. |
+| `NEXT_PUBLIC_POSTHOG_ENABLED` | No | Defaults to `false`; analytics no-op without it |
+| `NEXT_PUBLIC_POSTHOG_KEY` | No | Required only when analytics are enabled |
+| `NEXT_PUBLIC_POSTHOG_HOST` | No | PostHog ingestion host |
 
 Never add `SUPABASE_SERVICE_ROLE_KEY` or `ANTHROPIC_API_KEY` to Vercel — those belong on Cloud Run only.
+
+---
+
+## Run It Locally, No Accounts
+
+Everything in this section runs against nothing but this checkout — no Supabase project, no Anthropic key, no `.env` file. Skip to [Getting Started](#getting-started) below if you already have a Supabase project and an Anthropic key and want real narrative output.
+
+### Prove the code works
+
+```bash
+uv sync
+cd frontend && npm install && cd ..
+uv run pytest
+cd frontend && npm test && cd ..
+```
+
+### See the pipeline reason about real data (no database)
+
+```bash
+uv run python -m src.worker ingest-fixtures --scenario synthetic/seed-stage-saas
+```
+
+Loads one of the four committed synthetic scenarios (`fixtures/synthetic/`) and prints the routing preview for its inbound events. This never imports `src.db` — no database, no LLM call, no network.
+
+### Run the full worker pipeline against a local database
+
+Needs Docker and the [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started) — both free, neither needs a supabase.com account. `supabase start` runs a self-contained local stack (Postgres, Auth, PostgREST, Studio) in Docker; the 30 tracked migrations apply to it exactly as they would to a hosted project.
+
+```bash
+supabase start
+supabase status -o env   # prints API_URL, ANON_KEY, SERVICE_ROLE_KEY for the commands below
+
+SUPABASE_URL=<API_URL> SUPABASE_SERVICE_ROLE_KEY=<SERVICE_ROLE_KEY> \
+  uv run python -m src.worker process-fixtures --scenario synthetic/seed-stage-saas
+
+SUPABASE_URL=<API_URL> SUPABASE_SERVICE_ROLE_KEY=<SERVICE_ROLE_KEY> \
+  uv run python -m src.worker generate-narratives --workspace-slug lattice-build --all --stub-llm
+```
+
+`--stub-llm` (equivalently, `STUB_LLM=true` in the environment) swaps in a canned local stub for the Anthropic client — no `ANTHROPIC_API_KEY`, no outbound call. Every narrative it writes is prefixed `[STUB-LLM]` with a fixed low sentiment, so it can't be mistaken for real model output; drop the flag and set `ANTHROPIC_API_KEY` once you want to see the actual product. Never point `scripts/audit_narratives.py` at this output — grading canned text produces a meaningless pass rate.
+
+`supabase/seed.sql` runs automatically on `supabase start` and `supabase db reset`. It pre-creates the `lattice-build` organization and workspace with the same deterministic ID `process-fixtures` computes from the scenario's slug, so the two commands above always land on the same rows regardless of run order.
+
+Inspect the result via Studio (URL printed by `supabase start`, default `http://127.0.0.1:54323`) or `psql`/`docker exec` against the printed `DB_URL`. Run `supabase stop` when done.
+
+### See it in the actual frontend
+
+The frontend reads Supabase directly, so pointing it at the local stack from the previous section shows the same data in the real UI. One manual step is required — there's no self-serve signup-to-workspace flow yet.
+
+1. Point the frontend at the local stack (`frontend/.env.local`, or exported in your shell):
+
+   ```bash
+   NEXT_PUBLIC_SUPABASE_URL=<API_URL>          # same API_URL as above
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=<ANON_KEY>    # same ANON_KEY as above — safe to expose, RLS gates data
+   ```
+
+   These are printed by `supabase status`. They're the well-known Supabase CLI local-dev defaults, identical across every default local install — not a leaked project secret.
+
+2. Create an auth user via Studio → **Authentication → Users → Add user** (email + password), then copy its UUID.
+
+3. Link it to the seeded workspace by running this in Studio's SQL editor (or `psql`), substituting the UUID from step 2:
+
+   ```sql
+   insert into public.users (id, workspace_id, email, display_name, role)
+   values (
+     '<auth-user-uuid-from-step-2>',
+     'e20008c3-2f9f-5717-a076-eb101fd99bd8',  -- lattice-build, seeded by supabase/seed.sql
+     'you@example.com',
+     'Your Name',
+     'admin'
+   );
+   ```
+
+4. `cd frontend && npm run dev`, then log in at `http://localhost:3000/login` with the email/password from step 2.
 
 ---
 
@@ -227,7 +329,7 @@ uv run python -m src.worker serve    # Python worker → http://localhost:8080
 ```bash
 # Process the seed-stage-saas scenario (12 fictional accounts for a CI/CD observability
 # startup; populates the `lattice-build` workspace per the YAML's workspace_slug).
-uv run python -m src.worker process-fixtures --scenario seed-stage-saas
+uv run python -m src.worker process-fixtures --scenario synthetic/seed-stage-saas
 
 # Generate narratives for every account in the resulting workspace.
 uv run python -m src.worker generate-narratives --workspace-slug lattice-build --all
@@ -241,7 +343,7 @@ mapping.
 ### Test
 
 ```bash
-uv run pytest                          # Python tests (813 passing)
+uv run pytest                          # Python tests
 cd frontend && npm test                # Vitest
 ```
 

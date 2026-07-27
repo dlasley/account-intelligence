@@ -59,12 +59,13 @@ Full data-flow (inbound email → routing → narrative generation → audit) in
 Copy [.env.example](.env.example) to `.env`. Never commit `.env` (gitignored; settings deny-list blocks edits).
 
 - **LLM providers**: `ANTHROPIC_API_KEY` (narrative generation; outreach uses templates, no LLM); `OPENAI_API_KEY` (audit harness — GPT-5-mini as cross-vendor auditor).
-- **Supabase (worker)**: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ACCESS_TOKEN` (MCP).
-- **Supabase (frontend)**: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+- **Supabase (worker)**: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ACCESS_TOKEN` (MCP), `SUPABASE_PROJECT_REF` (MCP, substituted into `.mcp.json` URLs).
+- **Supabase (frontend)**: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_WORKER_URL` (Cloud Run URL the frontend calls for outreach context).
 - **Inbound email**: `INBOUND_DOMAIN` (public-repo files use `signal.example.com` as the RFC-2606 placeholder).
-- **Outreach + API**: `SENDGRID_API_KEY`, `CORS_ORIGINS`, `WEBHOOK_SECRET`, `SCHEDULER_SECRET`.
-- **Integrations**: `INTEGRATION_ENCRYPTION_KEY` (required — encrypts Plain/Pylon/Granola credentials, ADR-020).
-- **Analytics**: `POSTHOG_API_KEY`, `POSTHOG_HOST`, `POSTHOG_ENABLED`.
+- **Outreach + API**: `SENDGRID_API_KEY`, `CORS_ORIGINS`, `WEBHOOK_SECRET`, `SCHEDULER_SECRET`, `FASTAPI_DEBUG` (enables the `/docs` UI locally), `LOG_LEVEL` (defaults `WARNING`).
+- **Integrations**: `INTEGRATION_ENCRYPTION_KEY` (encrypts Plain/Pylon/Granola credentials, ADR-020; read lazily per-request/per-poll, so the worker boots without it if no structured integrations are configured).
+- **Analytics (worker)**: `POSTHOG_API_KEY`, `POSTHOG_HOST`, `POSTHOG_ENABLED`, `POSTHOG_LLM_OBSERVABILITY_ENABLED`, `DEPLOY_ENV`, `APP_ENV`.
+- **Analytics (frontend)**: `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST`, `NEXT_PUBLIC_POSTHOG_ENABLED`.
 
 ## Tooling Notes
 
@@ -85,7 +86,7 @@ Copy [.env.example](.env.example) to `.env`. Never commit `.env` (gitignored; se
 
 **Health dimensions** (`src/db/dimension_configs.py`, `dimension_scores.py`, `health_snapshots.py`): `health_dimension_configs` is a mutable config table; `account_dimension_scores` + `account_health_snapshots` are append-only with a supersede pattern. `accounts.overall_health_score` is a denormalized cache of the latest snapshot. Four dimension types today: `email`, `product_usage`, `sentiment`, `csm_score` — see `config/defaults.json` for current weights.
 
-**Migrations**: baseline `20260423_000001_initial_schema.sql`; changes are new numbered files. Since migration 000027 (ADR-019, "Single Mutation Surface"), `authenticated` is SELECT-only on every table — new tables get `GRANT SELECT ON <table> TO authenticated;` (or a column-restricted `GRANT SELECT (col, col, ...) ON <table> TO authenticated;` when a sensitive column like an encrypted secret must stay service-role-only, per `external_credentials` in migration 000029) plus `GRANT ALL ON <table> TO service_role;`. All mutations route through a SECURITY DEFINER RPC (see the Frontend mutation pattern below) — never grant INSERT/UPDATE/DELETE to `authenticated`, never grant anything to `anon`. RLS uses `current_user_workspace_id()` (SECURITY DEFINER); every workspace-isolation policy carries both `USING` and `WITH CHECK`.
+**Migrations**: baseline `20260423000001_initial_schema.sql`; changes are new numbered files. Filenames use the Supabase CLI's `YYYYMMDDHHMMSS_name.sql` form, with the trailing six digits carrying the sequence number (`…000001`, `…000002`) — the CLI parses everything before the first underscore as the version, so a `YYYYMMDD_NNNNNN_` form collides across same-day migrations and breaks `supabase db reset`. Since migration 000027 (ADR-019, "Single Mutation Surface"), `authenticated` is SELECT-only on every table — new tables get `GRANT SELECT ON <table> TO authenticated;` (or a column-restricted `GRANT SELECT (col, col, ...) ON <table> TO authenticated;` when a sensitive column like an encrypted secret must stay service-role-only, per `external_credentials` in migration 000029) plus `GRANT ALL ON <table> TO service_role;`. All mutations route through a SECURITY DEFINER RPC (see the Frontend mutation pattern below) — never grant INSERT/UPDATE/DELETE to `authenticated`, never grant anything to `anon`. RLS uses `current_user_workspace_id()` (SECURITY DEFINER); every workspace-isolation policy carries both `USING` and `WITH CHECK`.
 
 **Timestamp convention**: mutable tables use `created_at` + trigger-maintained `updated_at`. Append-only tables drop `created_at` for a column named after the event (`generated_at`, `scored_at`, `computed_at`, `received_at`, `occurred_at`, `audited_at`) and supersede via `superseded_at` instead of `deleted_at`. `signals` is the edge case: mutable (`created_at`/`updated_at`) plus a separate `occurred_at` for event time.
 
@@ -108,6 +109,8 @@ Copy [.env.example](.env.example) to `.env`. Never commit `.env` (gitignored; se
 **Synthetic data generator** (`src/synthetic/`): YAML scenario authoring → per-modality generators → conversion/emission → orchestrator. Generators are pure + seeded (deterministic `uuid5` IDs; workspace ids are `uuid5(NAMESPACE_DNS, slug)`); no `datetime.now()`. Always routes through production normalisation — never bypass it. Synthesise via `uv run python -m src.worker synthesise-fixtures --scenario <path>.yaml`.
 
 **Trajectory simulator** (`src/simulator/`, CLI `scripts/simulate_history.py`): backfills per-week historical narratives from YAML specs at `fixtures/synthetic-scenarios/trajectory.<workspace-slug>.yaml`, replaying synthesised signals through the **production** pipeline with `now_anchor=week_start`. Two invariants the module docstrings state: it must never import `src.db.*` directly, and per-week generation is its only mode — current-snapshot narratives belong to the production scheduler. `scripts/validate_per_week.py` is the cheap targeted alternative for re-auditing a few accounts after a prompt edit.
+
+**Doc freshness** (`scripts/check_doc_freshness.py`, CI: `.github/workflows/doc-freshness.yml`): recomputes the claims in tracked docs that can be derived from the repo — migration count and filename form, the ADR index against the files on disk, the README test count, and committed fixtures against freshly generated output. Runs on every push and PR; needs no secrets. **When a doc gains a new claim that could be recomputed, add a check rather than relying on someone noticing.** The script cannot see prose claims or stale rationale — those still need a reader.
 
 **Audit harness** (`scripts/audit_narratives.py`): a cross-vendor evaluator that grades generated narratives on 5 criteria (faithfulness, coverage, calibration, hallucination, tone-fit) using OpenAI GPT-5-mini (cross-vendor for training-priors independence). Two append-only tables (`narrative_audits`, `narrative_audit_runs`), committed atomically. Any single hard-gate failure blocks a PR. See [ADR-016](docs/adr/).
 
