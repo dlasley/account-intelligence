@@ -4,18 +4,9 @@ How inbound email and product-telemetry events are routed to a workspace and an 
 
 This is the routing layer; for the wider architecture (worker, frontend, audit harness, RLS, etc.) see [architecture.md](architecture.md).
 
----
-
-## Domain transition state (read this first)
-
-The codebase is mid-migration from the legacy domain to the target domain. **Live infrastructure (DNS / SendGrid / Cloud Run env vars) still uses the legacy domain**; **code references and tests use the target domain**.
-
-| Surface | Today (live MX + worker `INBOUND_DOMAIN`) | Target state (after DNS + SendGrid + Cloud Run reconfig) |
-|---|---|---|
-| Email inbound MX | `<legacy-inbound-domain>` | `<target-inbound-domain>` |
-| Tracker beacon URL fallback | (legacy) | `https://<target-api-domain>/event` |
-
-This document uses the **target domain** for examples (`<target-inbound-domain>`, `<target-api-domain>`) for forward-compatibility. **Real forwarding tests today must use the legacy domain** — `<workspace>@<legacy-inbound-domain>`. The reconfig is a deferred operational task, tracked internally.
+Real domains are redacted here as `<inbound-domain>` and `<api-domain>`; the live
+values are the worker's `INBOUND_DOMAIN` env var and the host its Inbound Parse
+webhook points at. Public files use `signal.example.com` as the placeholder.
 
 ---
 
@@ -36,10 +27,10 @@ Examples:
 
 | Recipient | Resolves to |
 |---|---|
-| `quantas-labs@<target-inbound-domain>` | workspace `quantas-labs`, no account hint |
-| `quantas-labs+harvard@<target-inbound-domain>` | workspace `quantas-labs`, account hint `harvard` |
-| `lattice-build+crucible@<target-inbound-domain>` | workspace `lattice-build`, account hint `crucible` |
-| `lattice-build-thornfield-ai@<target-inbound-domain>` | **workspace lookup for `lattice-build-thornfield-ai` — fails (no such workspace); email rejected.** Hyphen has no special meaning to the parser. |
+| `quantas-labs@<inbound-domain>` | workspace `quantas-labs`, no account hint |
+| `quantas-labs+harvard@<inbound-domain>` | workspace `quantas-labs`, account hint `harvard` |
+| `lattice-build+crucible@<inbound-domain>` | workspace `lattice-build`, account hint `crucible` |
+| `lattice-build-thornfield-ai@<inbound-domain>` | **workspace lookup for `lattice-build-thornfield-ai` — fails (no such workspace); email rejected.** Hyphen has no special meaning to the parser. |
 
 Parsing logic at [src/signals/shared_inbox.py:75-91](../src/signals/shared_inbox.py#L75-L91). The parser checks for `+` in the local part. If present, it partitions into workspace/account; if absent, the entire local part is the workspace slug.
 
@@ -141,7 +132,7 @@ The product event path **never creates candidate accounts** for unknown domains.
 
 ### Browser bundle defaults
 
-The embeddable browser bundle (`src/server/static/event.js`, built via `npm run build:event-js`; served at `/event.js` — renamed from `/tracker.js` on 2026-05-08, same privacy-aware reasoning as the endpoint rename — from the built output at `src/server/static/dist/event.js`) reads `data-key` and `data-url` attributes from its `<script>` tag. If `data-url` is absent, it falls back to **`https://<target-api-domain>/event`** (target state in code; legacy DNS not yet pointed there — see top of doc). Customers can override `data-url` to point at any environment-specific worker.
+The embeddable browser bundle (`src/server/static/event.js`, built via `npm run build:event-js`; served at `/event.js` — renamed from `/tracker.js` on 2026-05-08, same privacy-aware reasoning as the endpoint rename — from the built output at `src/server/static/dist/event.js`) reads `data-key` and `data-url` attributes from its `<script>` tag. If `data-url` is absent, it falls back to **`https://<api-domain>/event`**. Customers can override `data-url` to point at any environment-specific worker.
 
 ---
 
