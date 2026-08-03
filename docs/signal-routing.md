@@ -4,9 +4,11 @@ How inbound email and product-telemetry events are routed to a workspace and an 
 
 This is the routing layer; for the wider architecture (worker, frontend, audit harness, RLS, etc.) see [architecture.md](architecture.md).
 
-Real domains are redacted here as `<inbound-domain>` and `<api-domain>`; the live
-values are the worker's `INBOUND_DOMAIN` env var and the host its Inbound Parse
-webhook points at. Public files use `signal.example.com` as the placeholder.
+Real domains are redacted here as `<inbound-domain>` and `<api-domain>`; public
+files use `signal.example.com` as the placeholder. The live values are the worker's
+`INBOUND_DOMAIN` env var and the host its SendGrid Inbound Parse webhook targets.
+**Read them from the deployed service rather than from any document, including this
+one** — see `CLAUDE.md` § Environment for why.
 
 ---
 

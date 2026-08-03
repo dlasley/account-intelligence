@@ -70,6 +70,8 @@ Copy [.env.example](.env.example) to `.env`. Never commit `.env` (gitignored; se
 - **Analytics (worker)**: `POSTHOG_API_KEY`, `POSTHOG_HOST`, `POSTHOG_ENABLED`, `POSTHOG_LLM_OBSERVABILITY_ENABLED`, `DEPLOY_ENV`, `APP_ENV`.
 - **Analytics (frontend)**: `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST`, `NEXT_PUBLIC_POSTHOG_ENABLED`.
 
+**For deployed values, read the running service — not these docs and not `.env`.** `.env` is local dev and its placeholders outlive the decisions they stood in for. Docs record intent and history; the deploy environment holds current state — the same split that puts cumulative schema in Postgres rather than in accumulated migrations. This has bitten: multiple docs once disagreed with each other about a live env var, and the majority were wrong. When they conflict, the service settles it — then fix whichever doc disagreed, in the same pass.
+
 ## Tooling Notes
 
 - **Python** `>=3.11`. Ruff handles linting + formatting — 100-character lines, targeting 3.11, enforcing style, import order, and a set of bug-catching and modern-syntax rules (`frontend/` excluded). Pyright runs in basic mode across `src/` + `tests/`; `src/db/` suppresses Supabase JSON-union diagnostics via `executionEnvironments`. Keep new `src/` code at zero pyright errors.
