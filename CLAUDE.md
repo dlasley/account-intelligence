@@ -65,7 +65,7 @@ Copy [.env.example](.env.example) to `.env`. Never commit `.env` (gitignored; se
 - **Supabase (worker)**: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ACCESS_TOKEN` (MCP), `SUPABASE_PROJECT_REF` (MCP, substituted into `.mcp.json` URLs).
 - **Supabase (frontend)**: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_WORKER_URL` (Cloud Run URL the frontend calls for outreach context).
 - **Inbound email**: `INBOUND_DOMAIN` (public-repo files use `signal.example.com` as the RFC-2606 placeholder).
-- **Outreach + API**: `SENDGRID_API_KEY`, `CORS_ORIGINS`, `WEBHOOK_SECRET`, `SCHEDULER_SECRET`, `FASTAPI_DEBUG` (enables the `/docs` UI locally), `LOG_LEVEL` (defaults `WARNING`).
+- **Outreach + API**: `SENDGRID_API_KEY`, `CORS_ORIGINS`, `WEBHOOK_SECRET`, `SCHEDULER_SECRET`, `FASTAPI_DEBUG` (enables the service-introspection endpoints locally — see [§Service-introspection discipline](#service-introspection-discipline)), `LOG_LEVEL` (defaults `WARNING`).
 - **Integrations**: `INTEGRATION_ENCRYPTION_KEY` (encrypts Plain/Pylon/Granola credentials, ADR-020; read lazily per-request/per-poll, so the worker boots without it if no structured integrations are configured).
 - **Analytics (worker)**: `POSTHOG_API_KEY`, `POSTHOG_HOST`, `POSTHOG_ENABLED`, `POSTHOG_LLM_OBSERVABILITY_ENABLED`, `DEPLOY_ENV`, `APP_ENV`.
 - **Analytics (frontend)**: `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST`, `NEXT_PUBLIC_POSTHOG_ENABLED`.
@@ -130,6 +130,15 @@ Forward-looking rules for any `SECURITY DEFINER` Postgres function (RPC, RLS hel
 3. **Prefer `current_user_workspace_id()` over caller-supplied `workspace_id`** for authorization — a caller can pass any ID. Reserve `workspace_id` params for deliberately cross-workspace admin functions, gated on `is_super_user`.
 4. **Prefer SQL functions over PL/pgSQL** when no procedural logic is needed (avoids the OUT-param scoping traps).
 5. **`GRANT EXECUTE` to `authenticated`, `REVOKE EXECUTE` from `anon`** for any super-user-gated function (belt-and-suspenders behind the in-body gate).
+
+### Service-introspection discipline
+
+Anything that describes the service's own shape — endpoint inventory, request and response schemas, rendered API explorers — is a development convenience and is gated on `FASTAPI_DEBUG` as a **set**, in [src/server/app.py](src/server/app.py).
+
+1. **Gate `docs_url`, `redoc_url` and `openapi_url` together.** They are three views of one thing, and the framework does not couple them: disabling the two rendered UIs leaves the schema they render from serving at its default path. Turning off what you can see is not the same as turning it off.
+2. **A new introspection or diagnostic route joins the set.** Health checks stay ungated — they carry no shape, and uptime monitoring needs them.
+3. **Assert the gate rather than reasoning about it.** `curl` each path against a running instance with the flag off; a 404 on the UI proves nothing about the schema.
+4. **Nothing in this repo consumes the schema endpoint** — no client generation, no test, no frontend fetch. If that changes, the consumer needs a build-time source rather than a live production one, or the gate gets quietly reverted to unblock it.
 
 ### LLM-output discipline
 

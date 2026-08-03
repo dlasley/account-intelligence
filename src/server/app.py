@@ -6,10 +6,13 @@ from fastapi.middleware.cors import CORSMiddleware
 
 def create_app() -> FastAPI:
     debug = os.environ.get("FASTAPI_DEBUG", "").lower() == "true"
+    # All three introspection endpoints move together. openapi_url is the one
+    # that does not turn itself off when the UIs are disabled.
     app = FastAPI(
         title="Account Intelligence Worker",
         docs_url="/docs" if debug else None,
-        redoc_url=None,
+        redoc_url="/redoc" if debug else None,
+        openapi_url="/openapi.json" if debug else None,
     )
 
     # CORS_ORIGINS is a comma-separated list of allowed origins.
