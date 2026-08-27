@@ -12,6 +12,19 @@ on:
   pull_request:
   workflow_dispatch:
 
+# Least privilege: these jobs only read the checkout. Without this the default
+# repository scope applies, which on the push trigger is often read-write, and
+# actions/checkout persists that token into .git/config where every subsequent
+# step — repository code and third-party actions alike — can reach it.
+permissions:
+  contents: read
+
+# A new push supersedes the previous run rather than racing it, so check results
+# reflect the tip of the branch.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   python:
     name: Python ${{ matrix.python-version }} — pytest + ruff
@@ -29,6 +42,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -65,6 +80,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Set up Node
         uses: actions/setup-node@v4
