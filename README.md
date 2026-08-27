@@ -161,7 +161,7 @@ account-intelligence/
 │   ├── synthetic-scenarios/      # YAML scenarios driving the synthetic generator + audit corpus
 │   └── narrative-baselines/      # Phase 4c committed snapshots of audit-clean narratives
 ├── supabase/
-│   └── migrations/               # 30 numbered SQL migrations (baseline + incremental, 000001–000030)
+│   └── migrations/               # 31 numbered SQL migrations (baseline + incremental, 000001–000031)
 ├── frontend/                     # Next.js 15 App Router frontend
 │   └── src/
 │       ├── app/                  # Pages: / (redirects to /accounts), /login, /accounts, /accounts/[slug], /admin, /admin/workspaces/[slug]/accounts, /admin/workspaces/[slug]/accounts/[accountSlug]
