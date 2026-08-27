@@ -1,0 +1,235 @@
+# CodeRabbit configuration — https://docs.coderabbit.ai/reference/configuration
+#
+# The path_instructions below are lifted from CLAUDE.md rather than authored
+# here. They are deliberately weighted toward invariants whose violation is
+# SILENT — code that compiles, passes tests, and returns a wrong answer. A
+# reviewer without this context cannot infer them from the diff.
+
+language: en-US
+
+tone_instructions: >-
+  Solo maintainer, no second reviewer. Prefer a small number of substantive
+  findings over exhaustive nitpicking. State the failure mode concretely.
+
+reviews:
+  # assertive surfaces more than the `chill` default. This repo has had no
+  # automated correctness checking at all, so the first PRs are a baseline
+  # measurement of what an unaided reviewer finds.
+  profile: assertive
+
+  # Advisory, not blocking. A sole maintainer dismissing their own required
+  # reviewer teaches nothing about review quality, and a gate that is always
+  # overridden trains the habit of overriding it.
+  request_changes_workflow: false
+
+  high_level_summary: true
+  changed_files_summary: true
+  sequence_diagrams: true
+  review_status: true
+  poem: false
+
+  # Expanded by default — the walkthrough is the part worth reading here.
+  collapse_walkthrough: false
+
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - main
+
+  path_filters:
+    - "!**/node_modules/**"
+    - "!**/package-lock.json"
+    - "!**/uv.lock"
+    - "!**/.next/**"
+    - "!**/__pycache__/**"
+    - "!frontend/src/components/ui/**"
+    # Materialized generator output: deterministic, high-volume, and already
+    # verified against the generator by scripts/check_doc_freshness.py
+    # --fixtures. Reviewing it would drown the signal. The hand-authored YAML
+    # in fixtures/synthetic-scenarios/ is NOT excluded — that is the layer a
+    # human actually writes, and an error there propagates into every fixture.
+    - "!fixtures/synthetic/**"
+
+  tools:
+    ruff:
+      enabled: true
+    eslint:
+      enabled: true
+    # No sqlfluff config or dialect is set in this repo, so it flags
+    # Postgres-specific syntax across the migrations as errors. Re-enable
+    # alongside a .sqlfluff with `dialect = postgres`.
+    sqlfluff:
+      enabled: false
+
+  path_instructions:
+    - path: "src/pipeline/**"
+      instructions: >-
+        The scoring/narration boundary is the core invariant. Engagement health
+        is DETERMINISTIC — confidence.py computes it from signal count, recency
+        window, and contact diversity. health.py's compute_overall_health is a
+        pure weighted average. The LLM narrates; it does not score. Flag any
+        change that lets model output influence a health score, or that adds
+        I/O to router.py, confidence.py, or health.py — these are pure
+        functions and unit-testable precisely because they are.
+
+        _score_and_snapshot is fire-and-log: post-narrative scoring must NEVER
+        fail narrative generation. Flag any change that lets a scoring
+        exception propagate.
+
+        generator.py returns sentiment as an int alongside the narrative and
+        uses prompt caching (static system block, per-account user block).
+        Prompt content is A/B-gated per-account via a PostHog flag defaulting
+        to v1. Changing prompt text or signal density invalidates prior audit
+        results — flag prompt edits that do not reference a recent audit run.
+
+    - path: "src/domain/**"
+      instructions: >-
+        Pure Python, no I/O. src.domain must NEVER import src.db — flag any
+        such import. Immutable entities are @dataclass(frozen=True); mutable
+        ones are plain @dataclass. Enum-like fields are StrEnum whose values
+        must match the database CHECK constraints EXACTLY; a mismatch is a
+        runtime insert failure, not a type error. UUIDs are uuid.UUID and
+        timestamps are timezone-aware.
+
+    - path: "src/db/**"
+      instructions: >-
+        Every write must pass workspace_id as an explicit column value. This is
+        defense-in-depth behind RLS — flag writes that rely on RLS alone.
+        Row dicts convert via private _from_row/_to_dict helpers. Reads and
+        writes are typed functions per table; flag ad-hoc query construction
+        that bypasses them.
+
+    - path: "src/db/external_credentials.py"
+      instructions: >-
+        Handles third-party integration secrets. secret_enc is AES-256-GCM
+        encrypted under INTEGRATION_ENCRYPTION_KEY and is readable ONLY by
+        service_role — the `authenticated` grant is column-restricted to
+        exclude it, which is a column-level GRANT and not merely an RLS policy.
+        Flag anything that widens that grant, selects secret_enc into a payload
+        that could reach a client, logs a decrypted secret, or returns one from
+        an API response. The encryption key is read lazily per request/poll so
+        the worker boots without it; flag a change to module-import-time
+        reading, which would make the whole worker fail to start when no
+        structured integrations are configured.
+
+    - path: "supabase/migrations/**"
+      instructions: >-
+        Filenames must use the Supabase CLI form YYYYMMDDHHMMSS_name.sql — a
+        single 14-digit timestamp. The CLI parses everything before the first
+        underscore as the version, so a YYYYMMDD_NNNNNN_ form collides across
+        same-day migrations and breaks `supabase db reset`.
+
+        `authenticated` is SELECT-only on every table. New tables need
+        GRANT SELECT (or a column-restricted GRANT SELECT (cols) when a
+        sensitive column must stay service-role-only) plus GRANT ALL TO
+        service_role. NEVER grant INSERT/UPDATE/DELETE to `authenticated` and
+        NEVER grant anything to `anon` — all mutations route through
+        SECURITY DEFINER RPCs.
+
+        Every workspace-isolation RLS policy must carry BOTH USING and
+        WITH CHECK. A policy with only USING silently permits writing rows into
+        another workspace.
+
+        SECURITY DEFINER functions: wrap nullable subquery gates in
+        COALESCE(..., false) — a NULL auth.uid() yields NULL, which PL/pgSQL
+        treats as false and which silently PASSES an `IF NOT (...)` gate.
+        Qualify column references when RETURNS TABLE OUT params share names
+        with table columns. Prefer current_user_workspace_id() over a
+        caller-supplied workspace_id, which a caller can forge. Prefer plain
+        SQL functions over PL/pgSQL when no procedural logic is needed.
+        GRANT EXECUTE to authenticated and REVOKE from anon.
+
+        Mutable tables carry created_at plus a trigger-maintained updated_at
+        and a nullable deleted_at. Append-only tables instead use a column
+        named for the event (generated_at, scored_at, occurred_at, audited_at)
+        and supersede via superseded_at rather than deleted_at.
+
+    - path: "frontend/src/**"
+      instructions: >-
+        All writes go through SECURITY DEFINER RPCs via supabase.rpc(...);
+        direct table mutations are revoked for `authenticated`, so a
+        .from(...).insert/update/delete will fail at runtime rather than at
+        build. Reads use .from(...).select(...). Business logic and workspace
+        checks belong in the RPC body.
+
+        Never mix the Supabase clients: lib/supabase/client.ts is
+        browser-only ('use client') and server.ts is for Server Components and
+        Route Handlers.
+
+        Tailwind v4 scans source text STATICALLY and there is no
+        tailwind.config.js. Token class names must be written literally — an
+        interpolated class like `bg-health-${band}` silently never compiles and
+        renders unstyled. Flag any constructed class name.
+
+        Score-to-colour resolution belongs in scoreBadge/scoreBarColor, both
+        derived from the single HEALTH_BANDS table, so badge and bar cannot
+        drift. Flag new colour logic that reimplements a band threshold.
+
+    - path: "src/pipeline/outreach.py"
+      instructions: >-
+        _salutation_name fills the [Contact Name] template slot and is one half
+        of a CROSS-STACK contract: nameForContact in
+        frontend/src/components/OutreachTab.tsx derives the name the client
+        swaps into the greeting. Both must take the GIVEN NAME ONLY, falling
+        back to the email when there is no display name. If these diverge, the
+        client's swap anchor stops matching the text the server produced and
+        the greeting silently stops following the selected recipient — no
+        error, no failing type check. Flag any change to the name form here
+        that is not paired with the frontend change.
+
+    - path: "frontend/src/components/OutreachTab.tsx"
+      instructions: >-
+        The greeting tracks the selected recipient via a client-side anchored
+        swap, not a server re-render. nameForContact must stay identical in
+        form to _salutation_name in src/pipeline/outreach.py (given name only,
+        email fallback) or the swap anchor silently stops matching. Preserve
+        the lastAppliedNameContactIdRef invariants documented inline — they are
+        what keep the greeting from desyncing across a "No recipient" hop.
+
+    - path: "src/simulator/**"
+      instructions: >-
+        Must NEVER import src.db.* directly. Per-week generation is the only
+        supported mode — current-snapshot narratives belong to the production
+        scheduler. executor.run() is the SINGLE entry point: a parallel
+        top-level execution path previously drifted out of sync and rotted
+        unnoticed, so new capability belongs inside run(), not beside it.
+
+    - path: "src/synthetic/**"
+      instructions: >-
+        Generators are pure and seeded — deterministic uuid5 IDs, no
+        datetime.now(), no randomness that is not seeded. Output must always
+        route through production normalisation rather than bypassing it, or
+        fixtures stop proving anything about the real pipeline. Committed
+        fixtures are regenerated and diffed in CI, so a generator change
+        without refreshed fixtures will fail doc-freshness.
+
+    - path: "src/observability/**"
+      instructions: >-
+        Prompt and response CONTENT capture is hardcoded off at startup
+        (OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT=false), overriding
+        any environment value. This is a deliberate compliance control guarded
+        by a CI test, not a default worth tidying. Flag any change that makes
+        it env-configurable or removes the override.
+
+    - path: "src/server/**"
+      instructions: >-
+        Anything describing the service's own shape — endpoint inventory,
+        request/response schemas, rendered API explorers — must be gated on
+        FASTAPI_DEBUG as a SET. docs_url, redoc_url and openapi_url are three
+        views of one thing and the framework does not couple them: disabling
+        the two rendered UIs leaves the schema serving at its default path.
+        A new introspection or diagnostic route joins that set. Health checks
+        stay ungated.
+
+        Webhook auth uses hmac.compare_digest and is fail-closed. /inbound
+        returns 200 on permanent routing failures so SendGrid does not retry
+        forever — that is deliberate, not a swallowed error.
+
+    - path: "tests/**"
+      instructions: >-
+        Count-based assertions are INTENTIONAL regression guards, not brittle
+        tests — do not suggest loosening them. DB-dependent code is tested by
+        patching at the call site rather than by mocking the client object.
+        Fixture paths are Path("fixtures/...") relative to the repo root.
+        asyncio_mode is auto, so async tests need no marker.

@@ -1,0 +1,106 @@
+name: Tests
+
+# The test suite and linters had no CI at all: audit-narratives.yml gates
+# narrative quality and doc-freshness.yml gates recomputable doc claims, but
+# nothing ran pytest, vitest, or a linter on a pull request. This does.
+#
+# Needs no secrets and touches no external service, so it runs on every push and
+# PR rather than behind the `production` environment gate the audit workflow uses.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Least privilege: these jobs only read the checkout. Without this the default
+# repository scope applies, which on the push trigger is often read-write, and
+# actions/checkout persists that token into .git/config where every subsequent
+# step — repository code and third-party actions alike — can reach it.
+permissions:
+  contents: read
+
+# A new push supersedes the previous run rather than racing it, so check results
+# reflect the tip of the branch.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python:
+    name: Python ${{ matrix.python-version }} — pytest + ruff
+    runs-on: ubuntu-latest
+
+    # Both ends of the supported range. pyproject declares
+    # requires-python = ">=3.11" while local development runs 3.14, and the two
+    # disagree in practice: unittest.mock autospec exposes dataclass instance
+    # fields differently across versions, so a test can pass locally and fail on
+    # the declared minimum. Testing only one end hides that.
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.14"]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install uv
+        run: pip install uv
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Run tests
+        run: uv run pytest -q
+
+      # Scoped to the production surface deliberately. `ruff check .` currently
+      # reports 26 pre-existing errors in tests/ (E501 line length in
+      # tests/simulator/, plus RUF002/RUF003 ambiguous Unicode in comments),
+      # none of which this workflow introduced. Gating on them would land a red
+      # check on arrival and invite the habit of ignoring it. src/ and scripts/
+      # are clean today and are what ships.
+      #
+      # To see the outstanding test debt:  uv run ruff check tests/
+      # Widen this step to `ruff check .` once that is paid down.
+      - name: Lint
+        run: uv run ruff check src/ scripts/
+
+  frontend:
+    name: Frontend — vitest + eslint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Lint
+        run: npm run lint
+
+      # next build does NOT type-check test files, so a malformed test fixture
+      # passes build, lint and vitest alike. This has already hidden five type
+      # errors in this repo; run tsc separately.
+      - name: Type check
+        run: npx tsc --noEmit
