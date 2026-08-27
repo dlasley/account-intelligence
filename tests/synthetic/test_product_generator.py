@@ -5,8 +5,9 @@ normalize_product_event chain unchanged, hitting all three routing branches.
 """
 
 import uuid
+from dataclasses import replace
 from datetime import UTC, datetime
-from unittest.mock import MagicMock, create_autospec, patch
+from unittest.mock import MagicMock, patch
 from uuid import NAMESPACE_DNS, uuid5
 
 from src.domain.contact import Contact
@@ -112,9 +113,10 @@ class TestNewEmailRoutesToAutoDiscovery:
         )
 
         signal_stub = _make_signal_stub(RoutingMethod.AUTO_DISCOVERY)
-        # create_autospec required for Python 3.14: MagicMock(spec=dataclass) no longer
-        # exposes instance fields (id, etc.) as allowed attributes on that version.
-        contact_stub = create_autospec(Contact, instance=True)
+        # A real Contact rather than a mock. Autospec of a dataclass exposes
+        # instance fields inconsistently across Python versions, and this test
+        # only needs an object the normaliser can read an id off.
+        contact_stub = replace(_CONTACT_STUB, id=uuid.uuid4(), email="dana@brightpath.io")
 
         with (
             patch(

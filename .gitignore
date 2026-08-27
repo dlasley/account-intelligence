@@ -61,7 +61,11 @@ frontend/coverage/
 # Root-level package-lock for the tracker-build dev dep (esbuild). The built
 # tracker bundle in src/server/static/dist/ is committed; reproducing the
 # build is "npm install" away.
-package-lock.json
+#
+# Anchored to the repo root deliberately: unanchored, this also ignored
+# frontend/package-lock.json, which left frontend installs unpinned and made
+# `npm ci` impossible in CI.
+/package-lock.json
 
 # Python build artifacts
 dist/

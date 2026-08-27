@@ -14,8 +14,18 @@ on:
 
 jobs:
   python:
-    name: Python — pytest + ruff
+    name: Python ${{ matrix.python-version }} — pytest + ruff
     runs-on: ubuntu-latest
+
+    # Both ends of the supported range. pyproject declares
+    # requires-python = ">=3.11" while local development runs 3.14, and the two
+    # disagree in practice: unittest.mock autospec exposes dataclass instance
+    # fields differently across versions, so a test can pass locally and fail on
+    # the declared minimum. Testing only one end hides that.
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.14"]
 
     steps:
       - uses: actions/checkout@v4
@@ -23,7 +33,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: ${{ matrix.python-version }}
 
       - name: Install uv
         run: pip install uv
